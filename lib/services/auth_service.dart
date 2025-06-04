@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:register_login/services/api_service.dart';
 
 class AuthService extends ChangeNotifier {
+  final ApiService apiService;
   String? _verificationId;
   bool _isLoading = false;
   String? _error;
   bool _isVerified = false;
+
+  AuthService({required this.apiService});
 
   bool get isLoading => _isLoading;
   String? get error => _error;

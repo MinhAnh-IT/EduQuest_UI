@@ -7,6 +7,7 @@ import 'package:register_login/screens/auth/student/student_registration_screen.
 import 'package:register_login/screens/auth/otp_verification_screen.dart';
 import 'package:register_login/screens/auth/student/student_details_screen.dart';
 import 'package:register_login/services/auth_service.dart';
+import 'package:register_login/services/api_service.dart';
 import 'package:register_login/providers/auth_provider.dart';
 import 'package:register_login/providers/theme_provider.dart';
 import 'package:register_login/providers/student_provider.dart';
@@ -16,33 +17,43 @@ import 'package:register_login/utils/constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  final apiService = ApiService();
   
-  runApp(MyApp(prefs: prefs));
+  runApp(MyApp(
+    prefs: prefs,
+    apiService: apiService,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
+  final ApiService apiService;
 
   const MyApp({
     super.key,
     required this.prefs,
+    required this.apiService,
   });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => AuthService(apiService: apiService)),
+        Provider.value(value: apiService),
         ChangeNotifierProvider(
           create: (context) => AuthProvider(
             context.read<AuthService>(),
+            apiService,
             prefs,
           ),
         ),
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(prefs),
         ),
-        ChangeNotifierProvider(create: (_) => StudentProvider()),
+        ChangeNotifierProvider(
+          create: (_) => StudentProvider(apiService),
+        ),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

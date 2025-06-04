@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:register_login/models/student_model.dart';
+import 'package:register_login/services/api_service.dart';
 
 class StudentProvider extends ChangeNotifier {
+  final ApiService _apiService;
   Student? _studentDetails;
   bool _isLoading = false;
   String? _error;
+
+  StudentProvider(this._apiService);
 
   Student? get studentDetails => _studentDetails;
   bool get isLoading => _isLoading;
@@ -16,16 +20,7 @@ class StudentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      _studentDetails = Student(
-        userId: data['userId'],
-        studentCode: data['studentCode'],
-        faculty: data['faculty'],
-        enrolledYear: int.parse(data['enrolledYear']),
-        birthDate: data['birthDate'],
-      );
+      _studentDetails = await _apiService.saveStudentDetails(data);
 
       _isLoading = false;
       notifyListeners();
@@ -44,17 +39,7 @@ class StudentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Giả lập dữ liệu
-      _studentDetails = Student(
-        userId: userId,
-        studentCode: 'SV001',
-        faculty: 'Công nghệ thông tin',
-        enrolledYear: 2023,
-        birthDate: DateTime(2000, 1, 1),
-      );
+      _studentDetails = await _apiService.getStudentDetails(userId);
 
       _isLoading = false;
       notifyListeners();
@@ -62,6 +47,25 @@ class StudentProvider extends ChangeNotifier {
       _error = 'Không thể tải thông tin sinh viên: $e';
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> updateStudentDetails(int userId, Map<String, dynamic> data) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      _studentDetails = await _apiService.updateStudentDetails(userId, data);
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = 'Không thể cập nhật thông tin sinh viên: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 

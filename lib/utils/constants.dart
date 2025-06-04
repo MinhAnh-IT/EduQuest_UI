@@ -1,7 +1,7 @@
 class ApiConstants {
   static const String baseUrl = 'https://api.eduquest.com';
-  static const String apiVersion = '/v1';
-  static const String baseApiUrl = baseUrl + apiVersion;
+  // static const String apiVersion = '/v1';
+  // static const String baseApiUrl = baseUrl + apiVersion;
 
   // Auth endpoints
   static const String login = '/auth/login';

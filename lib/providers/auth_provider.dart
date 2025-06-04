@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:register_login/models/user_model.dart';
 import 'package:register_login/services/auth_service.dart';
+import 'package:register_login/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:register_login/utils/constants.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
+  final ApiService _apiService;
   final SharedPreferences _prefs;
   
   User? _currentUser;
   bool _isLoading = false;
   String? _error;
 
-  AuthProvider(this._authService, this._prefs);
+  AuthProvider(this._authService, this._apiService, this._prefs);
 
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
@@ -25,20 +27,15 @@ class AuthProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await _apiService.login(username, password);
       
-      // Giả lập đăng nhập thành công
-      _currentUser = User(
-        username: username,
-        name: 'Người dùng',
-        role: UserRole.STUDENT,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      // Lưu token
+      final token = response['token'] as String;
+      await _prefs.setString(StorageConstants.token, token);
+      _apiService.token = token;
 
-      // Lưu token vào SharedPreferences
-      await _prefs.setString(StorageConstants.token, 'fake_token');
+      // Lưu thông tin user
+      _currentUser = User.fromJson(response['user']);
 
       _isLoading = false;
       notifyListeners();
@@ -57,8 +54,7 @@ class AuthProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      await _apiService.register(userData);
 
       _isLoading = false;
       notifyListeners();
@@ -74,21 +70,15 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _currentUser = null;
     await _prefs.remove(StorageConstants.token);
+    _apiService.token = null;
     notifyListeners();
   }
 
   Future<void> checkAuthStatus() async {
     final token = _prefs.getString(StorageConstants.token);
     if (token != null) {
-      // TODO: Validate token with server
-      // For now, just set a dummy user
-      _currentUser = User(
-        username: 'user',
-        name: 'Người dùng',
-        role: UserRole.STUDENT,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      _apiService.token = token;
+      // TODO: Validate token with server and get user info
     }
     notifyListeners();
   }

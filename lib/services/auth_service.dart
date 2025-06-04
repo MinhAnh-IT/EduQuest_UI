@@ -1,11 +1,8 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:register_login/services/api_service.dart';
 
 class AuthService extends ChangeNotifier {
   final ApiService apiService;
-  String? _verificationId;
   bool _isLoading = false;
   String? _error;
   bool _isVerified = false;
@@ -16,21 +13,15 @@ class AuthService extends ChangeNotifier {
   String? get error => _error;
   bool get isVerified => _isVerified;
 
-  // Giả lập gửi OTP qua email
+  // Gửi OTP qua email
   Future<bool> sendOTP(String email) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Tạo mã OTP ngẫu nhiên 6 số
-      final otp = Random().nextInt(900000) + 100000;
-      _verificationId = otp.toString();
-      
-      print('OTP sent: $_verificationId'); // Trong thực tế sẽ gửi qua email
+      // Gọi API để gửi OTP
+      await apiService.resendOtp(email);
 
       _isLoading = false;
       notifyListeners();
@@ -44,26 +35,19 @@ class AuthService extends ChangeNotifier {
   }
 
   // Xác thực OTP
-  Future<bool> verifyOTP(String otp) async {
+  Future<bool> verifyOTP(String email, String otp) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      // Giả lập API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (otp == _verificationId) {
-        _isVerified = true;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      } else {
-        _error = 'Mã OTP không chính xác';
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
+      // Gọi API để xác thực OTP
+      final result = await apiService.verifyOtp(email, otp);
+      
+      _isVerified = result;
+      _isLoading = false;
+      notifyListeners();
+      return result;
     } catch (e) {
       _isLoading = false;
       _error = 'Lỗi xác thực: $e';
@@ -72,11 +56,56 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // Đăng ký tài khoản
+  Future<bool> register(Map<String, dynamic> userData) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // Gọi API đăng ký
+      await apiService.register(userData);
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _error = 'Đăng ký thất bại: $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Đăng nhập
+  Future<bool> login(String username, String password) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // Gọi API đăng nhập
+      final response = await apiService.login(username, password);
+      
+      // Cập nhật token trong ApiService
+      apiService.token = response['token'] as String;
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _error = 'Đăng nhập thất bại: $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Reset trạng thái
   void reset() {
-    _verificationId = null;
     _isLoading = false;
     _error = null;
     _isVerified = false;
     notifyListeners();
   }
-} 
+}

@@ -63,7 +63,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     }
 
     final authService = context.read<AuthService>();
-    final success = await authService.verifyOTP(_otpController.text);
+    final success = await authService.verifyOTP(widget.email, _otpController.text);  // Thêm widget.email vào đây
 
     if (success && mounted) {
       // Chuyển đến trang chi tiết sinh viên nếu xác thực thành công

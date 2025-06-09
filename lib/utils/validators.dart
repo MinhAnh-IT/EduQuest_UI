@@ -1,4 +1,14 @@
 class Validators {
+  static String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter an email';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
   static String? validateUsername(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter username';
@@ -8,6 +18,19 @@ class Validators {
     }
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
       return 'Username can only contain letters, numbers and underscore';
+    }
+    return null;
+  }
+
+  static String? validateOTP(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter OTP';
+    }
+    if (value.length != 6) {
+      return 'OTP must be 6 digits';
+    }
+    if (!RegExp(r'^\d+$').hasMatch(value)) {
+      return 'OTP must contain only digits';
     }
     return null;
   }

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utils/constants.dart';
 import '../../utils/validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../providers/auth_provider.dart';
 import 'otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
+
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
@@ -23,17 +27,74 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _resetPassword() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      
-      // Simulate API call
-      await Future.delayed(Duration(seconds: 2));
-      
-      setState(() {
-        _isLoading = false;
-        _otpSent = true;
-      });
+    print('Starting password reset process');
+    if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
+      return;
     }
+
+    setState(() {
+      _isLoading = true;
+      print('Set loading state to true');
+    });
+
+    try {
+      print('Calling requestPasswordReset with username: ${_usernameController.text}');
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await authProvider.requestPasswordReset(_usernameController.text);
+      print('Got response from API: ${response.status}, ${response.message}');
+
+      if (!mounted) {
+        print('Widget not mounted after API call');
+        return;
+      }
+
+      // API response status is '200' (String) not 'SUCCESS' (String)
+      // Convert to string and check for '200' or 'SUCCESS' for flexibility
+      final String apiStatus = response.status.toString().toUpperCase();
+
+      switch (apiStatus) {
+        case '200': // Check for '200' which is returned by the API
+        case 'SUCCESS': // Keep 'SUCCESS' for potential future API changes
+          print('API call successful, navigating to OTP screen');
+          setState(() => _otpSent = true);
+          // _goToOTPScreen(); // Navigation is handled by the _otpSent state change in build()
+          break;
+        case 'USER_NOT_FOUND':
+          print('API returned user not found');
+          _showError('User not found');
+          break;
+        case 'EMAIL_SEND_FAILED':
+          print('API returned email send failed');
+          _showError('Failed to send OTP email');
+          break;
+        default:
+          print('API returned unexpected status: ${response.status}');
+          _showError(response.message);
+      }
+    } catch (e, stackTrace) {
+      print('Error occurred during password reset: $e');
+      print('Stack trace: $stackTrace');
+      if (!mounted) return;
+      _showError('Network error occurred. Please check your connection and try again.');
+    } finally {
+      print('Cleaning up after password reset attempt');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          print('Set loading state to false');
+        });
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void _goToOTPScreen() {
@@ -48,16 +109,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text(AppStrings.forgotPasswordTitle),
+        title: const Text(AppStrings.forgotPasswordTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: AppColors.text,
+        foregroundColor: Colors.grey[800],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: _otpSent ? _buildOTPSentView() : _buildResetPasswordForm(),
         ),
       ),
@@ -70,9 +131,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           _buildHeader(),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
           CustomTextField(
             controller: _usernameController,
             labelText: 'Username',
@@ -81,13 +142,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             keyboardType: TextInputType.text,
             validator: Validators.validateUsername,
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           CustomButton(
-            onPressed: _resetPassword,
+            onPressed: _isLoading ? null : _resetPassword,
             text: AppStrings.sendOTP,
             isLoading: _isLoading,
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           _buildLoginLink(),
         ],
       ),
@@ -102,20 +163,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Icon(
             Icons.lock_reset_outlined,
             size: 80,
-            color: AppColors.primary,
+            color: Colors.blue,
           ),
-          SizedBox(height: 20),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             AppStrings.forgotPasswordTitle,
-            style: AppStyles.headingStyle,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               AppStrings.enterUsername,
               textAlign: TextAlign.center,
-              style: AppStyles.bodyStyle,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -129,13 +198,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       children: [
         Text(
           AppStrings.rememberPassword,
-          style: TextStyle(color: AppColors.textLight),
+          style: TextStyle(color: Colors.grey[600]),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
             AppStrings.backToLogin,
-            style: AppStyles.linkStyle,
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -146,11 +218,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(height: 50),
+        const SizedBox(height: 50),
         _buildSuccessIcon(),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         _buildSuccessMessage(),
-        SizedBox(height: 40),
+        const SizedBox(height: 40),
         CustomButton(
           onPressed: _goToOTPScreen,
           text: 'Enter OTP',
@@ -161,7 +233,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Widget _buildSuccessIcon() {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.green[50],
         shape: BoxShape.circle,
@@ -169,7 +241,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Icon(
         Icons.sms_outlined,
         size: 60,
-        color: AppColors.success,
+        color: Colors.green,
       ),
     );
   }
@@ -177,17 +249,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildSuccessMessage() {
     return Column(
       children: [
-        Text(
+        const Text(
           'OTP Sent!',
-          style: AppStyles.headingStyle,
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Text(
             'An OTP has been sent to verify your username.',
             textAlign: TextAlign.center,
-            style: AppStyles.bodyStyle,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              height: 1.4,
+            ),
           ),
         ),
       ],

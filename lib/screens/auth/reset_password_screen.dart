@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utils/constants.dart';
 import '../../utils/validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../providers/auth_provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String username;
+  final String otp;
 
   const ResetPasswordScreen({
     Key? key, 
     required this.username,
+    required this.otp,
   }) : super(key: key);
 
   @override
@@ -30,18 +34,45 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
-
   void _resetPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simulate password reset
-      await Future.delayed(Duration(seconds: 2));
-      
-      setState(() => _isLoading = false);
+      try {
+        final response = await Provider.of<AuthProvider>(context, listen: false)
+            .resetPassword(
+              widget.username, 
+              _passwordController.text
+            );
 
-      // Show success dialog
-      _showSuccessDialog();
+        if (!mounted) return;
+        
+        // Assuming '200' or 'SUCCESS' indicates success
+        String apiStatus = response.status.toString().toUpperCase();
+        if (apiStatus == '200' || apiStatus == 'SUCCESS') {
+          _showSuccessDialog();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to reset password: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 

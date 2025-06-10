@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import 'reset_password_screen.dart';
+import '../../../../core/enums/status_code.dart'; // Import StatusCode
 
 class OTPVerificationScreen extends StatefulWidget {
   final String username;
@@ -27,13 +28,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
         if (!mounted) return;
 
-        // API response status is '200' (String) not 'SUCCESS' (String)
-        // Convert to string and check for '200' or 'SUCCESS' for flexibility
-        final String apiStatus = response.status.toString().toUpperCase();
-
-        switch (apiStatus) {
-          case '200': // Check for '200' which is returned by the API
-          case 'SUCCESS': // Keep 'SUCCESS' for potential future API changes
+        switch (response.status) {
+          case StatusCode.OK: // Assuming 200 OK for OTP verified
+          case StatusCode.OTP_VERIFIED_SUCCESS:
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -44,14 +41,15 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
               ),
             );
             break;
-          case 'INVALID_OTP':
-            _showError('Invalid OTP code');
+          case StatusCode.INVALID_OTP:
+            _showError(response.message); // Use message from response
             break;
-          case 'OTP_EXPIRED':
-            _showError('OTP has expired');
-            break;
+          // Consider adding a case for OTP_EXPIRED if your API and StatusCode enum support it
+          // case StatusCode.OTP_EXPIRED:
+          //   _showError(response.message);
+          //   break;
           default:
-            _showError(response.message);
+            _showError(response.message); // Show the message from the response
         }
       } catch (e) {
         if (!mounted) return;

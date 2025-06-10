@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../utils/constants.dart';
-import '../../utils/validators.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../../../shared/utils/constants.dart';
+import '../../../../shared/utils/validators.dart';
+import '../../../../shared/widgets/custom_button.dart';
+import '../../../../shared/widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
 import 'otp_verification_screen.dart';
+import '../../../../core/enums/status_code.dart'; // Import StatusCode
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -49,28 +50,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return;
       }
 
-      // API response status is '200' (String) not 'SUCCESS' (String)
-      // Convert to string and check for '200' or 'SUCCESS' for flexibility
-      final String apiStatus = response.status.toString().toUpperCase();
-
-      switch (apiStatus) {
-        case '200': // Check for '200' which is returned by the API
-        case 'SUCCESS': // Keep 'SUCCESS' for potential future API changes
-          print('API call successful, navigating to OTP screen');
+      switch (response.status) {
+        case StatusCode.OK: // Assuming 200 OK for OTP sent
+          print('API call successful (OTP Sent), navigating to OTP screen');
           setState(() => _otpSent = true);
-          // _goToOTPScreen(); // Navigation is handled by the _otpSent state change in build()
           break;
-        case 'USER_NOT_FOUND':
+        case StatusCode.USER_NOT_FOUND:
           print('API returned user not found');
-          _showError('User not found');
+          _showError(response.message); // Use message from response
           break;
-        case 'EMAIL_SEND_FAILED':
+        case StatusCode.EMAIL_SEND_ERROR:
           print('API returned email send failed');
-          _showError('Failed to send OTP email');
+          _showError(response.message); // Use message from response
           break;
         default:
-          print('API returned unexpected status: ${response.status}');
-          _showError(response.message);
+          print('API returned unexpected status: ${response.status.code} - ${response.status.message}');
+          _showError(response.message); // Show the message from the response
       }
     } catch (e, stackTrace) {
       print('Error occurred during password reset: $e');
@@ -136,8 +131,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           const SizedBox(height: 50),
           CustomTextField(
             controller: _usernameController,
-            labelText: 'Username',
-            hintText: 'Enter your username',
+            labelText: 'Tên đăng nhập',
+            hintText: 'Nhập tên đăng nhập của bạn',
             prefixIcon: Icons.person_outline,
             keyboardType: TextInputType.text,
             validator: Validators.validateUsername,
@@ -225,7 +220,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         const SizedBox(height: 40),
         CustomButton(
           onPressed: _goToOTPScreen,
-          text: 'Enter OTP',
+          text: 'Nhập OTP',
         ),
       ],
     );

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../utils/constants.dart';
-import '../../utils/validators.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../../../shared/utils/constants.dart';
+import '../../../../shared/utils/validators.dart';
+import '../../../../shared/widgets/custom_button.dart';
+import '../../../../shared/widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
+import '../../../../core/enums/status_code.dart'; // Import StatusCode
 
 class ResetPasswordScreen extends StatefulWidget {
   final String username;
@@ -47,17 +48,29 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
         if (!mounted) return;
         
-        // Assuming '200' or 'SUCCESS' indicates success
-        String apiStatus = response.status.toString().toUpperCase();
-        if (apiStatus == '200' || apiStatus == 'SUCCESS') {
-          _showSuccessDialog();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response.message),
-              backgroundColor: Colors.red,
-            ),
-          );
+        switch (response.status) {
+          case StatusCode.OK: // Assuming 200 OK for password reset
+          case StatusCode.PASSWORD_RESET_SUCCESS:
+            _showSuccessDialog();
+            break;
+          case StatusCode.OTP_VERIFICATION_NEEDED: // Handle if OTP wasn't verified or expired
+             ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response.message), // Use message from response
+                backgroundColor: Colors.red,
+              ),
+            );
+            // Optionally, navigate back to OTP screen or show a specific message
+            // For example, navigate back to login or OTP screen if appropriate
+            // Navigator.popUntil(context, (route) => route.isFirst); 
+            break;
+          default:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response.message), // Show the message from the response
+                backgroundColor: Colors.red,
+              ),
+            );
         }
       } catch (e) {
         if (!mounted) return;
@@ -99,8 +112,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 SizedBox(height: 50),
                 CustomTextField(
                   controller: _passwordController,
-                  labelText: 'New Password',
-                  hintText: 'Enter your new password',
+                  labelText: 'Mật khẩu mới',
+                  hintText: 'Nhập mật khẩu mới',
                   prefixIcon: Icons.lock_outlined,
                   obscureText: !_showPassword,
                   suffixIcon: IconButton(
@@ -118,8 +131,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 SizedBox(height: 20),
                 CustomTextField(
                   controller: _confirmPasswordController,
-                  labelText: 'Confirm Password',
-                  hintText: 'Re-enter your new password',
+                  labelText: 'Xác nhận lại mật khẩu',
+                  hintText: 'Nhập lại mật khẩu mới của bạn',
                   prefixIcon: Icons.lock_outlined,
                   obscureText: !_showConfirmPassword,
                   suffixIcon: IconButton(

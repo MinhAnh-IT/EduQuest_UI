@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/api_response.dart';
 import '../models/auth_user.dart';
-import '../config/api_config.dart';
+import '../../../config/api_config.dart';
+import '../../../core/enums/status_code.dart'; // Import StatusCode
 
 class AuthService {
   late final Dio _dio;
@@ -60,13 +61,16 @@ class AuthService {
       
       print('Password reset response: ${response.data}');
       
-      if (response.statusCode == 404) {
-        return ApiResponse(
-          status: 'USER_NOT_FOUND',
-          message: 'User not found',
-          data: null,
-        );
-      }
+      // The ApiResponse.fromJson factory now handles determining the StatusCode.
+      // The manual check for 404 and specific string status is no longer needed here
+      // as fromJson will use StatusCode.fromCode.
+      // if (response.statusCode == 404) {
+      //   return ApiResponse(
+      //     status: StatusCode.USER_NOT_FOUND, // Use StatusCode enum
+      //     message: 'User not found',
+      //     data: null,
+      //   );
+      // }
 
       return ApiResponse.fromJson(response.data, null);
     } on DioException catch (e) {
@@ -81,7 +85,7 @@ class AuthService {
           e.type == DioExceptionType.sendTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
         return ApiResponse(
-          status: 'CONNECTION_ERROR',
+          status: StatusCode.INTERNAL_SERVER_ERROR, // Or a more specific connection error code if available
           message: 'Could not connect to server at ${_dio.options.baseUrl}. Please check if the server is running and accessible.',
           data: null,
         );
@@ -92,14 +96,14 @@ class AuthService {
       }
 
       return ApiResponse(
-        status: 'ERROR',
+        status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
         message: e.message ?? 'Network error occurred',
         data: null,
       );
     } catch (e) {
       print('Unexpected error: $e');
       return ApiResponse(
-        status: 'ERROR',
+        status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
         message: 'An unexpected error occurred',
         data: null,
       );
@@ -173,7 +177,7 @@ class AuthService {
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return ApiResponse(
-        status: 'CONNECTION_ERROR',
+        status: StatusCode.INTERNAL_SERVER_ERROR, // Or a more specific connection error code
         message: 'Could not connect to server. Please check your internet connection and try again.',
         data: null,
       );
@@ -197,7 +201,7 @@ class AuthService {
     };
 
     return ApiResponse(
-      status: 'ERROR',
+      status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
       message: errorMessage,
       data: null,
     );
@@ -211,6 +215,7 @@ class AuthService {
         'username': username,
         'otp': otp,
       });
+      // ApiResponse.fromJson will correctly parse the status code from the response data
       return ApiResponse.fromJson(response.data, null);
     } on DioException catch (e) {
       return _handleError(e);

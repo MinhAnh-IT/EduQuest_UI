@@ -1,7 +1,10 @@
 class ApiConfig {
-  static const String baseUrl = 'http://10.0.2.2:8080/api/auth';
-  static const String login = '/login';
-  static const String register = '/register';
-  static const String verifyOtp = '/verify-otp';
-  static const String resendOtp = '/resend-otp';
+  static const String baseUrl = 'http://localhost:8080/api';
+
+  // API configuration for authentication endpoints
+  static const String login = '/auth/login';
+  static const String register = '/auth/register';
+  static const String verifyOtp = '/auth/verify-otp';
+  static const String resendOtp = '/auth/resend-otp';
+
 }

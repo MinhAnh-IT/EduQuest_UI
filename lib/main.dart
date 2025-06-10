@@ -1,59 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:register_login/screens/auth/login_screen.dart';
-import 'package:register_login/screens/auth/role_selection_screen.dart';
-import 'package:register_login/screens/auth/student/student_registration_screen.dart';
-import 'package:register_login/screens/auth/otp_verification_screen.dart';
-import 'package:register_login/screens/auth/student/student_details_screen.dart';
-import 'package:register_login/services/auth_service.dart';
-import 'package:register_login/services/api_service.dart';
-import 'package:register_login/providers/auth_provider.dart';
-import 'package:register_login/providers/theme_provider.dart';
-import 'package:register_login/providers/student_provider.dart';
-import 'package:register_login/theme/app_theme.dart';
-import 'package:register_login/utils/constants.dart';
+import 'package:register_login/feature/auth/screens/login_screen.dart';
+import 'package:register_login/feature/auth/screens/role_selection_screen.dart';
+import 'package:register_login/feature/auth/screens/student/student_registration_screen.dart';
+import 'package:register_login/feature/auth/screens/otp_verification_screen.dart';
+import 'package:register_login/feature/auth/screens/student/student_details_screen.dart';
+import 'package:register_login/feature/auth/services/auth_service.dart';
+import 'package:register_login/feature/auth/services/auth_service.dart';
+import 'package:register_login/feature/auth/providers/auth_provider.dart';
+import 'package:register_login/feature/auth/providers/theme_provider.dart';
+import 'package:register_login/shared/theme/app_theme.dart';
+import 'package:register_login/shared/utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  final apiService = ApiService();
-  
-  runApp(MyApp(
-    prefs: prefs,
-    apiService: apiService,
-  ));
+
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
-  final ApiService apiService;
 
-  const MyApp({
-    super.key,
-    required this.prefs,
-    required this.apiService,
-  });
+  const MyApp({super.key, required this.prefs});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService(apiService: apiService)),
-        Provider.value(value: apiService),
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(
-            context.read<AuthService>(),
-            apiService,
-            prefs,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider(prefs),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => StudentProvider(apiService),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
+        ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -86,3 +63,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

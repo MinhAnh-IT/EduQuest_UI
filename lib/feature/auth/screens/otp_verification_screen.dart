@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/services/auth_service.dart';
-import 'package:register_login/theme/app_theme.dart';
-import 'package:register_login/widgets/otp_input.dart';
+import 'package:register_login/feature/auth/providers/auth_provider.dart';
+import 'package:register_login/shared/theme/app_theme.dart';
+import 'package:register_login/shared/widgets/otp_input.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
@@ -50,8 +50,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
   }
 
   Future<void> _sendOTP() async {
-    final authService = context.read<AuthService>();
-    await authService.sendOTP(widget.email);
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.resendOTP(widget.email);
   }
 
   Future<void> _verifyOTP() async {
@@ -62,11 +62,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
       return;
     }
 
-    final authService = context.read<AuthService>();
-    final success = await authService.verifyOTP(widget.email, _otpController.text);  // Thêm widget.email vào đây
+    final authProvider = context.read<AuthProvider>();
+    final success =
+        await authProvider.verifyOTP(widget.email, _otpController.text);
 
     if (success && mounted) {
-      // Chuyển đến trang chi tiết sinh viên nếu xác thực thành công
       Navigator.pushReplacementNamed(
         context,
         '/student-details',
@@ -93,10 +93,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         backgroundColor: Colors.transparent,
@@ -107,20 +104,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF4A90E2),
-              Color(0xFF357ABD),
-            ],
+            colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
           ),
         ),
         child: SafeArea(
-          child: Consumer<AuthService>(
-            builder: (context, authService, child) {
-              if (authService.isLoading) {
+          child: Consumer<AuthProvider>(
+            builder: (context, authProvider, child) {
+              if (authProvider.isLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
+                  child: CircularProgressIndicator(color: Colors.white),
                 );
               }
 
@@ -129,11 +121,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 40),
-                    const Icon(
-                      Icons.mark_email_read_outlined,
-                      size: 80,
-                      color: Colors.white,
-                    ),
+                    const Icon(Icons.mark_email_read_outlined,
+                        size: 80, color: Colors.white),
                     const SizedBox(height: 24),
                     const Text(
                       'Xác thực email của bạn',
@@ -150,9 +139,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                       child: Text(
                         'Chúng tôi đã gửi mã OTP đến\n${widget.email}',
                         style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
+                            fontSize: 16, color: Colors.white70),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -172,17 +159,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                             const SizedBox(height: 32),
                             OtpInput(
                               controller: _otpController,
-                              onCompleted: (pin) {
-                                _verifyOTP();
-                              },
+                              onCompleted: (pin) => _verifyOTP(),
                             ),
-                            if (authService.error != null) ...[
+                            if (authProvider.error != null) ...[
                               const SizedBox(height: 16),
                               Text(
-                                authService.error!,
-                                style: const TextStyle(
-                                  color: AppTheme.errorColor,
-                                ),
+                                authProvider.error!,
+                                style:
+                                    const TextStyle(color: AppTheme.errorColor),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -203,12 +187,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                                       height: 20,
                                       margin: const EdgeInsets.only(right: 8),
                                       child: const CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
+                                          strokeWidth: 2),
                                     )
                                   : const Icon(Icons.refresh),
-                              label:
-                                  Text(_isResending ? 'Đang gửi lại...' : 'Gửi lại mã'),
+                              label: Text(_isResending
+                                  ? 'Đang gửi lại...'
+                                  : 'Gửi lại mã'),
                             ),
                           ],
                         ),
@@ -223,4 +207,4 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
       ),
     );
   }
-} 
+}

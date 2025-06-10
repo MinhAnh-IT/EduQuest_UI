@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:register_login/models/user_model.dart';
-import 'package:register_login/theme/app_theme.dart';
+import 'package:register_login/feature/auth/models/user_model.dart';
+import 'package:register_login/shared/theme/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

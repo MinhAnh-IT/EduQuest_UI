@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:register_login/theme/app_theme.dart';
 
 class StudentDetailsScreen extends StatefulWidget {
   const StudentDetailsScreen({super.key});

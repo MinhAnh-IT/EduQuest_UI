@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:register_login/providers/auth_provider.dart';
-import 'package:register_login/theme/app_theme.dart';
-import 'package:register_login/utils/validators.dart';
+import 'package:register_login/shared/utils/validators.dart';
 
 class StudentRegistrationScreen extends StatefulWidget {
   const StudentRegistrationScreen({super.key});

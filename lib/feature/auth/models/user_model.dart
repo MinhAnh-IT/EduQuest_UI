@@ -11,6 +11,8 @@ class User {
   final DateTime? lastLoginAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  bool get isStudent => role == UserRole.STUDENT;
+  bool get isInstructor => role == UserRole.INSTRUCTOR;
 
   User({
     this.id,
@@ -57,5 +59,6 @@ class User {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+
   }
 }

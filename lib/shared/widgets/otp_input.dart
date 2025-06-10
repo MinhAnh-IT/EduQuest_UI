@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:register_login/theme/app_theme.dart';
+import 'package:register_login/shared/theme/app_theme.dart';
 
 class OtpInput extends StatelessWidget {
   final TextEditingController controller;

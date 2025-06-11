@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'login_screen.dart'; // Keep for ProfileTab logout
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,12 +9,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // Danh sách các trang
   final List<Widget> _pages = [
     HomeTab(),
-    SearchTab(),
+    AddTab(),
     ProfileTab(),
-    SettingsTab(),
   ];
 
   @override
@@ -37,16 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Trang chủ',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Tìm kiếm',
+            icon: Icon(Icons.add),
+            label: 'Thêm',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Hồ sơ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Cài đặt',
           ),
         ],
       ),
@@ -60,225 +54,191 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  int _counter = 0;
+  final List<Map<String, String>> _allClasses = [
+    {
+      'name': 'C5 HK2B NH24-25 Mần...',
+      'instructor': 'Anh Nguyen Dinh',
+    },
+    {
+      'name': 'Lý Thuyết: PTTRKHT Sáng 3',
+      'instructor': 'Nguyen Tien Trung',
+    },
+    {
+      'name': '2A_24_25_CSDLNC_CHI...',
+      'instructor': 'Nguyen Van Danh',
+    },
+    {
+      'name': '22DTHC6-22DTHC5 - C...',
+      'instructor': 'Pham Buu Tai',
+    },
+    {
+      'name': '[WIN-SÁNG-THỨ 6] - N...',
+      'instructor': 'Hung Tran',
+    },
+  ];
+  List<Map<String, String>> _filteredClasses = [];
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _filteredClasses = _allClasses;
+    _searchController.addListener(_filterClasses);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_filterClasses);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterClasses() {
+    final query = _searchController.text.toLowerCase();
     setState(() {
-      _counter++;
+      if (query.isEmpty) {
+        _filteredClasses = _allClasses;
+      } else {
+        _filteredClasses = _allClasses.where((classData) {
+          final nameLower = classData['name']!.toLowerCase();
+          final instructorLower = classData['instructor']!.toLowerCase();
+          return nameLower.contains(query) || instructorLower.contains(query);
+        }).toList();
+      }
     });
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear(); // Clears text and triggers _filterClasses
+      }
+      // Focus will be handled by autofocus property of TextField
+    });
+  }
+
+  Color _getCardColor(int index) {
+    const List<Color> colors = [
+      Color(0xFF4285F4), // Blue
+      Color(0xFF34A853), // Green
+      Color(0xFFFBBC05), // Yellow
+      Color(0xFFEA4335), // Red
+      Color(0xFF6D4C41), // Brown
+    ];
+    // To make color assignment more stable with filtering,
+    // you might want to assign colors based on a unique ID or original index
+    // For now, it cycles through the filtered list.
+    return colors[index % colors.length].withOpacity(0.9);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: Text('Trang chủ'),
+        title: Text('EduQuest'),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.cyan,
         foregroundColor: Colors.white,
         elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.blue, Colors.blue[50]!],
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: _toggleSearch,
           ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Welcome card
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.celebration,
-                        size: 50,
-                        color: Colors.blue,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Chào mừng bạn!',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Bạn đã đăng nhập thành công',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 30),
-
-                // Counter card
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Bạn đã nhấn nút bao nhiêu lần?',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '$_counter',
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: _incrementCounter,
-                        icon: Icon(Icons.add),
-                        label: Text('Tăng số'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 30),
-
-                // Quick actions
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Thao tác nhanh',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildQuickAction(
-                            icon: Icons.notifications,
-                            label: 'Thông báo',
-                            onTap: () {},
-                          ),
-                          _buildQuickAction(
-                            icon: Icons.favorite,
-                            label: 'Yêu thích',
-                            onTap: () {},
-                          ),
-                          _buildQuickAction(
-                            icon: Icons.share,
-                            label: 'Chia sẻ',
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildQuickAction({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
+      body: Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue[50],
-              borderRadius: BorderRadius.circular(12),
+          if (_isSearching)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Tìm kiếm lớp học...',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                    icon: Icon(Icons.clear, color: Colors.grey[600]),
+                    onPressed: () {
+                      _searchController.clear();
+                    },
+                  )
+                      : null,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide(color: Colors.cyan, width: 1.5),
+                  ),
+                ),
+              ),
             ),
-            child: Icon(
-              icon,
-              color: Colors.blue,
-              size: 24,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+          Expanded(
+            child: SafeArea(
+              top: !_isSearching, // Only apply top SafeArea padding if search bar is not visible
+              bottom: true,
+              left: true,
+              right: true,
+              child: _filteredClasses.isEmpty && _searchController.text.isNotEmpty
+                  ? Center(
+                child: Text(
+                  'Không tìm thấy kết quả nào.',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
+              )
+                  : ListView.builder(
+                padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
+                itemCount: _filteredClasses.length,
+                itemBuilder: (context, index) {
+                  final classData = _filteredClasses[index];
+                  return Card(
+                    color: _getCardColor(index),
+                    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                      leading: Icon(Icons.class_, color: Colors.white, size: 30),
+                      title: Text(
+                        classData['name']!,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        classData['instructor']!,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.85),
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Icon(Icons.more_vert, color: Colors.white),
+                      onTap: () {
+                        // Handle class item tap
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -287,12 +247,13 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-class SearchTab extends StatelessWidget {
+// New AddTab widget (as defined previously)
+class AddTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tìm kiếm'),
+        title: Text('Thêm mới'),
         centerTitle: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
@@ -301,14 +262,14 @@ class SearchTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search, size: 80, color: Colors.grey),
+            Icon(Icons.add_circle_outline, size: 80, color: Colors.grey),
             SizedBox(height: 20),
             Text(
-              'Trang tìm kiếm',
+              'Trang thêm mới',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-            Text('Tính năng tìm kiếm sẽ được thêm vào sau'),
+            Text('Chức năng thêm mới sẽ được phát triển ở đây.'),
           ],
         ),
       ),
@@ -316,6 +277,7 @@ class SearchTab extends StatelessWidget {
   }
 }
 
+// ProfileTab widget (as defined previously)
 class ProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -347,8 +309,6 @@ class ProfileTab extends StatelessWidget {
               style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             ),
             SizedBox(height: 30),
-
-            // Profile options
             _buildProfileOption(
               icon: Icons.edit,
               title: 'Chỉnh sửa hồ sơ',
@@ -364,66 +324,7 @@ class ProfileTab extends StatelessWidget {
               title: 'Trợ giúp',
               onTap: () {},
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileOption({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.blue),
-        title: Text(title),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
-      ),
-    );
-  }
-}
-
-class SettingsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Cài đặt'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildSettingOption(
-              icon: Icons.dark_mode,
-              title: 'Chế độ tối',
-              onTap: () {},
-            ),
-            _buildSettingOption(
-              icon: Icons.language,
-              title: 'Ngôn ngữ',
-              onTap: () {},
-            ),
-            _buildSettingOption(
-              icon: Icons.notifications,
-              title: 'Thông báo',
-              onTap: () {},
-            ),
-            _buildSettingOption(
-              icon: Icons.privacy_tip,
-              title: 'Chính sách bảo mật',
-              onTap: () {},
-            ),
             Spacer(),
-
-            // Logout button
             Container(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -442,20 +343,23 @@ class SettingsTab extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSettingOption({
+  Widget _buildProfileOption({
     required IconData icon,
     required String title,
     required VoidCallback onTap,
   }) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
+        contentPadding:
+        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         leading: Icon(icon, color: Colors.blue),
         title: Text(title),
         trailing: Icon(Icons.arrow_forward_ios, size: 16),

@@ -40,8 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (_usernameController.text == 'admin' && _passwordController.text == '123456') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+          MaterialPageRoute(builder: (context) => HomeScreen(),
+        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

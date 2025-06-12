@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // Keep for ProfileTab logout
+import '../../auth/screens/login_screen.dart'; // Keep for ProfileTab logout
 
 class ProfileScreen extends StatelessWidget {
   @override

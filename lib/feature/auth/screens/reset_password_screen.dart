@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../shared/utils/constants.dart';
-import '../../../../shared/utils/validators.dart';
-import '../../../../shared/widgets/custom_button.dart';
-import '../../../../shared/widgets/custom_text_field.dart';
-import '../../providers/auth_provider.dart';
-import '../../../../core/enums/status_code.dart'; // Import StatusCode
+import '../../../shared/utils/constants.dart';
+import '../../../shared/utils/validators.dart';
+import '../../../shared/widgets/custom_button.dart';
+import '../../../shared/widgets/custom_text_field.dart';
+import '../providers/auth_provider.dart';
+import '../../../core/enums/status_code.dart'; // Import StatusCode
 
 class ResetPasswordScreen extends StatefulWidget {
   final String username;

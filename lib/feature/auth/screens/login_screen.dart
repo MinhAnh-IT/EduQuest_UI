@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../core/enums/status_code.dart'; // Import StatusCode
+import '../../../core/enums/status_code.dart'; // Import StatusCode
 import 'register_screen.dart';
-import '../feature/auth/screens/auth/forgot_password_screen.dart';
-import 'home_screen.dart';
+import 'forgot_password_screen.dart';
+import '../../home/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

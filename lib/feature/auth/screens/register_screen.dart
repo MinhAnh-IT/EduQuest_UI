@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/enums/status_code.dart'; // Import StatusCode
+import '../../../core/enums/status_code.dart'; // Import StatusCode
 
 class RegisterScreen extends StatefulWidget {
   @override

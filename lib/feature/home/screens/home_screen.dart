@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // Keep for ProfileTab logout
-import '../shared/widgets/bottom_navigation_bar.dart'; // Import the new widget
+import '../../auth/screens/login_screen.dart'; // Keep for ProfileTab logout
+import '../../../shared/widgets/bottom_navigation_bar.dart'; // Import the new widget
 import 'profile_screen.dart'; // Import the new ProfileScreen
 
 class HomeScreen extends StatefulWidget {

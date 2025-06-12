@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart'; // Keep for ProfileTab logout
+import '../shared/widgets/bottom_navigation_bar.dart'; // Import the new widget
+import 'profile_screen.dart'; // Import the new ProfileScreen
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,38 +13,64 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     HomeTab(),
-    AddTab(),
-    ProfileTab(),
+    ProfileScreen(), // Use ProfileScreen
   ];
+
+  void _showJoinClassDialog(BuildContext context) {
+    final TextEditingController classCodeController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Tham gia lớp học'),
+          content: TextField(
+            controller: classCodeController,
+            decoration: InputDecoration(hintText: 'Nhập mã lớp'),
+            autofocus: true,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Tham gia'),
+              onPressed: () {
+                // Handle join class logic here
+                String classCode = classCodeController.text;
+                print('Class code entered: $classCode'); // Placeholder
+                Navigator.of(context).pop();
+                // You can add logic to actually join the class here
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showJoinClassDialog(context);
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.cyan, // Or your preferred color
+        foregroundColor: Colors.white,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Standard position
+      bottomNavigationBar: BottomNavigationBarWidget( // Use the new widget
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Thêm',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Hồ sơ',
-          ),
-        ],
       ),
     );
   }
@@ -243,163 +271,6 @@ class _HomeTabState extends State<HomeTab> {
           ),
         ],
       ),
-    );
-  }
-}
-
-// New AddTab widget (as defined previously)
-class AddTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Thêm mới'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_circle_outline, size: 80, color: Colors.grey),
-            SizedBox(height: 20),
-            Text(
-              'Trang thêm mới',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text('Chức năng thêm mới sẽ được phát triển ở đây.'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ProfileTab widget (as defined previously)
-class ProfileTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hồ sơ'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.blue[100],
-              child: Icon(Icons.person, size: 60, color: Colors.blue),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Người dùng',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'admin@example.com',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 30),
-            _buildProfileOption(
-              icon: Icons.edit,
-              title: 'Chỉnh sửa hồ sơ',
-              onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.security,
-              title: 'Bảo mật',
-              onTap: () {},
-            ),
-            _buildProfileOption(
-              icon: Icons.help,
-              title: 'Trợ giúp',
-              onTap: () {},
-            ),
-            Spacer(),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  _showLogoutDialog(context);
-                },
-                icon: Icon(Icons.logout),
-                label: Text('Đăng xuất'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileOption({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        contentPadding:
-        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        leading: Icon(icon, color: Colors.blue),
-        title: Text(title),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Đăng xuất'),
-          content: Text('Bạn có chắc chắn muốn đăng xuất không?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                      (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: Text('Đăng xuất'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

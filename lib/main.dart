@@ -6,8 +6,6 @@ import 'package:register_login/feature/auth/screens/role_selection_screen.dart';
 import 'package:register_login/feature/auth/screens/student/student_registration_screen.dart';
 import 'package:register_login/feature/auth/screens/otp_verification_screen.dart';
 import 'package:register_login/feature/auth/screens/student/student_details_screen.dart';
-import 'package:register_login/feature/auth/services/auth_service.dart';
-import 'package:register_login/feature/auth/services/auth_service.dart';
 import 'package:register_login/feature/auth/providers/auth_provider.dart';
 import 'package:register_login/feature/auth/providers/theme_provider.dart';
 import 'package:register_login/shared/theme/app_theme.dart';

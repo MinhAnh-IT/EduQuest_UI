@@ -31,10 +31,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _clearError() {
-    _error = null;
-    notifyListeners();
-  }
 
   Future<bool> login(String username, String password) async {
     _setLoading(true);

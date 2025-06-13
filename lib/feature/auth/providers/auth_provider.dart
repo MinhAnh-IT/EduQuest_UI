@@ -31,19 +31,16 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _clearError() {
-    _error = null;
-    notifyListeners();
-  }
 
   Future<bool> login(String username, String password) async {
     _setLoading(true);
     try {
       final response = await AuthService.login(username, password);
-      if (response['code'] == 0) {
+      if (response['code'] == 200) {
         final data = response['data'];
         _token = data['accessToken'];
-        _currentUser = User.fromJson(data['user']);
+        //_currentUser = User.fromJson(data['user']);
+        //print(_currentUser);
         await _prefs.setString(StorageConstants.token, _token!);
         ApiClient.token = _token;
         _setLoading(false);

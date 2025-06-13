@@ -7,7 +7,6 @@ class StorageConstants {
   static const String onboarding = 'onboarding';
 }
 
-/// Các hằng số cho validation
 class ValidationConstants {
   // Mật khẩu
   static const int minPasswordLength = 6;

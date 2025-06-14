@@ -14,7 +14,7 @@ subprojects {
 }
 
 subprojects {
-    project.evaluationDependsOn(":app") // This line can trigger NDK configuration for :app, which may have an issue.
+    project.evaluationDependsOn(":app") 
 }
 
 tasks.register<Delete>("clean") {

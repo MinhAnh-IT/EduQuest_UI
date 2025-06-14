@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/enums/status_code.dart'; // Import StatusCode
 
-class RegisterScreen extends StatefulWidget {
+class RegisterTempScreen extends StatefulWidget {
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<RegisterTempScreen> createState() => _RegisterTempScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterTempScreenState extends State<RegisterTempScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();

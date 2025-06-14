@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../core/enums/status_code.dart'; // Import StatusCode
-import 'register_screen.dart';
+import 'register_temp_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../home/screens/home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginTempScreen extends StatefulWidget {
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginTempScreen> createState() => _LoginTempScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginTempScreenState extends State<LoginTempScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -233,10 +232,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Nút đăng ký
                 OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () {                    Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      MaterialPageRoute(builder: (context) => RegisterTempScreen()),
                     );
                   },
                   style: OutlinedButton.styleFrom(

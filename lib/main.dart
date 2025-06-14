@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../feature/auth/screens/login_screen.dart';
+import '../feature/auth/screens/login_temp_screen.dart';
 import '../feature/home/screens/home_screen.dart';
 import '../feature/auth/providers/auth_provider.dart';
 
@@ -22,9 +22,8 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         debugShowCheckedModeBanner: false,
-        initialRoute: '/',
-        routes: {
-          '/': (context) =>  LoginScreen(),
+        initialRoute: '/',        routes: {
+          '/': (context) =>  LoginTempScreen(),
           '/home': (context) => HomeScreen(),
         },
       ),

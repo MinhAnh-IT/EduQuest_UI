@@ -109,7 +109,6 @@ class AuthService {
       );
     }
   }
-
   // Reset password with OTP
   Future<ApiResponse<void>> resetPassword(String username, String newPassword) async {
     try {
@@ -127,31 +126,62 @@ class AuthService {
   // Logout
   Future<ApiResponse<void>> logout() async {
     try {
-      final token = await _storage.read(key: 'token');
-      if (token == null) throw Exception('No token found');
+      print('=== Starting Logout Request ===');
+      
+      final token = await _storage.read(key: 'auth_token');
+      if (token == null) {
+        return ApiResponse<void>(
+          status: StatusCode.INVALID_TOKEN,
+          message: 'Authentication token not found',
+        );
+      }
 
       final response = await _dio.post(
         '/api/auth/logout',
         options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         ),
       );
 
-      await _clearStoredCredentials();
-      return ApiResponse.fromJson(response.data, null);
+      print('Logout response received: ${response.statusCode}');
+      print('Logout response data: ${response.data}');
+
+      // Clear stored token after successful logout
+      if (response.statusCode == 200) {
+        await _storage.delete(key: 'auth_token');
+      }
+
+      return ApiResponse<void>.fromJson(response.data, null);
     } on DioException catch (e) {
-      return _handleError(e);
+      print('=== DioException in logout ===');
+      print('Error type: ${e.type}');
+      print('Error message: ${e.message}');
+      print('Response status: ${e.response?.statusCode}');
+      print('Response data: ${e.response?.data}');
+
+      if (e.response != null && e.response!.data is Map<String, dynamic>) {
+        return ApiResponse<void>.fromJson(e.response!.data, null);
+      }
+
+      return ApiResponse<void>(
+        status: StatusCode.INTERNAL_SERVER_ERROR,
+        message: e.message ?? 'Network error occurred',
+      );
+    } catch (e) {
+      print('=== General Exception in logout ===');
+      print('Error: $e');
+      return ApiResponse<void>(
+        status: StatusCode.INTERNAL_SERVER_ERROR,
+        message: 'An unexpected error occurred',
+      );
     }
   }
-
   // Get stored auth user
   Future<AuthUser?> getStoredUser() async {
     final token = await _storage.read(key: 'token');
     final username = await _storage.read(key: 'username');
     final role = await _storage.read(key: 'role');
-
+    
     if (token != null && username != null && role != null) {
       return AuthUser(
         token: token,
@@ -160,11 +190,6 @@ class AuthService {
       );
     }
     return null;
-  }
-
-  // Clear stored credentials
-  Future<void> _clearStoredCredentials() async {
-    await _storage.deleteAll();
   }
 
   // Handle Dio errors
@@ -208,10 +233,10 @@ class AuthService {
   }
 
   // Verify OTP
-  Future<ApiResponse<void>> verifyOTP(String username, String otp) async {
+  Future<ApiResponse<void>> verifyOTPForgotPassword(String username, String otp) async {
     try {
       print('Verifying OTP for username: $username');
-      final response = await _dio.post('/api/auth/verify-otp', data: {
+      final response = await _dio.post('/api/auth/verify-otp-forgot-password', data: {
         'username': username,
         'otp': otp,
       });

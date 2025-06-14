@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../auth/screens/login_screen.dart'; // Keep for ProfileTab logout
+import '../../auth/screens/login_temp_screen.dart';
+import '../../auth/services/auth_service.dart';
+import '../../../core/enums/status_code.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,37 +99,92 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
   void _showLogoutDialog(BuildContext context) {
+    bool isLoading = false;
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Đăng xuất'),
-          content: Text('Bạn có chắc chắn muốn đăng xuất không?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                      (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Đăng xuất'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Bạn có chắc chắn muốn đăng xuất không?'),
+                  if (isLoading)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
               ),
-              child: Text('Đăng xuất'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Hủy'),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading ? null : () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    try {
+                      final response = await _authService.logout();
+                      
+                      // Navigate to login screen regardless of API response                      // since we want to log out the user from the app
+                      Navigator.of(context).pop(); // Close dialog
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginTempScreen()),
+                        (route) => false,
+                      );
+                      
+                      // Show success/error message
+                      if (response.status == StatusCode.LOGOUT_SUCCESS) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Đăng xuất thành công'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Đã đăng xuất khỏi ứng dụng'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      // Even if API fails, we still want to log out locally                      Navigator.of(context).pop(); // Close dialog
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginTempScreen()),
+                        (route) => false,
+                      );
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Đã đăng xuất khỏi ứng dụng'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text('Đăng xuất'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

@@ -65,12 +65,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<ApiResponse> verifyOTP(String username, String otp) async {
+  Future<ApiResponse> verifyOTPForgotPassword(String username, String otp) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _authService.verifyOTP(username, otp);
+      final response = await _authService.verifyOTPForgotPassword(username, otp);
       return response;
     } finally {
       _isLoading = false;

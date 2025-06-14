@@ -4,27 +4,27 @@ import '../providers/auth_provider.dart';
 import 'reset_password_screen.dart';
 import '../../../core/enums/status_code.dart'; // Import StatusCode
 
-class OTPVerificationScreen extends StatefulWidget {
+class OTPVerificationFPScreen extends StatefulWidget {
   final String username;
 
-  const OTPVerificationScreen({Key? key, required this.username}) : super(key: key);
+  const OTPVerificationFPScreen({Key? key, required this.username}) : super(key: key);
 
   @override
-  _OTPVerificationScreenState createState() => _OTPVerificationScreenState();
+  _OTPVerificationFPScreenState createState() => _OTPVerificationFPScreenState();
 }
 
-class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
+class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
 
-  void _verifyOTP() async {
+  void _verifyOTPForgotPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final response = await authProvider.verifyOTP(widget.username, _otpController.text.trim());
+        final response = await authProvider.verifyOTPForgotPassword(widget.username, _otpController.text.trim());
 
         if (!mounted) return;
 
@@ -90,7 +90,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _isLoading ? null : _verifyOTP,
+                onPressed: _isLoading ? null : _verifyOTPForgotPassword,
                 child: _isLoading
                     ? const CircularProgressIndicator()
                     : const Text('Xác nhận'),

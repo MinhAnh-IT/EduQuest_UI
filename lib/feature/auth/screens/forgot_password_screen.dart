@@ -5,7 +5,7 @@ import '../../../shared/utils/validators.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
-import 'otp_verification_screen.dart';
+ import 'otp_verification_fp_screen.dart'; 
 import '../../../core/enums/status_code.dart'; // Import StatusCode
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => OTPVerificationScreen(username: _usernameController.text),
+        builder: (context) => OTPVerificationFPScreen(username: _usernameController.text),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'reset_password_screen.dart';
-import '../../../core/enums/status_code.dart'; // Import StatusCode
+
 
 class OTPVerificationFPScreen extends StatefulWidget {
   final String username;
@@ -17,39 +17,29 @@ class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
-
   void _verifyOTPForgotPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final response = await authProvider.verifyOTPForgotPassword(widget.username, _otpController.text.trim());
+        final success = await authProvider.verifyOTPForgotPassword(widget.username, _otpController.text.trim());
 
         if (!mounted) return;
 
-        switch (response.status) {
-          case StatusCode.OK: // Assuming 200 OK for OTP verified
-          case StatusCode.OTP_VERIFIED_SUCCESS:
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ResetPasswordScreen(
-                  username: widget.username,
-                  otp: _otpController.text.trim(),
-                ),
+        if (success) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ResetPasswordScreen(
+                username: widget.username,
+                otp: _otpController.text.trim(),
               ),
-            );
-            break;
-          case StatusCode.INVALID_OTP:
-            _showError(response.message); // Use message from response
-            break;
-          // Consider adding a case for OTP_EXPIRED if your API and StatusCode enum support it
-          // case StatusCode.OTP_EXPIRED:
-          //   _showError(response.message);
-          //   break;
-          default:
-            _showError(response.message); // Show the message from the response
+            ),
+          );
+        } else {
+          // Provider đã xử lý lỗi và hiển thị thông báo
+          _showError(authProvider.error ?? 'Xác thực OTP thất bại');
         }
       } catch (e) {
         if (!mounted) return;

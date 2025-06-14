@@ -1,249 +1,95 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:register_login/config/api_config.dart';
+import 'package:register_login/core/network/api_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../models/api_response.dart';
-import '../models/auth_user.dart';
-import '../../../config/api_config.dart';
-import '../../../core/enums/status_code.dart'; // Import StatusCode
 
 class AuthService {
-  late final Dio _dio;
   final FlutterSecureStorage _storage;
-
-  AuthService() : _storage = const FlutterSecureStorage() {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: ApiConfig.connectionTimeout,
-      receiveTimeout: ApiConfig.receiveTimeout,
-      sendTimeout: ApiConfig.sendTimeout,
-      headers: ApiConfig.defaultHeaders,
-      validateStatus: (status) => status != null && status < 500,
-    ));
-    _setupInterceptors();
-  }
-
-  void _setupInterceptors() {
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        print('REQUEST[${options.method}] => PATH: ${options.path}');
-        print('REQUEST BODY: ${options.data}');
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        print('RESPONSE[${response.statusCode}] => DATA: ${response.data}');
-        return handler.next(response);
-      },
-      onError: (error, handler) {
-        print('ERROR[${error.response?.statusCode}] => ${error.message}');
-        print('ERROR DATA: ${error.response?.data}');
-        return handler.next(error);
-      },
-    ));
-  }
-
+  AuthService() : _storage = const FlutterSecureStorage();
+  
   // Request password reset
-  Future<ApiResponse<void>> requestPasswordReset(String username) async {
-    try {
-      print('=== Starting Password Reset Request ===');
-      print('Username: $username');
-      print('Base URL: ${_dio.options.baseUrl}');
-      print('Connect Timeout: ${_dio.options.connectTimeout}');
-      print('Receive Timeout: ${_dio.options.receiveTimeout}');
-      
-      final response = await _dio.post(
-        '/api/auth/forgot-password', 
-        data: {'username': username},
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          responseType: ResponseType.json,
-          validateStatus: (status) => status! < 500,
-        ),
-      );
-      
-      print('Password reset response: ${response.data}');
-      
-      // The ApiResponse.fromJson factory now handles determining the StatusCode.
-      // The manual check for 404 and specific string status is no longer needed here
-      // as fromJson will use StatusCode.fromCode.
-      // if (response.statusCode == 404) {
-      //   return ApiResponse(
-      //     status: StatusCode.USER_NOT_FOUND, // Use StatusCode enum
-      //     message: 'User not found',
-      //     data: null,
-      //   );
-      // }
-
-      return ApiResponse.fromJson(response.data, null);
-    } on DioException catch (e) {
-      print('=== DioException Details ===');
-      print('Type: ${e.type}');
-      print('Message: ${e.message}');
-      print('Response: ${e.response?.data}');
-      print('Status Code: ${e.response?.statusCode}');
-      print('Request URL: ${e.requestOptions.uri}');
-
-      if (e.type == DioExceptionType.connectionTimeout || 
-          e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        return ApiResponse(
-          status: StatusCode.INTERNAL_SERVER_ERROR, // Or a more specific connection error code if available
-          message: 'Could not connect to server at ${_dio.options.baseUrl}. Please check if the server is running and accessible.',
-          data: null,
-        );
-      }
-
-      if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
-        return ApiResponse.fromJson(e.response!.data, null);
-      }
-
-      return ApiResponse(
-        status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
-        message: e.message ?? 'Network error occurred',
-        data: null,
-      );
-    } catch (e) {
-      print('Unexpected error: $e');
-      return ApiResponse(
-        status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
-        message: 'An unexpected error occurred',
-        data: null,
-      );
-    }
+  Future<Map<String, dynamic>> requestPasswordReset(String username) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
+    final response = await ApiClient.post(url, {
+      'username': username
+    });
+    return jsonDecode(response.body);
   }
+
   // Reset password with OTP
-  Future<ApiResponse<void>> resetPassword(String username, String newPassword) async {
-    try {
-      print('Resetting password for username: $username');
-      final response = await _dio.post('/api/auth/reset-password', data: {
-        'username': username,
-        'newPassword': newPassword,
-      });
-      return ApiResponse.fromJson(response.data, null);
-    } on DioException catch (e) {
-      return _handleError(e);
-    }
+  Future<Map<String, dynamic>> resetPassword(String username, String newPassword) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.resetPassword}';
+    final response = await ApiClient.post(url, {
+      'username': username,
+      'newPassword': newPassword
+    });
+    return jsonDecode(response.body);
   }
-
+  
   // Logout
-  Future<ApiResponse<void>> logout() async {
-    try {
-      print('=== Starting Logout Request ===');
-      
-      final token = await _storage.read(key: 'auth_token');
-      if (token == null) {
-        return ApiResponse<void>(
-          status: StatusCode.INVALID_TOKEN,
-          message: 'Authentication token not found',
-        );
-      }
-
-      final response = await _dio.post(
-        '/api/auth/logout',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
-      );
-
-      print('Logout response received: ${response.statusCode}');
-      print('Logout response data: ${response.data}');
-
-      // Clear stored token after successful logout
-      if (response.statusCode == 200) {
-        await _storage.delete(key: 'auth_token');
-      }
-
-      return ApiResponse<void>.fromJson(response.data, null);
-    } on DioException catch (e) {
-      print('=== DioException in logout ===');
-      print('Error type: ${e.type}');
-      print('Error message: ${e.message}');
-      print('Response status: ${e.response?.statusCode}');
-      print('Response data: ${e.response?.data}');
-
-      if (e.response != null && e.response!.data is Map<String, dynamic>) {
-        return ApiResponse<void>.fromJson(e.response!.data, null);
-      }
-
-      return ApiResponse<void>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
-        message: e.message ?? 'Network error occurred',
-      );
-    } catch (e) {
-      print('=== General Exception in logout ===');
-      print('Error: $e');
-      return ApiResponse<void>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
-        message: 'An unexpected error occurred',
-      );
+  Future<Map<String, dynamic>> logout() async {
+    final token = await _storage.read(key: 'auth_token');
+    if (token == null) {
+      return {
+        'code': 401,
+        'message': 'Authentication token not found',
+        'data': null
+      };
     }
-  }
-  // Get stored auth user
-  Future<AuthUser?> getStoredUser() async {
-    final token = await _storage.read(key: 'token');
-    final username = await _storage.read(key: 'username');
-    final role = await _storage.read(key: 'role');
+      // Set token for auth header
+    ApiClient.token = token;
     
-    if (token != null && username != null && role != null) {
-      return AuthUser(
-        token: token,
-        username: username,
-        role: role,
-      );
+    final url = '${ApiConfig.baseUrl}${ApiConfig.logout}';
+    final response = await ApiClient.post(url, {}, auth: true);
+    
+    // Clear stored token after successful logout
+    if (response.statusCode == 200) {
+      await _storage.delete(key: 'auth_token');
+      ApiClient.token = null;
     }
-    return null;
-  }
-
-  // Handle Dio errors
-  ApiResponse<T> _handleError<T>(DioException e) {
-    print('DioError type: ${e.type}');
-    print('DioError message: ${e.message}');
-    print('DioError response: ${e.response?.data}');
-
-    if (e.type == DioExceptionType.connectionTimeout ||
-        e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout) {
-      return ApiResponse(
-        status: StatusCode.INTERNAL_SERVER_ERROR, // Or a more specific connection error code
-        message: 'Could not connect to server. Please check your internet connection and try again.',
-        data: null,
-      );
-    }
-
-    if (e.response?.data != null && e.response?.data is Map) {
-      try {
-        return ApiResponse.fromJson(e.response!.data, null);
-      } catch (_) {
-        // If parsing fails, fall through to default error
-      }
-    }
-
-    String errorMessage = switch (e.type) {
-      DioExceptionType.connectionTimeout => 'Connection timed out',
-      DioExceptionType.sendTimeout => 'Request timed out while sending data',
-      DioExceptionType.receiveTimeout => 'Request timed out while waiting for response',
-      DioExceptionType.badResponse => 'Server returned an error: ${e.response?.statusCode}',
-      DioExceptionType.unknown => e.message ?? 'An unknown error occurred',
-      _ => 'Network error occurred'
-    };
-
-    return ApiResponse(
-      status: StatusCode.INTERNAL_SERVER_ERROR, // Default error status
-      message: errorMessage,
-      data: null,
-    );
+    
+    return jsonDecode(response.body);
   }
 
   // Verify OTP
-  Future<ApiResponse<void>> verifyOTPForgotPassword(String username, String otp) async {
-    try {
-      print('Verifying OTP for username: $username');
-      final response = await _dio.post('/api/auth/verify-otp-forgot-password', data: {
-        'username': username,
-        'otp': otp,
-      });
-      // ApiResponse.fromJson will correctly parse the status code from the response data
-      return ApiResponse.fromJson(response.data, null);
-    } on DioException catch (e) {
-      return _handleError(e);
-    }
+  Future<Map<String, dynamic>> verifyOTPForgotPassword(String username, String otp) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtpForgotPassword}';
+    final response = await ApiClient.post(url, {
+      'username': username,
+      'otp': otp
+    });
+    
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> login(String username, String password) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.login}';
+    final response = await ApiClient.post(url, {
+      'username': username,
+      'password': password,
+    });
+
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> register(Map<String, dynamic> payload) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.register}';
+    final response = await ApiClient.post(url, payload);
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtp}';
+    final response = await ApiClient.post(url, {
+      'email': email,
+      'otp': otp,
+    });
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> resendOtp(String email) async {
+    final url = '${ApiConfig.baseUrl}${ApiConfig.resendOtp}';
+    final response = await ApiClient.post(url, {'email': email});
+    return jsonDecode(response.body);
   }
 }

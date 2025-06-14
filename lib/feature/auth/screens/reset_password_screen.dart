@@ -5,7 +5,7 @@ import '../../../shared/utils/validators.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
-import '../../../core/enums/status_code.dart'; // Import StatusCode
+
 
 class ResetPasswordScreen extends StatefulWidget {
   final String username;
@@ -28,49 +28,35 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
-
   @override
   void dispose() {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
+  
   void _resetPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
       try {
-        final response = await Provider.of<AuthProvider>(context, listen: false)
-            .resetPassword(
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final success = await authProvider.resetPassword(
               widget.username, 
               _passwordController.text
             );
 
         if (!mounted) return;
         
-        switch (response.status) {
-          case StatusCode.OK: // Assuming 200 OK for password reset
-          case StatusCode.PASSWORD_RESET_SUCCESS:
-            _showSuccessDialog();
-            break;
-          case StatusCode.OTP_VERIFICATION_NEEDED: // Handle if OTP wasn't verified or expired
-             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(response.message), // Use message from response
-                backgroundColor: Colors.red,
-              ),
-            );
-            // Optionally, navigate back to OTP screen or show a specific message
-            // For example, navigate back to login or OTP screen if appropriate
-            // Navigator.popUntil(context, (route) => route.isFirst); 
-            break;
-          default:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(response.message), // Show the message from the response
-                backgroundColor: Colors.red,
-              ),
-            );
+        if (success) {
+          _showSuccessDialog();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.error ?? 'Đặt lại mật khẩu thất bại'), 
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } catch (e) {
         if (!mounted) return;

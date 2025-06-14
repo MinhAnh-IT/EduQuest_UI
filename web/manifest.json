@@ -1,6 +1,6 @@
 {
-    "name": "eduquest_ui",
-    "short_name": "eduquest_ui",
+    "name": "register_login",
+    "short_name": "register_login",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

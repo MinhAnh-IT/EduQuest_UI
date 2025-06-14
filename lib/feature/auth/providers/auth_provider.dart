@@ -1,80 +1,173 @@
 import 'package:flutter/material.dart';
-import '../models/auth_user.dart';
-import '../models/api_response.dart';
-import '../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:register_login/core/network/api_client.dart';
+import 'package:register_login/feature/auth/models/user_model.dart';
+import 'package:register_login/feature/auth/services/auth_service.dart';
+import 'package:register_login/shared/utils/constants.dart';
+import 'package:register_login/feature/auth/models/auth_user.dart';
+
 
 class AuthProvider extends ChangeNotifier {
+  final SharedPreferences _prefs;
   final AuthService _authService = AuthService();
   AuthUser? _user;
+  User? _currentUser;
   bool _isLoading = false;
+  String? _error;
+  String? _token;
 
-  AuthUser? get user => _user;
+  AuthProvider(this._prefs);
+
+  User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
-  bool get isAuthenticated => _user != null;
+  String? get error => _error;
+  bool get isAuthenticated => _token != null;
 
-  AuthProvider() {
-    _loadStoredUser();
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
   }
 
-  Future<void> _loadStoredUser() async {
-    _isLoading = true;
-    notifyListeners();
-
-    _user = await _authService.getStoredUser();
-
+  void _setError(String message) {
+    _error = message;
     _isLoading = false;
     notifyListeners();
-  }
-  Future<ApiResponse<void>> requestPasswordReset(String username) async {
-    _isLoading = true;
-    notifyListeners();
-
+  }  Future<bool> requestPasswordReset(String username) async {
+    _setLoading(true);
     try {
       final response = await _authService.requestPasswordReset(username);
-      return response;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Yêu cầu đặt lại mật khẩu thất bại: $e');
+      return false;
     }
-  }
-
-  Future<ApiResponse<void>> resetPassword(String username, String newPassword) async {
-    _isLoading = true;
-    notifyListeners();
-
+  }  Future<bool> resetPassword(String username, String newPassword) async {
+    _setLoading(true);
     try {
       final response = await _authService.resetPassword(username, newPassword);
-      return response;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Đặt lại mật khẩu thất bại: $e');
+      return false;
     }
-  }
-
-  Future<void> logout() async {
-    _isLoading = true;
-    notifyListeners();
-
+  }  Future<bool> logout() async {
+    _setLoading(true);
     try {
-      await _authService.logout();
-      _user = null;
-      notifyListeners();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      final response = await _authService.logout();
+      if (response['code'] == 200) {
+        _user = null;
+        _token = null;
+        // Xóa token từ SharedPreferences
+        await _prefs.remove(StorageConstants.token);
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Đăng xuất thất bại: $e');
+      return false;
     }
-  }
-
-  Future<ApiResponse> verifyOTPForgotPassword(String username, String otp) async {
-    _isLoading = true;
-    notifyListeners();
-
+  }  Future<bool> verifyOTPForgotPassword(String username, String otp) async {
+    _setLoading(true);
     try {
       final response = await _authService.verifyOTPForgotPassword(username, otp);
-      return response;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Xác thực OTP thất bại: $e');
+      return false;
     }
+  }
+
+  Future<bool> login(String username, String password) async {
+    _setLoading(true);
+    try {
+      final response = await AuthService.login(username, password);
+      if (response['code'] == 200) {
+        final data = response['data'];
+        _token = data['accessToken'];
+        //_currentUser = User.fromJson(data['user']);
+        //print(_currentUser);
+        await _prefs.setString(StorageConstants.token, _token!);
+        ApiClient.token = _token;
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Đăng nhập thất bại: $e');
+      return false;
+    }
+  }
+
+  Future<bool> register(Map<String, dynamic> payload) async {
+    _setLoading(true);
+    try {
+      final response = await AuthService.register(payload);
+      if (response['code'] == 0) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Đăng ký thất bại: $e');
+      return false;
+    }
+  }
+
+  Future<bool> verifyOTP(String email, String otp) async {
+    _setLoading(true);
+    try {
+      final response = await AuthService.verifyOtp(email, otp);
+      if (response['code'] == 0) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Lỗi xác thực OTP: $e');
+      return false;
+    }
+  }
+
+  Future<void> resendOTP(String email) async {
+    try {
+      await AuthService.resendOtp(email);
+    } catch (e) {
+      _setError('Gửi lại mã OTP thất bại: $e');
+    }
+  }
+
+  Future<void> checkAuthStatus() async {
+    _token = _prefs.getString(StorageConstants.token);
+    if (_token != null) {
+      ApiClient.token = _token;
+    }
+    notifyListeners();
   }
 }

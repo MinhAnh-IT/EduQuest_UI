@@ -1,60 +1,83 @@
 class Validators {
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter an email';
+      return 'Vui lòng nhập email';
     }
-    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
-      return 'Please enter a valid email address';
+    if (!value.contains('@')) {
+      return 'Vui lòng nhập email hợp lệ';
     }
     return null;
   }
 
   static String? validateUsername(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter username';
+      return 'Vui lòng nhập tên người dùng';
     }
     if (value.length < 3) {
-      return 'Username must be at least 3 characters';
+      return 'Tên người dùng phải có ít nhất 3 ký tự ';
     }
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'Username can only contain letters, numbers and underscore';
+      return 'Tên người dùng chỉ có thể chứa chữ cái, số và dấu gạch dưới';
     }
     return null;
   }
 
   static String? validateOTP(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter OTP';
+      return 'Vui lòng nhập OTP';
     }
     if (value.length != 6) {
-      return 'OTP must be 6 digits';
+      return 'OTP phải có 6 chữ số';
     }
     if (!RegExp(r'^\d+$').hasMatch(value)) {
-      return 'OTP must contain only digits';
+      return 'OTP chỉ có thể chứa chữ số';
     }
     return null;
   }
+  
 
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter a password';
+      return 'Vui lòng nhập mật khẩu';
     }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters long';
-    }
-    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-      return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    if (value.length < 6) {
+      return 'Mật khẩu phải có ít nhất 6 ký tự';
     }
     return null;
   }
 
   static String? validateConfirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'Vui lòng xác nhận mật khẩu';
     }
     if (value != password) {
-      return 'Passwords do not match';
+      return 'Mật khẩu không khớp';
     }
     return null;
   }
-}
+
+  static String? validateStudentCode(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập mã số sinh viên';
+    }
+    return null;
+  }
+
+  static String? validateEnrolledYear(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập năm nhập học';
+    }
+    final year = int.tryParse(value);
+    if (year == null || year < 1900 || year > DateTime.now().year) {
+      return 'Vui lòng nhập năm hợp lệ';
+    }
+    return null;
+  }
+
+  static String? validateRequired(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập $fieldName';
+    }
+    return null;
+  }
+} 

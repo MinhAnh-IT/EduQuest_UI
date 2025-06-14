@@ -6,7 +6,7 @@ import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
  import 'otp_verification_fp_screen.dart'; 
-import '../../../core/enums/status_code.dart'; // Import StatusCode
+
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -26,7 +26,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     _usernameController.dispose();
     super.dispose();
   }
-
   Future<void> _resetPassword() async {
     print('Starting password reset process');
     if (!_formKey.currentState!.validate()) {
@@ -42,30 +41,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       print('Calling requestPasswordReset with username: ${_usernameController.text}');
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final response = await authProvider.requestPasswordReset(_usernameController.text);
-      print('Got response from API: ${response.status}, ${response.message}');
+      final success = await authProvider.requestPasswordReset(_usernameController.text);
+      print('Got response from API: $success');
 
       if (!mounted) {
         print('Widget not mounted after API call');
         return;
       }
 
-      switch (response.status) {
-        case StatusCode.OK: // Assuming 200 OK for OTP sent
-          print('API call successful (OTP Sent), navigating to OTP screen');
-          setState(() => _otpSent = true);
-          break;
-        case StatusCode.USER_NOT_FOUND:
-          print('API returned user not found');
-          _showError(response.message); // Use message from response
-          break;
-        case StatusCode.EMAIL_SEND_ERROR:
-          print('API returned email send failed');
-          _showError(response.message); // Use message from response
-          break;
-        default:
-          print('API returned unexpected status: ${response.status.code} - ${response.status.message}');
-          _showError(response.message); // Show the message from the response
+      if (success) {
+        print('API call successful (OTP Sent), navigating to OTP screen');
+        setState(() => _otpSent = true);
+      } else {
+        print('API call failed');
+        _showError(authProvider.error ?? 'Yêu cầu đặt lại mật khẩu thất bại');
       }
     } catch (e, stackTrace) {
       print('Error occurred during password reset: $e');

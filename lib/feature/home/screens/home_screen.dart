@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/bottom_navigation_bar.dart'; // Import the new widget
-import 'profile_screen.dart'; // Import the new ProfileScreen
+import '../../ profile/screens/profile_screen.dart'; // Import the new ProfileScreen
 import '../../class/services/enrollment_service.dart'; // Import enrollment service
 import '../../../core/enums/status_code.dart'; // Import status codes
 import '../../class/screens/class_detail_screen.dart'; // Import class detail screen

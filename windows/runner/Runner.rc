@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "eduquest_ui" "\0"
+            VALUE "FileDescription", "register_login" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "eduquest_ui" "\0"
+            VALUE "InternalName", "register_login" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "eduquest_ui.exe" "\0"
-            VALUE "ProductName", "eduquest_ui" "\0"
+            VALUE "OriginalFilename", "register_login.exe" "\0"
+            VALUE "ProductName", "register_login" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

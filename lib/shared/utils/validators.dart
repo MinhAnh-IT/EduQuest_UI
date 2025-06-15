@@ -9,6 +9,33 @@ class Validators {
     return null;
   }
 
+  static String? validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập tên người dùng';
+    }
+    if (value.length < 3) {
+      return 'Tên người dùng phải có ít nhất 3 ký tự ';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+      return 'Tên người dùng chỉ có thể chứa chữ cái, số và dấu gạch dưới';
+    }
+    return null;
+  }
+
+  static String? validateOTP(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập OTP';
+    }
+    if (value.length != 6) {
+      return 'OTP phải có 6 chữ số';
+    }
+    if (!RegExp(r'^\d+$').hasMatch(value)) {
+      return 'OTP chỉ có thể chứa chữ số';
+    }
+    return null;
+  }
+  
+
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập mật khẩu';

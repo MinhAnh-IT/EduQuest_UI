@@ -6,8 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthService {
   final FlutterSecureStorage _storage;
   AuthService() : _storage = const FlutterSecureStorage();
-  
-  // Request password reset
   Future<Map<String, dynamic>> requestPasswordReset(String username) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
     final response = await ApiClient.post(url, {

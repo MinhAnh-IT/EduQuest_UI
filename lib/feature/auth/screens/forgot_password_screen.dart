@@ -5,7 +5,7 @@ import '../../../shared/utils/validators.dart';
 import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
- import 'otp_verification_fp_screen.dart'; 
+import 'otp_verification_fp_screen.dart';
 
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -25,48 +25,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void dispose() {
     _usernameController.dispose();
     super.dispose();
-  }
-  Future<void> _resetPassword() async {
-    print('Starting password reset process');
+  }  Future<void> _resetPassword() async {
     if (!_formKey.currentState!.validate()) {
-      print('Form validation failed');
       return;
     }
 
     setState(() {
       _isLoading = true;
-      print('Set loading state to true');
     });
 
     try {
-      print('Calling requestPasswordReset with username: ${_usernameController.text}');
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.requestPasswordReset(_usernameController.text);
-      print('Got response from API: $success');
 
       if (!mounted) {
-        print('Widget not mounted after API call');
         return;
       }
 
       if (success) {
-        print('API call successful (OTP Sent), navigating to OTP screen');
-        setState(() => _otpSent = true);
+        // setState(() => _otpSent = true); // Comment để không hiển thị success screen
+        _goToOTPScreen(); // Navigate trực tiếp đến OTP screen
       } else {
-        print('API call failed');
         _showError(authProvider.error ?? 'Yêu cầu đặt lại mật khẩu thất bại');
       }
-    } catch (e, stackTrace) {
-      print('Error occurred during password reset: $e');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       if (!mounted) return;
       _showError('Network error occurred. Please check your connection and try again.');
     } finally {
-      print('Cleaning up after password reset attempt');
       if (mounted) {
         setState(() {
           _isLoading = false;
-          print('Set loading state to false');
         });
       }
     }

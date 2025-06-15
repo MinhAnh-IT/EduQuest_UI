@@ -68,9 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     
                     setState(() {
                       isLoading = true;
-                    });
-
-                    try {
+                    });                    try {
                       final response = await _enrollmentService.joinClass(classCode);
                       
                       if (response.status == StatusCode.JOIN_CLASS_SUCCESS) {
@@ -79,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           SnackBar(
                             content: Text(response.message),
                             backgroundColor: Colors.green,
+                            duration: Duration(seconds: 3),
                           ),
                         );
                         // Refresh the class list if needed
@@ -92,14 +91,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           SnackBar(
                             content: Text(response.message),
                             backgroundColor: Colors.red,
+                            duration: Duration(seconds: 4),
                           ),
                         );
                       }
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Đã xảy ra lỗi: $e'),
+                          content: Text('Đã xảy ra lỗi kết nối. Vui lòng thử lại.'),
                           backgroundColor: Colors.red,
+                          duration: Duration(seconds: 4),
                         ),
                       );
                     } finally {

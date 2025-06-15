@@ -10,7 +10,7 @@ import 'package:register_login/feature/auth/providers/auth_provider.dart';
 import 'package:register_login/feature/auth/providers/theme_provider.dart';
 import 'package:register_login/shared/theme/app_theme.dart';
 import 'package:register_login/shared/utils/constants.dart';
-
+import 'package:register_login/feature/home/screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
               return null;
             },
             routes: {
+              '/home': (context) =>  HomeScreen(),
               '/login': (context) => const LoginScreen(),
               '/role-selection': (context) => const RoleSelectionScreen(),
               '/register': (context) => const StudentRegistrationScreen(),

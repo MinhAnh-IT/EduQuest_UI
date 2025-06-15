@@ -1,0 +1,585 @@
+# Tài liệu API EduQuest
+
+## Mục lục
+1. [Authentication APIs](#authentication-apis)
+   - [ForgotPassword API](#forgotpassword-api)
+   - [Logout API](#logout-api)
+2. [Class Management APIs](#class-management-apis)
+   - [JoinClass API](#joinclass-api)
+   - [LeaveClass API](#leaveclass-api)
+3. [Common Information](#common-information)
+   - [Mã lỗi phổ biến](#mã-lỗi-phổ-biến)
+   - [Lưu ý quan trọng](#lưu-ý-quan-trọng)
+
+---
+
+## Authentication APIs
+
+### Logout API
+
+**Endpoint:** `POST /api/auth/logout`
+
+**Mô tả:** Đăng xuất và xóa session của người dùng.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Logout successful"
+}
+```
+
+### ForgotPassword API
+
+Quy trình đặt lại mật khẩu bao gồm 3 bước:
+1. Yêu cầu đặt lại mật khẩu
+2. Xác thực mã OTP
+3. Đặt mật khẩu mới
+
+### 1. Yêu cầu đặt lại mật khẩu
+
+**Endpoint:** `POST /api/auth/forgot-password`
+
+**Mô tả:** Gửi yêu cầu đặt lại mật khẩu bằng username. Hệ thống sẽ gửi mã OTP đến email của người dùng.
+
+**Request Body:**
+```json
+{
+  "username": "tên_đăng_nhập"
+}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": true
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 430,
+  "message": "User not found"
+}
+```
+
+### 2. Xác thực mã OTP
+
+**Endpoint:** `POST /api/auth/verify-otp-forgot-password`
+
+**Mô tả:** Xác thực mã OTP đã được gửi đến email của người dùng.
+
+**Request Body:**
+```json
+{
+  "username": "tên_đăng_nhập",
+  "otp": "123456"
+}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": true
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 401,
+  "message": "Invalid or expired OTP"
+}
+```
+
+### 3. Đặt lại mật khẩu mới
+
+**Endpoint:** `POST /api/auth/reset-password`
+
+**Mô tả:** Đặt mật khẩu mới sau khi đã xác thực OTP thành công.
+
+**Request Body:**
+```json
+{
+  "username": "tên_đăng_nhập",
+  "newPassword": "mật_khẩu_mới"
+}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": true
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 402,
+  "message": "OTP must be verified before resetting the password or the session has expired"
+}
+```
+
+## JoinClass API
+
+### 🔐 Quan trọng: Xác thực cho Giao diện Di động
+
+**Để tham gia lớp học trên ứng dụng mobile, người dùng PHẢI lấy token thông qua quá trình đăng nhập. Dưới đây là luồng hoàn chỉnh:**
+
+#### Bước 1: Đăng nhập để lấy Token
+
+**Endpoint:** `POST /api/auth/login`
+
+**Request Body:**
+```json
+{
+  "username": "tên_đăng_nhập",
+  "password": "mật_khẩu"
+}
+```
+
+**Response thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**💾 Lưu trữ Token trong App Mobile:**
+- 📱 Lưu `accessToken` trong bộ nhớ tạm (có thời hạn 1 giờ - 3600 seconds)
+- 🔒 Lưu `refreshToken` trong bộ nhớ an toàn như Keychain/Keystore (có thời hạn 30 ngày)
+- ✅ Sử dụng `accessToken` trong header Authorization cho tất cả API calls
+- 🔄 Tự động refresh token khi accessToken sắp hết hạn
+
+**⚠️ Xử lý Token trong Mobile App:**
+```javascript
+// Lưu token sau khi login thành công
+localStorage.setItem('accessToken', response.data.accessToken);
+localStorage.setItem('refreshToken', response.data.refreshToken);
+
+// Sử dụng token trong các API call
+const config = {
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+    'Content-Type': 'application/json'
+  }
+};
+```
+
+#### Bước 2: Làm mới Token khi hết hạn
+
+**Endpoint:** `POST /api/auth/refresh-token`
+
+**Request Body:**
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**🔄 Tự động Refresh Token Logic:**
+```javascript
+// Kiểm tra và refresh token tự động
+async function checkAndRefreshToken() {
+  const accessToken = localStorage.getItem('accessToken');
+  const refreshToken = localStorage.getItem('refreshToken');
+  
+  // Kiểm tra token có hết hạn không (decode JWT)
+  if (isTokenExpired(accessToken) && refreshToken) {
+    try {
+      const response = await refreshTokenAPI(refreshToken);
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      return response.data.accessToken;
+    } catch (error) {
+      // Redirect to login nếu refresh thất bại
+      redirectToLogin();
+    }
+  }
+  return accessToken;
+}
+```
+
+### 1. Tham gia lớp học
+
+**Endpoint:** `POST /api/enrollments/join`
+
+**Mô tả:** Cho phép học sinh đã đăng nhập tham gia vào lớp học bằng mã lớp học.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Request Body:**
+```json
+{
+  "classCode": "CNPM2025"
+}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "id": 1,
+    "studentId": 1,
+    "studentName": "Lê Học Sinh",
+    "classId": 1,
+    "className": "Lớp Công Nghệ Phần Mềm",
+    "enrolledAt": "2025-06-14T10:30:00Z",
+    "message": "Successfully enrolled in class: Lớp Công Nghệ Phần Mềm"
+  }
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 409,
+  "message": "Student is already enrolled in this class"
+}
+```
+
+### 2. Kiểm tra mã lớp học
+
+**Endpoint:** `POST /api/enrollments/validate`
+
+**Mô tả:** Kiểm tra tính hợp lệ của mã lớp học mà không cần đăng nhập hoặc tham gia lớp.
+
+**Request Body:**
+```json
+{
+  "classCode": "CNPM2025"
+}
+```
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "exists": true,
+    "className": "Lớp Công Nghệ Phần Mềm",
+    "instructorName": "Nguyễn Văn Giảng"
+  }
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 404,
+  "message": "Class not found with the provided code"
+}
+```
+
+## LeaveClass API
+
+**Endpoint:** `DELETE /api/enrollments/leave/{classId}`
+
+**Mô tả:** Cho phép học sinh đã đăng nhập rời khỏi lớp học đã tham gia.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Parameters:**
+- `classId`: ID của lớp học muốn rời khỏi
+
+**Phản hồi thành công:**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": true
+}
+```
+
+**Phản hồi lỗi:**
+```json
+{
+  "code": 404,
+  "message": "Student is not enrolled in this class"
+}
+```
+
+hoặc
+
+```json
+{
+  "code": 400,
+  "message": "Bad request"
+}
+```
+
+### Mã lỗi phổ biến
+
+| Mã | Tin nhắn | Mô tả |
+|----|----------|-------|
+| 200 | Success | Yêu cầu thành công |
+| 400 | Bad request | Yêu cầu không hợp lệ (thường là do thiếu token xác thực) |
+| 401 | Invalid or expired OTP | OTP không đúng hoặc đã hết hạn |
+| 402 | OTP verification needed | Cần xác thực OTP trước khi đặt lại mật khẩu |
+| 403 | User is not a student | Người dùng không phải là học sinh |
+| 404 | Class not found/Student not enrolled | Không tìm thấy lớp hoặc học sinh không đăng ký lớp |
+| 409 | Student is already enrolled in this class | Học sinh đã đăng ký lớp này |
+| 430 | User not found | Không tìm thấy người dùng |
+
+### Lưu ý quan trọng
+
+1. Khi gọi API LeaveClass và JoinClass, token xác thực phải được cung cấp trong header `Authorization` với định dạng `Bearer {token}`.
+2. **Giải quyết lỗi "Bad request" (400):**
+   - **Nguyên nhân phổ biến:** Token xác thực không được cung cấp hoặc không hợp lệ
+   - **Cách khắc phục:**
+     - Đảm bảo token được đặt trong header với định dạng chính xác: `Authorization: Bearer {token}`
+     - Kiểm tra token chưa hết hạn (thông thường token có thời hạn 1 tiếng)
+     - Đảm bảo người dùng đã đăng nhập và có quyền thực hiện hành động
+     - Kiểm tra tham số `classId` hợp lệ và tồn tại trong hệ thống
+3. Quy trình OTP trong ForgotPassword có thời gian hiệu lực giới hạn (thường là 10-15 phút). Sau thời gian này, người dùng cần yêu cầu OTP mới.
+
+## 🚨 Troubleshooting: "Authentication token not found"
+
+### Mô tả lỗi:
+```
+I/flutter ( 5608): === Starting Join Class Request ===
+I/flutter ( 5608): Class Code: CSDL2025
+Authentication token not found
+```
+
+### 🔍 Nguyên nhân:
+Ứng dụng Flutter đã đăng nhập thành công nhưng **KHÔNG gửi token** trong header của API request join class.
+
+### ✅ Cách khắc phục:
+
+#### 1. Kiểm tra Token có được lưu sau khi login không:
+
+**Trong Flutter app, thêm debug code:**
+```dart
+// Sau khi login thành công
+print('=== Login Response ===');
+print('Access Token: ${response.data.accessToken}');
+print('Refresh Token: ${response.data.refreshToken}');
+
+// Lưu token vào SharedPreferences
+SharedPreferences prefs = await SharedPreferences.getInstance();
+await prefs.setString('access_token', response.data.accessToken);
+await prefs.setString('refresh_token', response.data.refreshToken);
+
+print('=== Token Saved Successfully ===');
+```
+
+#### 2. Kiểm tra Token có được đọc khi join class không:
+
+**Trước khi gọi API join class:**
+```dart
+// Debug: Kiểm tra token trước khi join class
+SharedPreferences prefs = await SharedPreferences.getInstance();
+String? accessToken = prefs.getString('access_token');
+
+print('=== Join Class Debug ===');
+print('Class Code: $classCode');
+print('Access Token: $accessToken');
+print('Token exists: ${accessToken != null}');
+print('Token length: ${accessToken?.length ?? 0}');
+```
+
+#### 3. Đảm bảo gửi token trong header:
+
+**❌ SAI - Không có Authorization header:**
+```dart
+final response = await dio.post(
+  '/api/enrollments/join',
+  data: {
+    'classCode': classCode,
+  },
+);
+```
+
+**✅ ĐÚNG - Có Authorization header:**
+```dart
+SharedPreferences prefs = await SharedPreferences.getInstance();
+String? accessToken = prefs.getString('access_token');
+
+final response = await dio.post(
+  '/api/enrollments/join',
+  data: {
+    'classCode': classCode,
+  },
+  options: Options(
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+  ),
+);
+```
+
+#### 4. Tạo Interceptor để tự động thêm token:
+
+**Cách tốt nhất - Sử dụng Dio Interceptor:**
+```dart
+class AuthInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('access_token');
+    
+    if (accessToken != null) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
+      print('=== Token Added to Request ===');
+      print('URL: ${options.path}');
+      print('Token: ${accessToken.substring(0, 20)}...');
+    } else {
+      print('=== WARNING: No Token Found ===');
+    }
+    
+    handler.next(options);
+  }
+}
+
+// Thêm interceptor vào Dio instance
+dio.interceptors.add(AuthInterceptor());
+```
+
+#### 5. Kiểm tra format token:
+
+**Debug request headers trước khi gửi:**
+```dart
+print('=== Request Headers ===');
+options.headers.forEach((key, value) {
+  print('$key: $value');
+});
+```
+
+**Đảm bảo format header đúng:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### 🔧 Code mẫu hoàn chỉnh cho Join Class:
+
+```dart
+Future<void> joinClass(String classCode) async {
+  try {
+    print('=== Starting Join Class Request ===');
+    print('Class Code: $classCode');
+    
+    // 1. Lấy token từ storage
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('access_token');
+    
+    // 2. Kiểm tra token tồn tại
+    if (accessToken == null || accessToken.isEmpty) {
+      print('❌ ERROR: No access token found');
+      throw Exception('Please login first');
+    }
+    
+    print('✅ Access token found: ${accessToken.substring(0, 20)}...');
+    
+    // 3. Gửi request với token
+    final response = await dio.post(
+      '/api/enrollments/join',
+      data: {
+        'classCode': classCode,
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
+    
+    print('✅ Join class successful: ${response.data}');
+    
+  } catch (e) {
+    print('❌ Join class failed: $e');
+    
+    // Nếu token hết hạn, thử refresh
+    if (e.toString().contains('401') || e.toString().contains('token')) {
+      await refreshTokenAndRetry(classCode);
+    }
+  }
+}
+```
+
+### 🔄 Auto Refresh Token khi hết hạn:
+
+```dart
+Future<void> refreshTokenAndRetry(String classCode) async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? refreshToken = prefs.getString('refresh_token');
+    
+    if (refreshToken == null) {
+      throw Exception('No refresh token, please login again');
+    }
+    
+    // Gọi API refresh token
+    final refreshResponse = await dio.post(
+      '/api/auth/refresh-token',
+      data: {
+        'refreshToken': refreshToken,
+      },
+    );
+    
+    // Lưu token mới
+    await prefs.setString('access_token', refreshResponse.data.data.accessToken);
+    await prefs.setString('refresh_token', refreshResponse.data.data.refreshToken);
+    
+    print('✅ Token refreshed successfully');
+    
+    // Thử lại join class với token mới
+    await joinClass(classCode);
+    
+  } catch (e) {
+    print('❌ Refresh token failed: $e');
+    // Redirect to login screen
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+}
+```
+
+### 📋 Checklist Debug:
+
+- [ ] Token được lưu sau khi login thành công
+- [ ] Token được đọc trước khi join class  
+- [ ] Header Authorization có format đúng: "Bearer {token}"
+- [ ] Không có ký tự thừa hoặc space trong token
+- [ ] Request được gửi đến đúng endpoint `/api/enrollments/join`
+- [ ] Token chưa hết hạn (kiểm tra thời gian tạo)

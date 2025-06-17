@@ -7,4 +7,9 @@ class ApiConfig {
   static const String verifyOtp = '/auth/verify-otp';
   static const String resendOtp = '/auth/resend-otp';
 
+
+
+  // Exercise
+  static const String getQuestionForExercise = '/exercises/questions';
+
 }

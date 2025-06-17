@@ -62,7 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       };
 
       if (_selectedRole == UserRole.STUDENT) {
-        // Nếu là sinh viên, chuyển đến màn hình xác thực OTP
         Navigator.pushNamed(
           context,
           '/otp-verification',
@@ -72,8 +71,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       } else {
-        // Nếu là giảng viên, hoàn tất đăng ký luôn
-        // TODO: Implement instructor registration
         Navigator.pushReplacementNamed(context, '/home');
       }
     }

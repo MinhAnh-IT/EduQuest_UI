@@ -39,8 +39,6 @@ class AuthProvider extends ChangeNotifier {
       if (response['code'] == 200) {
         final data = response['data'];
         _token = data['accessToken'];
-        //_currentUser = User.fromJson(data['user']);
-        //print(_currentUser);
         await _prefs.setString(StorageConstants.token, _token!);
         ApiClient.token = _token;
         _setLoading(false);

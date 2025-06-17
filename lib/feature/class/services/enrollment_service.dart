@@ -18,25 +18,28 @@ class EnrollmentService {
       headers: ApiConfig.defaultHeaders,
       validateStatus: (status) => status != null && status < 500,
     ));
-  }  // Get Authorization token from storage
+  }  
+  
+  // Get Authorization token from storage
   Future<String?> _getAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(StorageConstants.token);
   }
+
   // Join Class
   Future<ApiResponse<Enrollment>> joinClass(String classCode) async {
     try {
       final token = await _getAuthToken();
       if (token == null) {
         return ApiResponse<Enrollment>(
-          status: StatusCode.INVALID_TOKEN,
-          message: 'Authentication token not found',
+          status: StatusCode.authenticationRequired,
+          message: StatusCode.authenticationRequired.message,
         );
       }
 
       final response = await _dio.post(
         ApiConfig.joinClass,
-        data: {'classCode': classCode},
+        data: {'classCode': classCode.trim()},
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
@@ -56,12 +59,12 @@ class EnrollmentService {
       }
 
       return ApiResponse<Enrollment>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
+        status: StatusCode.internalServerError,
         message: e.message ?? 'Network error occurred',
       );
     } catch (e) {
       return ApiResponse<Enrollment>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
+        status: StatusCode.internalServerError,
         message: 'An unexpected error occurred',
       );
     }
@@ -73,8 +76,8 @@ class EnrollmentService {
       final token = await _getAuthToken();
       if (token == null) {
         return ApiResponse<void>(
-          status: StatusCode.INVALID_TOKEN,
-          message: 'Authentication token not found',
+          status: StatusCode.authenticationRequired,
+          message: StatusCode.authenticationRequired.message,
         );
       }
 
@@ -92,12 +95,12 @@ class EnrollmentService {
       }
 
       return ApiResponse<void>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
+        status: StatusCode.internalServerError,
         message: e.message ?? 'Network error occurred',
       );
     } catch (e) {
       return ApiResponse<void>(
-        status: StatusCode.INTERNAL_SERVER_ERROR,
+        status: StatusCode.internalServerError,
         message: 'An unexpected error occurred',
       );
     }

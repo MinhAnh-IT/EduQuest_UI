@@ -26,10 +26,8 @@ class ApiResponse<T> {
         }
     }
 
-    String messageValue = json['message'] as String? ?? 'An error occurred';
-
-    return ApiResponse(
-      status: StatusCode.fromCode(statusCodeValue, responseMessage: messageValue), // Use StatusCode.fromCode
+    String messageValue = json['message'] as String? ?? 'An error occurred';    return ApiResponse(
+      status: StatusCode.fromCode(statusCodeValue) ?? StatusCode.internalServerError, // Handle null case
       message: messageValue,
       data: json['data'] != null && fromJson != null ? fromJson(json['data']) : null,
     );

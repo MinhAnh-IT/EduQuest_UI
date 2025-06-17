@@ -5,20 +5,20 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage;
-  AuthService() : _storage = const FlutterSecureStorage();
-  Future<Map<String, dynamic>> requestPasswordReset(String username) async {
+
+  AuthService() : _storage = const FlutterSecureStorage();  // Request password reset - Updated according to API documentation
+    Future<Map<String, dynamic>> requestPasswordReset(String username) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
     final response = await ApiClient.post(url, {
-      'username': username
+      'username': username.trim()
     });
     return jsonDecode(response.body);
   }
-
   // Reset password with OTP
   Future<Map<String, dynamic>> resetPassword(String username, String newPassword) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.resetPassword}';
     final response = await ApiClient.post(url, {
-      'username': username,
+      'username': username.trim(),
       'newPassword': newPassword
     });
     return jsonDecode(response.body);
@@ -48,15 +48,13 @@ class AuthService {
     
     return jsonDecode(response.body);
   }
-
-  // Verify OTP
+  // Verify OTP for forgot password
   Future<Map<String, dynamic>> verifyOTPForgotPassword(String username, String otp) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtpForgotPassword}';
     final response = await ApiClient.post(url, {
-      'username': username,
-      'otp': otp
+      'username': username.trim(),
+      'otp': otp.trim()
     });
-    
     return jsonDecode(response.body);
   }
 

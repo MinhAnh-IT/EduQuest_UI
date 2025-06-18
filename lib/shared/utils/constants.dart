@@ -5,6 +5,7 @@ class StorageConstants {
   static const String theme = 'theme';
   static const String language = 'language';
   static const String onboarding = 'onboarding';
+  static const String tempUserId = 'temp_user_id';
 }
 
 /// Các hằng số cho validation

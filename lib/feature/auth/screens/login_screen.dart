@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text("Bạn chưa có tài khoản?"),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/role-selection');
+                          Navigator.pushNamed(context, '/register');
                         },
                         child: const Text('Đăng ký'),
                       ),

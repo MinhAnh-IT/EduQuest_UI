@@ -5,12 +5,13 @@ import 'package:register_login/shared/theme/app_theme.dart';
 import 'package:register_login/shared/widgets/otp_input.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String email;
+  final String username;
+
   final Map<String, dynamic> registrationData;
 
   const OtpVerificationScreen({
     super.key,
-    required this.email,
+    required this.username,
     required this.registrationData,
   });
 
@@ -38,7 +39,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
         curve: Curves.easeIn,
       ),
     );
-    _sendOTP();
+    // _sendOTP();
     _animationController.forward();
   }
 
@@ -51,27 +52,57 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
 
   Future<void> _sendOTP() async {
     final authProvider = context.read<AuthProvider>();
-    await authProvider.resendOTP(widget.email);
+    await authProvider.resendOTP(widget.username);
   }
 
   Future<void> _verifyOTP() async {
+
     if (_otpController.text.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập đủ 6 số')),
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'Vui lòng nhập đủ 6 số',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
       return;
     }
 
-    final authProvider = context.read<AuthProvider>();
-    final success =
-        await authProvider.verifyOTP(widget.email, _otpController.text);
+    try {
+      final authProvider = context.read<AuthProvider>();
+      authProvider.clearError();
+      final success = await authProvider.verifyOTP(widget.username, _otpController.text);
 
-    if (success && mounted) {
-      Navigator.pushReplacementNamed(
-        context,
-        '/student-details',
-        arguments: widget.registrationData,
+      if (success) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/student-details',
+          arguments: widget.registrationData,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              'Xác minh OTP thất bại. Vui lòng thử lại!',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red, // <-- ĐẶT MÀU NỀN SNACKBAR LÀ MÀU ĐỎ
+          content: Text(
+            'Lỗi: ${e.toString().replaceAll('Exception: ', '')}. Vui lòng thử lại sau!', // Thêm replaceAll để làm sạch thông báo lỗi Exception:
+            style: TextStyle(color: Colors.white), // <-- ĐẶT MÀU CHỮ LÀ MÀU TRẮNG
+          ),
+        ),
       );
+      print('Error during OTP verification: $e'); // Log lỗi để debug
     }
   }
 
@@ -79,12 +110,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     setState(() {
       _isResending = true;
     });
-
-    await _sendOTP();
-
-    setState(() {
-      _isResending = false;
-    });
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.resendOTP(widget.username);  // Dùng username để resend
+    } finally {
+      setState(() {
+        _isResending = false;
+      });
+    }
   }
 
   @override
@@ -137,7 +170,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32),
                       child: Text(
-                        'Chúng tôi đã gửi mã OTP đến\n${widget.email}',
+                        'Chúng tôi đã gửi mã OTP đến\n${widget.username}',
                         style: const TextStyle(
                             fontSize: 16, color: Colors.white70),
                         textAlign: TextAlign.center,
@@ -165,8 +198,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                               const SizedBox(height: 16),
                               Text(
                                 authProvider.error!,
-                                style:
-                                    const TextStyle(color: AppTheme.errorColor),
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],

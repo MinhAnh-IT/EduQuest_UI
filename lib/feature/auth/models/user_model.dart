@@ -20,7 +20,7 @@ class User {
     required this.name,
     this.email,
     required this.role,
-    this.isActive = true,
+    this.isActive = false,
     this.avatarUrl,
     this.lastLoginAt,
     required this.createdAt,
@@ -59,6 +59,5 @@ class User {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
-
   }
 }

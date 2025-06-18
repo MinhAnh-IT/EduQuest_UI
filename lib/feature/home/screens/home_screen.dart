@@ -8,6 +8,8 @@ import '../../class/models/class_detail.dart'; // Import class detail model
 import '../../class/models/assignment.dart'; // Import assignment model
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -17,8 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final EnrollmentService _enrollmentService = EnrollmentService();
 
   final List<Widget> _pages = [
-    HomeTab(),
-    ProfileScreen(), // Use ProfileScreen
+    const HomeTab(),
+    const ProfileScreen(), // Use ProfileScreen
   ];
 
   void _showJoinClassDialog(BuildContext context) {
@@ -31,37 +33,36 @@ class _HomeScreenState extends State<HomeScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('Tham gia lớp học'),
+              title: const Text('Tham gia lớp học'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: classCodeController,
-                    decoration: InputDecoration(hintText: 'Nhập mã lớp'),
+                    decoration: const InputDecoration(hintText: 'Nhập mã lớp'),
                     autofocus: true,
                     enabled: !isLoading,
                   ),
                   if (isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
                       child: CircularProgressIndicator(),
                     ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Hủy'),
                   onPressed: isLoading ? null : () {
                     Navigator.of(context).pop();
                   },
+                  child: const Text('Hủy'),
                 ),
                 ElevatedButton(
-                  child: Text('Tham gia'),
                   onPressed: isLoading ? null : () async {
                     String classCode = classCodeController.text.trim();
                     if (classCode.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Vui lòng nhập mã lớp')),
+                        const SnackBar(content: Text('Vui lòng nhập mã lớp')),
                       );
                       return;
                     }
@@ -71,13 +72,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     });                    try {
                       final response = await _enrollmentService.joinClass(classCode);
                       
-                      if (response.status == StatusCode.JOIN_CLASS_SUCCESS) {
+                      if (response.status == StatusCode.joinClassSuccess) {
+                        // ignore: use_build_context_synchronously
                         Navigator.of(context).pop();
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(response.message),
                             backgroundColor: Colors.green,
-                            duration: Duration(seconds: 3),
+                            duration: const Duration(seconds: 3),
                           ),
                         );
                         // Refresh the class list if needed
@@ -87,17 +90,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         }
                       } else {
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(response.message),
                             backgroundColor: Colors.red,
-                            duration: Duration(seconds: 4),
+                            duration: const Duration(seconds: 4),
                           ),
                         );
                       }
                     } catch (e) {
+                      // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Đã xảy ra lỗi kết nối. Vui lòng thử lại.'),
                           backgroundColor: Colors.red,
                           duration: Duration(seconds: 4),
@@ -111,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     }
                   },
+                  child: const Text('Tham gia'),
                 ),
               ],
             );
@@ -128,9 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           _showJoinClassDialog(context);
         },
-        child: Icon(Icons.add),
         backgroundColor: Colors.cyan, // Or your preferred color
         foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Standard position
       bottomNavigationBar: BottomNavigationBarWidget( // Use the new widget
@@ -146,6 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeTab extends StatefulWidget {
+  const HomeTab({super.key});
+
   @override
   State<HomeTab> createState() => _HomeTabState();
 }
@@ -228,11 +236,11 @@ class _HomeTabState extends State<HomeTab> {
       Color(0xFFEA4335), // Red
       Color(0xFF6D4C41), // Brown
     ];
+    // ignore: deprecated_member_use
     return colors[index % colors.length].withOpacity(0.9);
   }
 
   void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
-    // Create sample data for class detail
     final classDetail = ClassDetail(
       id: int.parse(classData['id'] ?? '1'),
       name: classData['name'] ?? '',
@@ -260,26 +268,26 @@ class _HomeTabState extends State<HomeTab> {
         id: classId * 10 + 1,
         title: 'Bài tập 1: Giới thiệu',
         description: 'Viết một bài luận ngắn về bản thân và mục tiêu học tập.',
-        dueDate: baseDate.add(Duration(days: 7)),
+        dueDate: baseDate.add(const Duration(days: 7)),
         status: 'submitted',
         grade: '8.5',
-        createdAt: baseDate.subtract(Duration(days: 14)),
+        createdAt: baseDate.subtract(const Duration(days: 14)),
       ),
       Assignment(
         id: classId * 10 + 2,
         title: 'Bài tập 2: Nghiên cứu',
         description: 'Thực hiện nghiên cứu về chủ đề được giao và trình bày kết quả.',
-        dueDate: baseDate.add(Duration(days: 14)),
+        dueDate: baseDate.add(const Duration(days: 14)),
         status: 'pending',
-        createdAt: baseDate.subtract(Duration(days: 7)),
+        createdAt: baseDate.subtract(const Duration(days: 7)),
       ),
       Assignment(
         id: classId * 10 + 3,
         title: 'Bài tập 3: Thực hành',
         description: 'Hoàn thành các bài tập thực hành trong sách giáo khoa chương 3.',
-        dueDate: baseDate.subtract(Duration(days: 2)),
+        dueDate: baseDate.subtract(const Duration(days: 2)),
         status: 'pending',
-        createdAt: baseDate.subtract(Duration(days: 10)),
+        createdAt: baseDate.subtract(const Duration(days: 10)),
       ),
     ];
   }
@@ -292,27 +300,26 @@ class _HomeTabState extends State<HomeTab> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('Rời lớp học'),
+              title: const Text('Rời lớp học'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Bạn có chắc chắn muốn rời lớp học "${classData['name']}" không?'),
                   if (isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
                       child: CircularProgressIndicator(),
                     ),
                 ],
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Hủy'),
                   onPressed: isLoading ? null : () {
                     Navigator.of(dialogContext).pop();
                   },
+                  child: const Text('Hủy'),
                 ),
                 ElevatedButton(
-                  child: Text('Rời lớp'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: isLoading ? null : () async {
                     setState(() {
@@ -323,8 +330,10 @@ class _HomeTabState extends State<HomeTab> {
                       final classId = int.parse(classData['id']!);
                       final response = await _enrollmentService.leaveClass(classId);
                       
-                      if (response.status == StatusCode.LEAVE_CLASS_SUCCESS) {
+                      if (response.status == StatusCode.leaveClassSuccess) {
+                        // ignore: use_build_context_synchronously
                         Navigator.of(dialogContext).pop();
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(response.message),
@@ -336,6 +345,7 @@ class _HomeTabState extends State<HomeTab> {
                           _filteredClasses = _allClasses;
                         });
                       } else {
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(response.message),
@@ -344,6 +354,7 @@ class _HomeTabState extends State<HomeTab> {
                         );
                       }
                     } catch (e) {
+                      // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Đã xảy ra lỗi: $e'),
@@ -358,6 +369,7 @@ class _HomeTabState extends State<HomeTab> {
                       }
                     }
                   },
+                  child: const Text('Rời lớp'),
                 ),
               ],
             );
@@ -372,7 +384,7 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: Text('EduQuest'),
+        title: const Text('EduQuest'),
         centerTitle: true,
         backgroundColor: Colors.cyan,
         foregroundColor: Colors.white,
@@ -406,21 +418,21 @@ class _HomeTabState extends State<HomeTab> {
                       : null,
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide(color: Colors.cyan, width: 1.5),
+                    borderSide: const BorderSide(color: Colors.cyan, width: 1.5),
                   ),
                 ),
               ),
             ),
           Expanded(
             child: SafeArea(
-              top: !_isSearching, // Only apply top SafeArea padding if search bar is not visible
+              top: !_isSearching, 
               bottom: true,
               left: true,
               right: true,
@@ -432,23 +444,23 @@ class _HomeTabState extends State<HomeTab> {
                 ),
               )
                   : ListView.builder(
-                padding: EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
+                padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
                 itemCount: _filteredClasses.length,
                 itemBuilder: (context, index) {
                   final classData = _filteredClasses[index];
                   return Card(
                     color: _getCardColor(index),
-                    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                     elevation: 2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                      leading: Icon(Icons.class_, color: Colors.white, size: 30),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                      leading: const Icon(Icons.class_, color: Colors.white, size: 30),
                       title: Text(
                         classData['name']!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -459,6 +471,7 @@ class _HomeTabState extends State<HomeTab> {
                       subtitle: Text(
                         classData['instructor']!,
                         style: TextStyle(
+                          // ignore: deprecated_member_use
                           color: Colors.white.withOpacity(0.85),
                           fontSize: 14,
                         ),
@@ -466,7 +479,7 @@ class _HomeTabState extends State<HomeTab> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert, color: Colors.white),
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
                         onSelected: (String value) {
                           if (value == 'leave') {
                             _showLeaveClassConfirmationDialog(context, classData);

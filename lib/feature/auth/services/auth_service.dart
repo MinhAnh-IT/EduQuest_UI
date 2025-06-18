@@ -5,20 +5,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage;
-  AuthService() : _storage = const FlutterSecureStorage();
-  Future<Map<String, dynamic>> requestPasswordReset(String username) async {
+
+  AuthService() : _storage = const FlutterSecureStorage();  
+    Future<Map<String, dynamic>> requestPasswordReset(String username) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
     final response = await ApiClient.post(url, {
-      'username': username
+      'username': username.trim()
     });
     return jsonDecode(response.body);
   }
-
-  // Reset password with OTP
   Future<Map<String, dynamic>> resetPassword(String username, String newPassword) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.resetPassword}';
     final response = await ApiClient.post(url, {
-      'username': username,
+      'username': username.trim(),
       'newPassword': newPassword
     });
     return jsonDecode(response.body);
@@ -48,20 +47,18 @@ class AuthService {
     
     return jsonDecode(response.body);
   }
-
-  // Verify OTP
+  // Verify OTP for forgot password
   Future<Map<String, dynamic>> verifyOTPForgotPassword(String username, String otp) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtpForgotPassword}';
     final response = await ApiClient.post(url, {
-      'username': username,
-      'otp': otp
+      'username': username.trim(),
+      'otp': otp.trim()
     });
-    
     return jsonDecode(response.body);
   }
 
   static Future<Map<String, dynamic>> login(String username, String password) async {
-    const url = '${ApiConfig.baseUrl}${ApiConfig.login}';
+    final url = '${ApiConfig.baseUrl}${ApiConfig.login}';
     final response = await ApiClient.post(url, {
       'username': username,
       'password': password,
@@ -71,13 +68,13 @@ class AuthService {
   }
 
   static Future<Map<String, dynamic>> register(Map<String, dynamic> payload) async {
-    const url = '${ApiConfig.baseUrl}${ApiConfig.register}';
+    final url = '${ApiConfig.baseUrl}${ApiConfig.register}';
     final response = await ApiClient.post(url, payload);
     return jsonDecode(response.body);
   }
 
   static Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
-    const url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtp}';
+    final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtp}';
     final response = await ApiClient.post(url, {
       'email': email,
       'otp': otp,
@@ -86,7 +83,7 @@ class AuthService {
   }
 
   static Future<Map<String, dynamic>> resendOtp(String email) async {
-    const url = '${ApiConfig.baseUrl}${ApiConfig.resendOtp}';
+    final url = '${ApiConfig.baseUrl}${ApiConfig.resendOtp}';
     final response = await ApiClient.post(url, {'email': email});
     return jsonDecode(response.body);
   }

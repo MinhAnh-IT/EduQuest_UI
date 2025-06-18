@@ -25,7 +25,7 @@ class QuizService {
       throw Exception(StatusCode.notIsStudent.message);
     } else if(code == StatusCode.participationAlreadyExists.code){
       throw Exception(StatusCode.participationAlreadyExists.message);
-    } else if (code == StatusCode.participationAlreadyExists.code){
+    } else if (code == StatusCode.participationIsSubmitted.code){
       throw Exception(StatusCode.participationIsSubmitted.message);
     }else {
       throw Exception(message.isNotEmpty ? message : "Có lỗi xảy ra");
@@ -33,7 +33,7 @@ class QuizService {
   }
 
   static Future<SubmitedModel> submissionExam(SubmissionRequest request) async {
-    const url = '${ApiConfig.baseUrl}${ApiConfig.submissionExam}';
+    final url = '${ApiConfig.baseUrl}${ApiConfig.submissionExam}';
     final response = await ApiClient.post(url, request.toJson());
 
     final Map<String, dynamic> body = jsonDecode(response.body);

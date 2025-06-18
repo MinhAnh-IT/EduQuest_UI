@@ -469,7 +469,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(
         title: 'Danh sách lớp học',
         actions: [

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static String? token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiRWR1UXVlc3RBdWRpZW5jZSIsImlhdCI6MTc1MDIxNTc2NCwidXNlcm5hbWUiOiJzdHVkZW50MSIsImlzcyI6IkVkdVF1ZXN0SXNzdWVyIiwiZXhwIjoxNzUwMjE5MzY0LCJyb2xlIjoiUk9MRV9TVFVERU5UIn0.7Iy2AZs3x69J9SkcnXQJBq2Bv0BBTFrwyl2HcYEImTY";
+  static String? token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiRWR1UXVlc3RBdWRpZW5jZSIsImlhdCI6MTc1MDIxODYwOCwidXNlcm5hbWUiOiJzdHVkZW50MSIsImlzcyI6IkVkdVF1ZXN0SXNzdWVyIiwiZXhwIjoxNzUwMjIyMjA4LCJyb2xlIjoiUk9MRV9TVFVERU5UIn0.VivkXsPefhbiOx5sfjAa6D_UfIJYtA4iSvWdQ4e9_Rg";
   static Map<String, String> _getHeaders({bool useAuth = false}) {
     final headers = {
       'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:edu_quest/feature/quiz/models/question_waper.dart';
+import '../../../feature/quiz/models/question_waper.dart';
 
 class QuestionWidget extends StatelessWidget {
   final QuestionWrapper questionWrapper;

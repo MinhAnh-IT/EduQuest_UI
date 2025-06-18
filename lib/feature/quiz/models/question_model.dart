@@ -1,4 +1,4 @@
-import 'package:edu_quest/feature/quiz/models/answer_model.dart';
+import '../../../feature/quiz/models/answer_model.dart';
 
 class QuestionModel {
   final int id;

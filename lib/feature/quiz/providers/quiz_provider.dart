@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:edu_quest/feature/quiz/models/answer_selected.dart';
-import 'package:edu_quest/feature/quiz/models/question_waper.dart';
-import 'package:edu_quest/feature/quiz/models/start_exam_model.dart';
-import 'package:edu_quest/feature/quiz/models/submission_request.dart';
+import '../../../feature/quiz/models/answer_selected.dart';
+import '../../../feature/quiz/models/question_waper.dart';
+import '../../../feature/quiz/models/start_exam_model.dart';
+import '../../../feature/quiz/models/submission_request.dart';
 import '../services/quiz_service.dart';
 
 class QuizProvider extends ChangeNotifier {

@@ -11,7 +11,7 @@ import '../../../feature/auth/screens/student/student_details_screen.dart';
 import '../../../feature/auth/providers/auth_provider.dart';
 import '../../../feature/auth/providers/theme_provider.dart';
 import '../../../shared/utils/constants.dart';
-
+import '../../../feature/home/screens/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;

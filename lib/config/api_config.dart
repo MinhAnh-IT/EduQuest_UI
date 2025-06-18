@@ -26,6 +26,10 @@ class ApiConfig {
   static const String myClasses = '/enrollments/my-classes';
   static const String myEnrolledClasses = '/enrollments/my-enrolled-classes';
 
+  // Exercise
+  static const String startExam = '/participations/exercises';
+  static const String submissionExam = '/participations/exercises/submit';
+
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

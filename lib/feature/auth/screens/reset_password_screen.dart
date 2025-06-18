@@ -78,24 +78,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(AppStrings.resetPasswordTitle),
+      backgroundColor: AppColors.background,      appBar: AppBar(
+        title: const Text(AppStrings.resetPasswordTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.text,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 20),
+              children: [                const SizedBox(height: 20),
                 _buildHeader(),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 CustomTextField(
                   controller: _passwordController,
                   labelText: 'Mật khẩu mới',
@@ -112,9 +110,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       });
                     },
                   ),
-                  validator: Validators.validatePassword,
-                ),
-                SizedBox(height: 20),
+                  validator: Validators.validatePassword,                ),
+                const SizedBox(height: 20),
                 CustomTextField(
                   controller: _confirmPasswordController,
                   labelText: 'Xác nhận lại mật khẩu',
@@ -131,11 +128,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       });
                     },
                   ),
-                  validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),
-                ),
-                SizedBox(height: 20),
+                  validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),                ),
+                const SizedBox(height: 20),
                 _buildPasswordRequirements(),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 CustomButton(
                   onPressed: _resetPassword,
                   text: AppStrings.resetPasswordTitle,
@@ -149,10 +145,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
+  Widget _buildHeader() {    return Container(
       alignment: Alignment.center,
-      child: Column(
+      child: const Column(
         children: [
           Icon(
             Icons.lock_outline,
@@ -177,10 +172,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
     );
   }
-
   Widget _buildPasswordRequirements() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue[50],
         borderRadius: BorderRadius.circular(12),
@@ -189,14 +183,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             AppStrings.passwordRequirements,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: AppColors.text,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildRequirementItem(
             'At least 8 characters',
             _passwordController.text.length >= 8,
@@ -213,10 +207,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
     );
   }
-
   Widget _buildRequirementItem(String text, bool isMet) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           Icon(
@@ -224,7 +217,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             color: isMet ? AppColors.success : Colors.grey[400],
             size: 20,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             text,
             style: TextStyle(
@@ -239,9 +232,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void _showSuccessDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
+      barrierDismissible: false,      builder: (context) => AlertDialog(
+        title: const Row(
           children: [
             Icon(
               Icons.check_circle,
@@ -251,13 +243,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Text('Success'),
           ],
         ),
-        content: Text('Your password has been reset successfully.'),
+        content: const Text('Your password has been reset successfully.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.popUntil(context, (route) => route.isFirst);
             },
-            child: Text('Back to Login'),
+            child: const Text('Back to Login'),
           ),
         ],
       ),

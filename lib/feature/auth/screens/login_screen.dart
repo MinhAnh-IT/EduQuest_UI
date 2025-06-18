@@ -26,10 +26,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_formKey.currentState!.validate()) {      final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.login(
           _usernameController.text, _passwordController.text);
+      
+      if (!mounted) return;
+      
       if (success) {
         AwesomeDialog(
           context: context,
@@ -42,13 +44,14 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           btnOkText: 'Vào app',
           btnOkColor: Colors.blue,
-          
         ).show();
       } else {
-        AwesomeDialog(context: context,
-        title: "Thất bại",
-        dialogType: DialogType.error,
-        desc: authProvider.error ?? "Đăng nhập thất bại" ).show();
+        AwesomeDialog(
+                context: context,
+                title: "Thất bại",
+                dialogType: DialogType.error,
+                desc: authProvider.error ?? "Đăng nhập thất bại")
+            .show();
       }
     }
   }
@@ -129,10 +132,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     onPressed: _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      textStyle: const TextStyle(fontSize: 17)
-                    ),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blue,
+                        textStyle: const TextStyle(fontSize: 17)),
                     child: const Text("Đăng nhập"),
                   ),                  const SizedBox(height: 16),
                   TextButton(
@@ -155,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/role-selection');
                         },
-                        child: const Text('Đăng ký' ),
+                        child: const Text('Đăng ký'),
                       ),
                     ],
                   ),

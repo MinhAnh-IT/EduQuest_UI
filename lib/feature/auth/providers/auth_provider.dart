@@ -4,12 +4,10 @@ import 'package:register_login/core/network/api_client.dart';
 import 'package:register_login/feature/auth/models/user_model.dart';
 import 'package:register_login/feature/auth/services/auth_service.dart';
 import 'package:register_login/shared/utils/constants.dart';
-import 'package:register_login/feature/auth/models/auth_user.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
   final AuthService _authService = AuthService();
-  AuthUser? _user;
   User? _currentUser;
   bool _isLoading = false;
   String? _error;
@@ -72,7 +70,6 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await _authService.logout();
       if (response['code'] == 200) {
-        _user = null;
         _token = null;
         await _prefs.remove(StorageConstants.token);
         _setLoading(false);
@@ -112,8 +109,6 @@ class AuthProvider extends ChangeNotifier {
       if (response['code'] == 200) {
         final data = response['data'];
         _token = data['accessToken'];
-        //_currentUser = User.fromJson(data['user']);
-        //print(_currentUser);
         await _prefs.setString(StorageConstants.token, _token!);
         ApiClient.token = _token;
         _setLoading(false);

@@ -16,8 +16,16 @@ enum StatusCode {
   studentAlreadyEnrolledInClass(409, "Sinh viên đã tham gia lớp học này"),
   userNotFound(430, "Không tìm thấy người dùng"),
   validationError(450, "Lỗi xác thực dữ liệu"),
-  internalServerError(500, "Lỗi máy chủ nội bộ"),
-  emailSendError(501, "Gửi email thất bại");
+  emailSendError(501, "Gửi email thất bại"),
+  
+  notMatch(4002, "Bạn không có quyền nộp bài này!"),
+  notIsStudent(4007, "Yêu cầu bạn phải là sinh viên để được tham gia làm bài."),
+  participationAlreadyExists(4204, "Bạn đã nộp bài hoặc hết hạn làm bài tập này."),
+  expiredExercise(4205, "Bài tập đã hết hạn nộp"),
+  participationIsSubmitted(4200, "Bài tập đã được nộp"),
+  unknown(50001, "Unknown error occurred."),
+  inValidToken(401, "Invalid or expired token."),
+  internalServerError(500, "Internal Server Error.");
 
   final int code;
   final String message;
@@ -36,4 +44,5 @@ enum StatusCode {
       return null;
     }
   }
+
 }

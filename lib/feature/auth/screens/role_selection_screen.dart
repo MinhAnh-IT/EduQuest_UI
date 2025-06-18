@@ -56,11 +56,10 @@ class RoleSelectionScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildRoleCard(
-                        context,
-                        'Sinh viên',
+                        context,                        'Sinh viên',
                         'Đăng ký tài khoản để truy cập các khóa học',
                         Icons.school,
-                        UserRole.STUDENT,
+                        UserRole.student,
                       ),
                       const SizedBox(height: 20),
                       _buildRoleCard(
@@ -68,7 +67,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         'Giảng viên',
                         'Đăng ký để tạo và quản lý các khóa học',
                         Icons.person_outline,
-                        UserRole.INSTRUCTOR,
+                        UserRole.instructor,
                       ),
                     ],
                   ),
@@ -100,7 +99,7 @@ class RoleSelectionScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(

@@ -8,9 +8,8 @@ class OTPVerificationFPScreen extends StatefulWidget {
   final String username;
 
   const OTPVerificationFPScreen({Key? key, required this.username}) : super(key: key);
-
   @override
-  _OTPVerificationFPScreenState createState() => _OTPVerificationFPScreenState();
+  State<OTPVerificationFPScreen> createState() => _OTPVerificationFPScreenState();
 }
 
 class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {

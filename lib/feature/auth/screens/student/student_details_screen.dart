@@ -38,7 +38,6 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
 
   void _handleSubmit() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement registration completion
       Navigator.pushReplacementNamed(context, '/home');
     }
   }

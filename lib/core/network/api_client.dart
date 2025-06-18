@@ -13,7 +13,7 @@ class ApiClient {
     return headers;
   }
 
-  static Future<http.Response> post(String url, dynamic body, {bool auth = false}) async {
+  static Future<http.Response> post(String url, dynamic body, {bool auth = true}) async {
     final uri = Uri.parse(url);
     return await http.post(uri, headers: _getHeaders(useAuth: auth), body: jsonEncode(body));
   }

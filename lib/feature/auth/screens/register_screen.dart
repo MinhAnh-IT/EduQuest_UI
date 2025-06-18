@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _selectedRole = ModalRoute.of(context)!.settings.arguments as UserRole;
-      _showStudentForm = _selectedRole == UserRole.STUDENT;
+      _showStudentForm = _selectedRole == UserRole.student;
       setState(() {});
     });
   }
@@ -61,8 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'role': _selectedRole,
       };
 
-      if (_selectedRole == UserRole.STUDENT) {
-        // Nếu là sinh viên, chuyển đến màn hình xác thực OTP
+      if (_selectedRole == UserRole.student) {
         Navigator.pushNamed(
           context,
           '/otp-verification',
@@ -72,8 +71,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       } else {
-        // Nếu là giảng viên, hoàn tất đăng ký luôn
-        // TODO: Implement instructor registration
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
@@ -118,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Đăng ký với vai trò ${_selectedRole == UserRole.STUDENT ? 'Sinh viên' : 'Giảng viên'}',
+                  'Đăng ký với vai trò ${_selectedRole == UserRole.student ? 'Sinh viên' : 'Giảng viên'}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -307,7 +304,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _handleRegister,
-                  child: Text(_selectedRole == UserRole.STUDENT 
+                  child: Text(_selectedRole == UserRole.student 
                     ? 'Tiếp tục' 
                     : 'Tạo tài khoản'),
                 ),

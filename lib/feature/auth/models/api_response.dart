@@ -1,7 +1,7 @@
-import '../../../core/enums/status_code.dart'; // Corrected Import StatusCode
+import '../../../core/enums/status_code.dart'; 
 
 class ApiResponse<T> {
-  final StatusCode status; // Changed to StatusCode
+  final StatusCode status; 
   final String message;
   final T? data;
 
@@ -12,21 +12,20 @@ class ApiResponse<T> {
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic)? fromJson) {
-    int statusCodeValue = 500; // Default to an error code
+    int statusCodeValue = 500; 
     if (json.containsKey('code') && json['code'] is int) {
       statusCodeValue = json['code'] as int;
-    } else if (json.containsKey('status') && json['status'] is int) { // Handle if status is int
+    } else if (json.containsKey('status') && json['status'] is int) { 
       statusCodeValue = json['status'] as int;
-    } else if (json.containsKey('status') && json['status'] is String) { // Handle if status is String and can be parsed
-        try {
+    } else if (json.containsKey('status') && json['status'] is String) {        try {
             statusCodeValue = int.parse(json['status'] as String);
         } catch (e) {
-            // If parsing fails, keep default or handle error
-            print("Error parsing status string to int: ${json['status']}");
+            // Error parsing status string to int: ${json['status']}
         }
     }
 
-    String messageValue = json['message'] as String? ?? 'An error occurred';    return ApiResponse(
+    String messageValue = json['message'] as String? ?? 'An error occurred';    
+    return ApiResponse(
       status: StatusCode.fromCode(statusCodeValue) ?? StatusCode.internalServerError, // Handle null case
       message: messageValue,
       data: json['data'] != null && fromJson != null ? fromJson(json['data']) : null,

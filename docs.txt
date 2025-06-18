@@ -252,6 +252,115 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+### 6. Get My Enrollments API
+
+**Endpoint:** `GET /api/enrollments/my-classes`
+
+**Description:** Retrieves all classes that the student has enrolled in (all statuses: PENDING, ENROLLED, REJECTED)
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response:**
+```json
+{
+  "code": 200,
+  "message": "Successfully retrieved student enrollments", // or "No enrollments found" if empty
+  "data": [
+    {
+      "enrollmentId": 1,
+      "studentId": 123,
+      "classId": 456,
+      "className": "Java Programming",
+      "instructorName": "Dr. Smith",
+      "status": "ENROLLED"
+    },
+    {
+      "enrollmentId": 2,
+      "studentId": 123,
+      "classId": 789,
+      "className": "Database Design",
+      "instructorName": "Prof. Johnson",
+      "status": "PENDING"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200` - Success: Successfully retrieved student enrollments
+- `402` - Authentication Required: You must be logged in
+- `405` - User Not A Student: User is not registered as a student
+- `500` - Internal Server Error: Failed to retrieve student enrollments
+
+**Business Logic:**
+1. Extract and validate JWT token from Authorization header
+2. Verify user is authenticated
+3. Find student record associated with the user
+4. Get all enrollments for this student (all statuses)
+5. Map to response DTOs with essential fields only
+6. Return list ordered by enrollment date (newest first)
+
+**Notes:**
+- Returns enrollments with ALL statuses (PENDING, ENROLLED, REJECTED)
+- Ordered by enrollment date descending (newest first)
+- Response includes only essential fields for UI display
+
+---
+
+### 7. Get My Enrolled Classes API
+
+**Endpoint:** `GET /api/enrollments/my-enrolled-classes`
+
+**Description:** Retrieves only the classes that the student is currently enrolled in (ENROLLED status only)
+
+**Headers:**
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Response:**
+```json
+{
+  "code": 200,
+  "message": "Successfully retrieved student enrolled classes", // or "No enrolled classes found" if empty
+  "data": [
+    {
+      "enrollmentId": 1,
+      "studentId": 123,
+      "classId": 456,
+      "className": "Java Programming",
+      "instructorName": "Dr. Smith",
+      "status": "ENROLLED"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200` - Success: Successfully retrieved student enrolled classes
+- `402` - Authentication Required: You must be logged in
+- `405` - User Not A Student: User is not registered as a student
+- `500` - Internal Server Error: Failed to retrieve student enrolled classes
+
+**Business Logic:**
+1. Extract and validate JWT token from Authorization header
+2. Verify user is authenticated
+3. Find student record associated with the user
+4. Get only ENROLLED status enrollments for this student
+5. Map to response DTOs with essential fields only
+6. Return list ordered by enrollment date (newest first)
+
+**Notes:**
+- Returns enrollments with ENROLLED status ONLY
+- Excludes PENDING and REJECTED enrollments
+- Ordered by enrollment date descending (newest first)
+- Useful for displaying active classes that student can participate in
+
+---
+
 ## Enum Definitions
 
 ### EnrollmentStatus

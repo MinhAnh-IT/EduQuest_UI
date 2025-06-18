@@ -20,11 +20,11 @@ class ApiConfig {
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
   static const String verifyOtpForgotPassword = '/auth/verify-otp-forgot-password';
-  static const String logout = '/auth/logout';
-
-  // Enrollment endpoints
+  static const String logout = '/auth/logout';  // Enrollment endpoints
   static const String joinClass = '/enrollments/join';
   static const String leaveClass = '/enrollments/leave';
+  static const String myClasses = '/enrollments/my-classes';
+  static const String myEnrolledClasses = '/enrollments/my-enrolled-classes';
 
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',

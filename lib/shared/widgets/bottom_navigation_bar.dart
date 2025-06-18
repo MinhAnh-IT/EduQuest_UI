@@ -16,15 +16,10 @@ class BottomNavigationBarWidget extends StatelessWidget {
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.cyan,
-      unselectedItemColor: Colors.grey,
-      items: const [
+      unselectedItemColor: Colors.grey,      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Trang chủ',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.class_),
-          label: 'Lớp học',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

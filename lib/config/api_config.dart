@@ -10,6 +10,7 @@ class ApiConfig {
 
 
   // Exercise
-  static const String getQuestionForExercise = '/exercises/questions';
+  static const String startExam = '/participations/exercises';
+  static const String submissionExam = '/participations/exercises/submit';
 
 }

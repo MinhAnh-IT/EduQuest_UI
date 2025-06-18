@@ -4,6 +4,7 @@ class QuestionModel {
   final int id;
   final String content;
   final List<AnswerModel> answers;
+  
   final String difficulty;
 
   QuestionModel({

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/question_model.dart';
+import 'package:register_login/feature/quiz/models/answer_selected.dart';
+import 'package:register_login/feature/quiz/models/question_waper.dart';
+import 'package:register_login/feature/quiz/models/start_exam_model.dart';
+import 'package:register_login/feature/quiz/models/submission_request.dart';
 import '../services/quiz_service.dart';
 
 class QuizProvider extends ChangeNotifier {
-  List<QuestionModel> questions = [];
-  List<int?> selectedAnswers = [];
-  int currentIndex = 0;
+  List<QuestionWrapper> questionWrappers = [];
+  StartExamModel? startExamModel;
+  List<AnswerSelected?> selectedAnswers = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -14,51 +17,60 @@ class QuizProvider extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
     try {
-      questions = await QuizService.getQuestionsByExerciseId(exerciseId);
-      selectedAnswers = List<int?>.filled(questions.length, null);
-      currentIndex = 0;
+      startExamModel = await QuizService.getQuestionsByExerciseId(exerciseId);
+
+      questionWrappers = startExamModel?.questionWappers ?? [];
+      selectedAnswers = List<AnswerSelected?>.filled(
+          questionWrappers.length, null,
+          growable: false);
     } catch (e) {
       errorMessage = (e is Exception)
           ? e.toString().replaceFirst('Exception: ', '')
-          : e.toString();
-      questions = [];
+          : "Có lỗi xảy ra trong quá trình tải dữ liệu.";
+      questionWrappers = [];
       selectedAnswers = [];
-      currentIndex = 0;
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  void selectAnswer(int answerId) {
-    if (questions.isNotEmpty) {
-      selectedAnswers[currentIndex] = answerId;
-      notifyListeners();
-    }
-  }
-
-  void selectAnswerForIndex(int answerId, int index) {
+  void selectAnswerForIndex(int answerId, int index, int exerciseQuestionId) {
     if (index >= 0 && index < selectedAnswers.length) {
-      selectedAnswers[index] = answerId;
+      selectedAnswers[index] = AnswerSelected(
+        exerciseQuestionId: exerciseQuestionId,
+        selectedAnswerId: answerId,
+      );
       notifyListeners();
     }
   }
 
-  void nextQuestion() {
-    if (currentIndex < questions.length - 1) {
-      currentIndex++;
+  Future<void> submit() async {
+    if (startExamModel == null) {
+      errorMessage = "Chưa load thông tin bài thi!";
+      notifyListeners();
+      return;
+    }
+    final participationId = startExamModel!.participationId;
+    final answers = selectedAnswers.whereType<AnswerSelected>().toList();
+
+    if (answers.isEmpty) {
+      errorMessage = "Bạn chưa chọn đáp án nào!";
+      notifyListeners();
+      return;
+    }
+
+    SubmissionRequest request = SubmissionRequest(
+      participationId: participationId,
+      selectedAnswers: answers,
+    );
+    try {
+      await QuizService.submissionExam(request);
+    } catch (e) {
+      errorMessage = (e is Exception)
+          ? e.toString().replaceFirst('Exception: ', '')
+          : "Có lỗi xảy ra trong quá trình nộp bài.";
       notifyListeners();
     }
-  }
-
-  void prevQuestion() {
-    if (currentIndex > 0) {
-      currentIndex--;
-      notifyListeners();
-    }
-  }
-
-  void submit() {
-    print("You pressed submit button");
   }
 }

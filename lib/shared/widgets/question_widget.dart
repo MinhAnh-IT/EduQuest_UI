@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../feature/quiz/models/question_model.dart';
+import 'package:register_login/feature/quiz/models/question_waper.dart';
 
 class QuestionWidget extends StatelessWidget {
-  final QuestionModel question;
+  final QuestionWrapper questionWrapper;
   final int? selectedAnswerId;
   final void Function(int) onAnswerSelected;
   final int? questionIndex;
 
   const QuestionWidget({
     super.key,
-    required this.question,
+    required this.questionWrapper,
     required this.selectedAnswerId,
     required this.onAnswerSelected,
     required this.questionIndex
@@ -31,14 +31,14 @@ class QuestionWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
-                "Câu $questionIndex: ${question.content}",
+                "Câu $questionIndex: ${questionWrapper.question.content}",
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.5,
                     ),
               ),
             ),
-            ...question.answers.map(
+            ...questionWrapper.question.answers.map(
               (answer) => InkWell(
                 onTap: () => onAnswerSelected(answer.id),
                 child: Padding(

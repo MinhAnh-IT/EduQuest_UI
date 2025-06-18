@@ -13,7 +13,6 @@ class ApiResponse<T> {
     Map<String, dynamic> json,
     T Function(dynamic) fromDataJson,
   ) {
-    print("ApiResponse.fromJson json = $json");
     int codeValue = -1;
     if (json['code'] is int) {
       codeValue = json['code'];

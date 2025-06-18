@@ -58,9 +58,9 @@ class _ExamScreenState extends State<ExamScreen> {
           offset: const Offset(0, 3),
         ),
       ],
-      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarPosition: FlushbarPosition.TOP,
       leftBarIndicatorColor: Colors.redAccent,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     ).show(context);
   }
 
@@ -69,13 +69,13 @@ class _ExamScreenState extends State<ExamScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (quizProvider.questions.isEmpty) {
+    if (quizProvider.questionWrappers.isEmpty) {
       return const Center(child: Text("Không có câu hỏi nào"));
     }
 
     final answeredCount =
         quizProvider.selectedAnswers.where((e) => e != null).length;
-    final totalQuestions = quizProvider.questions.length;
+    final totalQuestions = quizProvider.questionWrappers.length;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -100,15 +100,20 @@ class _ExamScreenState extends State<ExamScreen> {
             child: ListView.builder(
               itemCount: totalQuestions,
               itemBuilder: (context, index) {
-                final question = quizProvider.questions[index];
+                final question = quizProvider.questionWrappers[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: QuestionWidget(
-                    question: question,
+                    questionWrapper: question,
                     questionIndex: index + 1,
-                    selectedAnswerId: quizProvider.selectedAnswers[index],
+                    selectedAnswerId:
+                        quizProvider.selectedAnswers[index]?.selectedAnswerId,
                     onAnswerSelected: (answerId) {
-                      quizProvider.selectAnswerForIndex(answerId, index);
+                      quizProvider.selectAnswerForIndex(
+                        answerId,
+                        index,
+                        question.exerciseQuestionId,
+                      );
                     },
                   ),
                 );
@@ -152,7 +157,7 @@ class _ExamScreenState extends State<ExamScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         content: const SizedBox(
-          width: 280, 
+          width: 280,
           child: Text(
             "Bạn có chắc chắn muốn nộp bài không ?",
             style: TextStyle(fontSize: 15),

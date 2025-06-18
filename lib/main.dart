@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:register_login/app.dart';
+import 'package:edu_quest/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {

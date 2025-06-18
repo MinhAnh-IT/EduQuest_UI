@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:register_login/config/api_config.dart';
-import 'package:register_login/core/enums/status_code.dart';
-import 'package:register_login/core/network/api_client.dart';
-import 'package:register_login/feature/quiz/models/start_exam_model.dart';
-import 'package:register_login/feature/quiz/models/submission_request.dart';
-import 'package:register_login/feature/quiz/models/submited_model.dart';
+import 'package:edu_quest/config/api_config.dart';
+import 'package:edu_quest/core/enums/status_code.dart';
+import 'package:edu_quest/core/network/api_client.dart';
+import 'package:edu_quest/feature/quiz/models/start_exam_model.dart';
+import 'package:edu_quest/feature/quiz/models/submission_request.dart';
+import 'package:edu_quest/feature/quiz/models/submited_model.dart';
 
 class QuizService {
   static Future<StartExamModel> getQuestionsByExerciseId(int id) async {

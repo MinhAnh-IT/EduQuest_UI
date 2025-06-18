@@ -1,4 +1,4 @@
-import 'package:register_login/feature/quiz/models/answer_selected.dart';
+import 'package:edu_quest/feature/quiz/models/answer_selected.dart';
 
 class SubmissionRequest {
   final int participationId;

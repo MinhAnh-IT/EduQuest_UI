@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     });                    try {
                       final response = await _enrollmentService.joinClass(classCode);
                       
-                      if (response.status == StatusCode.joinClassSuccess) {
+                      if (response.status == StatusCode.ok) {
                         // ignore: use_build_context_synchronously
                         Navigator.of(context).pop();
                         // ignore: use_build_context_synchronously

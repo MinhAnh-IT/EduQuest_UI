@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:register_login/config/api_config.dart';
-import 'package:register_login/core/network/api_client.dart';
+import 'package:edu_quest/config/api_config.dart';
+import 'package:edu_quest/core/network/api_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {

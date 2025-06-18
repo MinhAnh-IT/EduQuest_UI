@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/feature/auth/providers/auth_provider.dart';
-import 'package:register_login/shared/theme/app_theme.dart';
-import 'package:register_login/shared/widgets/otp_input.dart';
+import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
+import 'package:edu_quest/shared/theme/app_theme.dart';
+import 'package:edu_quest/shared/widgets/otp_input.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;

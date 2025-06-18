@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:register_login/feature/auth/models/user_model.dart';
-import 'package:register_login/shared/theme/app_theme.dart';
+import 'package:edu_quest/feature/auth/models/user_model.dart';
+import 'package:edu_quest/shared/theme/app_theme.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});

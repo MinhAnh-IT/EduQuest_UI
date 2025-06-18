@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/shared/widgets/exam_app_bar.dart';
+import 'package:edu_quest/shared/widgets/exam_app_bar.dart';
 import '../providers/quiz_provider.dart';
 import '../../../shared/widgets/question_widget.dart';
 

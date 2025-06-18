@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/feature/quiz/providers/quiz_provider.dart';
-import 'package:register_login/feature/quiz/screens/exam_screen.dart';
+import '../../../feature/quiz/providers/quiz_provider.dart';
+import '../../../feature/quiz/screens/exam_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:register_login/feature/auth/screens/login_screen.dart';
-import 'package:register_login/feature/auth/screens/role_selection_screen.dart';
-import 'package:register_login/feature/auth/screens/student/student_registration_screen.dart';
-import 'package:register_login/feature/auth/screens/otp_verification_screen.dart';
-import 'package:register_login/feature/auth/screens/student/student_details_screen.dart';
-import 'package:register_login/feature/auth/providers/auth_provider.dart';
-import 'package:register_login/feature/auth/providers/theme_provider.dart';
-import 'package:register_login/shared/utils/constants.dart';
-import 'package:register_login/feature/home/screens/home_screen.dart';
+import '../../../feature/auth/screens/login_screen.dart';
+import '../../../feature/auth/screens/role_selection_screen.dart';
+import '../../../feature/auth/screens/student/student_registration_screen.dart';
+import '../../../feature/auth/screens/otp_verification_screen.dart';
+import '../../../feature/auth/screens/student/student_details_screen.dart';
+import '../../../feature/auth/providers/auth_provider.dart';
+import '../../../feature/auth/providers/theme_provider.dart';
+import '../../../shared/utils/constants.dart';
 
 
 class MyApp extends StatelessWidget {

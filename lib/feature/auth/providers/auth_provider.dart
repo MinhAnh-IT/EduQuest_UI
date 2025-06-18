@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:register_login/core/network/api_client.dart';
-import 'package:register_login/feature/auth/models/user_model.dart';
-import 'package:register_login/feature/auth/services/auth_service.dart';
-import 'package:register_login/shared/utils/constants.dart';
+import '../../../core/network/api_client.dart';
+import '../../../feature/auth/models/user_model.dart';
+import '../../../feature/auth/services/auth_service.dart';
+import '../../../shared/utils/constants.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences _prefs;

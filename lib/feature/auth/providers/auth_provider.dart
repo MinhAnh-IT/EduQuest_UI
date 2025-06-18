@@ -4,10 +4,13 @@ import 'package:register_login/core/network/api_client.dart';
 import 'package:register_login/feature/auth/models/user_model.dart';
 import 'package:register_login/feature/auth/services/auth_service.dart';
 import 'package:register_login/shared/utils/constants.dart';
+import 'package:register_login/feature/auth/models/auth_user.dart';
+
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
-
+  final AuthService _authService = AuthService();
+  AuthUser? _user;
   User? _currentUser;
   bool _isLoading = false;
   String? _error;
@@ -29,8 +32,74 @@ class AuthProvider extends ChangeNotifier {
     _error = message;
     _isLoading = false;
     notifyListeners();
+  }  
+    Future<bool> requestPasswordReset(String username) async {
+    _setLoading(true);
+    try {      final response = await _authService.requestPasswordReset(username);
+      
+      if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }    } catch (e) {
+      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      return false;
+    }
+  }  
+  
+  Future<bool> resetPassword(String username, String newPassword) async {
+    _setLoading(true);
+    try {
+      final response = await _authService.resetPassword(username, newPassword);
+      print('AuthProvider - Reset password response: $response'); // Debug log
+        if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }    } catch (e) {
+      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      return false;
+    }
   }
-
+  
+  Future<bool> logout() async {
+    _setLoading(true);
+    try {
+      final response = await _authService.logout();
+      if (response['code'] == 200) {
+        _user = null;
+        _token = null;
+        await _prefs.remove(StorageConstants.token);
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }
+    } catch (e) {
+      _setError('Đăng xuất thất bại: $e');
+      return false;
+    }
+  }  
+  
+  Future<bool> verifyOTPForgotPassword(String username, String otp) async {
+    _setLoading(true);
+    try {      final response = await _authService.verifyOTPForgotPassword(username, otp);
+        if (response['code'] == 200) {
+        _setLoading(false);
+        return true;
+      } else {
+        _setError(response['message']);
+        return false;
+      }    } catch (e) {
+      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      return false;
+    }
+  }
 
   Future<bool> login(String username, String password) async {
     _setLoading(true);
@@ -93,14 +162,6 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _setError('Gửi lại mã OTP thất bại: $e');
     }
-  }
-
-  Future<void> logout() async {
-    _currentUser = null;
-    _token = null;
-    ApiClient.token = null;
-    await _prefs.remove(StorageConstants.token);
-    notifyListeners();
   }
 
   Future<void> checkAuthStatus() async {

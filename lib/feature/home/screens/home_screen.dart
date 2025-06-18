@@ -330,7 +330,7 @@ class _HomeTabState extends State<HomeTab> {
                       final classId = int.parse(classData['id']!);
                       final response = await _enrollmentService.leaveClass(classId);
                       
-                      if (response.status == StatusCode.leaveClassSuccess) {
+                      if (response.status == StatusCode.ok) {
                         // ignore: use_build_context_synchronously
                         Navigator.of(dialogContext).pop();
                         // ignore: use_build_context_synchronously

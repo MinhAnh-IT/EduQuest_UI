@@ -26,9 +26,12 @@ class ApiConfig {
   static const String joinClass = '/enrollments/join';
   static const String leaveClass = '/enrollments/leave';
 
+  // Exercise
+  static const String startExam = '/participations/exercises';
+  static const String submissionExam = '/participations/exercises/submit';
+
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-  };
 }
 

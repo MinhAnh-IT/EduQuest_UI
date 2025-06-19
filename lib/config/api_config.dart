@@ -3,7 +3,7 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8080/api';
+      return 'http://10.12.39.214:8080/api';
     }
     return 'http://localhost:8080/api';
   }
@@ -29,6 +29,8 @@ class ApiConfig {
   // Exercise
   static const String startExam = '/participations/exercises';
   static const String submissionExam = '/participations/exercises/submit';
+  // Result
+  static const String getResultByExerciseId = '/results';
 
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',

@@ -1,3 +1,5 @@
+import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
+import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../feature/quiz/providers/quiz_provider.dart';
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
         ChangeNotifierProvider(create: (_) => ResultProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -57,6 +61,8 @@ class MyApp extends StatelessWidget {
                 exerciseId: 2,
                 jwtToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiYXVkIjoiRWR1UXVlc3RBdWRpZW5jZSIsImlhdCI6MTc1MDMxMTYzNCwidXNlcm5hbWUiOiJzdHVkZW50MSIsImlzcyI6IkVkdVF1ZXN0SXNzdWVyIiwiZXhwIjoxNzUwMzE1MjM0LCJyb2xlIjoiUk9MRV9TVFVERU5UIn0.OWtDMfcqQQyqroVBfgZ_vZ_qUzkoKlmPN3DK1pwV4Mk',
               ),
+              '/profile': (context) => const ProfileScreen(),
+
             },
           );
         },

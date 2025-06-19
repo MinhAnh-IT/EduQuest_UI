@@ -35,7 +35,7 @@ class AuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
-
+  
   Future<bool> requestPasswordReset(String username) async {
     _setLoading(true);
     try {

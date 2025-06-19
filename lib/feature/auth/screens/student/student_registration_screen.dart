@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:edu_quest/feature/auth/models/user_model.dart';
 import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
 import 'package:edu_quest/shared/utils/validators.dart';
+import 'package:edu_quest/feature/auth/screens/otp_verification_screen.dart';
+import 'package:edu_quest/shared/utils/validators.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
 class StudentRegistrationScreen extends StatefulWidget {
   const StudentRegistrationScreen({super.key});

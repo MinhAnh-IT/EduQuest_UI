@@ -53,7 +53,6 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
         final success = await authProvider.updateStudentDetails(userId, studentDetails);
 
         if (success) {
-          // Xử lý thành công
           await prefs.remove(StorageConstants.tempUserId);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

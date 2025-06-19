@@ -1,4 +1,4 @@
-import 'package:register_login/feature/auth/models/user_model.dart';
+import 'package:edu_quest/feature/auth/models/user_model.dart';
 
 class ProfileModel {
   final int? id;

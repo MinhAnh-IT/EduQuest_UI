@@ -60,7 +60,7 @@ class StorageConstants {
   static const String language = 'language';
   static const String onboarding = 'onboarding';
   static const String tempUserId = 'temp_user_id';
-}
+ }
 
 class ValidationConstants {
   // Mật khẩu

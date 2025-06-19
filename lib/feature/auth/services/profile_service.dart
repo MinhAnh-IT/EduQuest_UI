@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:register_login/config/api_config.dart';
-import 'package:register_login/core/network/api_client.dart';
-import 'package:register_login/feature/auth/models/Profile_Model.dart';
+import 'package:edu_quest/config/api_config.dart';
+import 'package:edu_quest/core/network/api_client.dart';
+import 'package:edu_quest/feature/auth/models/Profile_Model.dart';
 
 class ProfileService {
   static Future<ProfileModel> getCurrentUser() async {

@@ -1,5 +1,11 @@
 class ApiConfig {
-  static const String baseUrl = 'http://192.168.1.15:8080/api';
+  static String get baseUrl {
+    if (Platform.isAndroid) {
+      return 'http://10.12.39.214:8080/api';
+    }
+    return 'http://localhost:8080/api';
+  }
+  
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
@@ -23,6 +29,8 @@ class ApiConfig {
   // Exercise
   static const String startExam = '/participations/exercises';
   static const String submissionExam = '/participations/exercises/submit';
+  // Result
+  static const String getResultByExerciseId = '/results';
 
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',

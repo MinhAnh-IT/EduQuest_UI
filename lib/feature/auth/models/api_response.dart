@@ -17,19 +17,16 @@ class ApiResponse<T> {
       statusCodeValue = json['code'] as int;
     } else if (json.containsKey('status') && json['status'] is int) { 
       statusCodeValue = json['status'] as int;
-    } else if (json.containsKey('status') && json['status'] is String) { 
-        try {
+    } else if (json.containsKey('status') && json['status'] is String) {        try {
             statusCodeValue = int.parse(json['status'] as String);
         } catch (e) {
-            
-            print("Error parsing status string to int: ${json['status']}");
+            // Error parsing status string to int: ${json['status']}
         }
     }
 
-    String messageValue = json['message'] as String? ?? 'An error occurred';
-
+    String messageValue = json['message'] as String? ?? 'An error occurred';    
     return ApiResponse(
-      status: StatusCode.fromCode(statusCodeValue, responseMessage: messageValue) ?? StatusCode.unknown,
+      status: StatusCode.fromCode(statusCodeValue) ?? StatusCode.internalServerError, // Handle null case
       message: messageValue,
       data: json['data'] != null && fromJson != null ? fromJson(json['data']) : null,
     );

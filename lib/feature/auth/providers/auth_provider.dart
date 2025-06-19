@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:edu_quest/core/network/api_client.dart';
-import 'package:edu_quest/feature/auth/models/user_model.dart';
-import 'package:edu_quest/feature/auth/services/auth_service.dart';
-import 'package:edu_quest/shared/utils/constants.dart';
+import '../../../core/network/api_client.dart';
+import '../../../feature/auth/models/user_model.dart';
+import '../../../feature/auth/services/auth_service.dart';
+import '../../../shared/utils/constants.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
@@ -35,11 +35,11 @@ class AuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+  
   Future<bool> requestPasswordReset(String username) async {
     _setLoading(true);
     try {
       final response = await _authService.requestPasswordReset(username);
-
       if (response['code'] == 200) {
         _setLoading(false);
         return true;
@@ -48,7 +48,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      _setError('Yêu cầu đặt lại mật khẩu thất bại: $e');
       return false;
     }
   }
@@ -65,7 +65,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      _setError('Đặt lại mật khẩu thất bại: $e');
       return false;
     }
   }
@@ -102,7 +102,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _setError('Lỗi kết nối mạng. Vui lòng thử lại.');
+      _setError('Lỗi xác thực OTP: $e');
       return false;
     }
   }

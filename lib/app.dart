@@ -2,8 +2,8 @@ import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
 import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:edu_quest/feature/quiz/providers/quiz_provider.dart';
-import 'package:edu_quest/feature/quiz/screens/exam_screen.dart';
+import '../../../feature/quiz/providers/quiz_provider.dart';
+import '../../../feature/quiz/screens/exam_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:edu_quest/feature/auth/screens/login_screen.dart';
 import 'package:edu_quest/feature/auth/screens/student/student_registration_screen.dart';
@@ -14,8 +14,7 @@ import 'package:edu_quest/feature/result/providers/result_provider.dart';
 import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
 import 'package:edu_quest/feature/auth/providers/theme_provider.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
-
-
+import 'package:edu_quest/feature/home/screens/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
-            initialRoute: '/result',
+            initialRoute: '/login',
             onGenerateRoute: (settings) {
               if (settings.name == '/otp-verification') {
                 final args = settings.arguments as Map<String, dynamic>;
@@ -53,6 +52,7 @@ class MyApp extends StatelessWidget {
               return null;
             },
             routes: {
+              '/home': (context) => const HomeScreen(),
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),

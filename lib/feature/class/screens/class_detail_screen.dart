@@ -273,7 +273,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 24),
@@ -367,12 +367,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: assignment.statusColor.withOpacity(0.1),
+                    ),                    decoration: BoxDecoration(
+                      color: assignment.statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: assignment.statusColor.withOpacity(0.3),
+                        color: assignment.statusColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
@@ -514,12 +513,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: assignment.statusColor.withOpacity(0.1),
+                      ),                      decoration: BoxDecoration(
+                        color: assignment.statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: assignment.statusColor.withOpacity(0.3),
+                          color: assignment.statusColor.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -553,16 +551,15 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
 
                 // Due Date
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(16),                  decoration: BoxDecoration(
                     color: assignment.isOverdue 
-                        ? Colors.red.withOpacity(0.1)
-                        : Colors.blue.withOpacity(0.1),
+                        ? Colors.red.withValues(alpha: 0.1)
+                        : Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: assignment.isOverdue 
-                          ? Colors.red.withOpacity(0.3)
-                          : Colors.blue.withOpacity(0.3),
+                          ? Colors.red.withValues(alpha: 0.3)
+                          : Colors.blue.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -602,12 +599,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 if (assignment.grade != null) ...[
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                    padding: const EdgeInsets.all(16),                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: Colors.green.withOpacity(0.3),
+                        color: Colors.green.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -653,7 +649,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        // TODO: Navigate to submit assignment screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Chức năng nộp bài sẽ được cập nhật sau'),

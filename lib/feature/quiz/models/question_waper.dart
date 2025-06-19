@@ -1,4 +1,4 @@
-import 'package:edu_quest/feature/quiz/models/question_model.dart';
+import '../../../feature/quiz/models/question_model.dart';
 
 class QuestionWrapper {
   final int exerciseQuestionId;

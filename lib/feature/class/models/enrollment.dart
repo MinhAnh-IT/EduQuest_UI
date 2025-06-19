@@ -1,31 +1,28 @@
 class Enrollment {
   final int enrollmentId;
   final int studentId;
-  final String studentName;
   final int classId;
   final String className;
-  final String enrollmentDate;
-  final String message;
+  final String instructorName;
+  final String status;
 
   Enrollment({
     required this.enrollmentId,
     required this.studentId,
-    required this.studentName,
     required this.classId,
     required this.className,
-    required this.enrollmentDate,
-    required this.message,
+    required this.instructorName,
+    required this.status,
   });
 
   factory Enrollment.fromJson(Map<String, dynamic> json) {
     return Enrollment(
       enrollmentId: json['enrollmentId'] as int,
       studentId: json['studentId'] as int,
-      studentName: json['studentName'] as String,
       classId: json['classId'] as int,
       className: json['className'] as String,
-      enrollmentDate: json['enrollmentDate'] as String,
-      message: json['message'] as String,
+      instructorName: json['instructorName'] as String,
+      status: json['status'] as String,
     );
   }
 
@@ -33,11 +30,10 @@ class Enrollment {
     return {
       'enrollmentId': enrollmentId,
       'studentId': studentId,
-      'studentName': studentName,
       'classId': classId,
       'className': className,
-      'enrollmentDate': enrollmentDate,
-      'message': message,
+      'instructorName': instructorName,
+      'status': status,
     };
   }
 }

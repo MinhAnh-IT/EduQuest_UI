@@ -1,19 +1,20 @@
 import 'dart:convert';
-import 'package:edu_quest/config/api_config.dart';
-import 'package:edu_quest/core/network/api_client.dart';
+import '../../../../../config/api_config.dart';
+import '../../../../../core/network/api_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage;
 
   AuthService() : _storage = const FlutterSecureStorage();  
-    Future<Map<String, dynamic>> requestPasswordReset(String username) async {
+  Future<Map<String, dynamic>> requestPasswordReset(String username) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
     final response = await ApiClient.post(url, {
       'username': username.trim()
     });
     return jsonDecode(response.body);
   }
+  
   Future<Map<String, dynamic>> resetPassword(String username, String newPassword) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.resetPassword}';
     final response = await ApiClient.post(url, {

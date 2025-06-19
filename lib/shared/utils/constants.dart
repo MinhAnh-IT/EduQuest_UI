@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static final primary = Colors.blue;
-  static final background = Colors.grey[100];
-  static final text = Colors.grey[800];
-  static final textLight = Colors.grey[600];
-  static final success = Colors.green;
-  static final error = Colors.red;
+  static const primary = Colors.blue;
+  static const background = Colors.grey;
+  static const text = Colors.grey;  static const textLight = Colors.grey;
+  static const success = Colors.green;
+  static const error = Colors.red;
 }
 
 class AppStyles {
-  static final headingStyle = TextStyle(
+  static const headingStyle = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
     color: AppColors.text,
   );
 
-  static final bodyStyle = TextStyle(
+  static const bodyStyle = TextStyle(
     fontSize: 16,
     color: AppColors.textLight,
     height: 1.4,
   );
 
-  static final linkStyle = TextStyle(
+  static const linkStyle = TextStyle(
     color: AppColors.primary,
     fontWeight: FontWeight.bold,
   );
@@ -60,6 +59,7 @@ class StorageConstants {
   static const String theme = 'theme';
   static const String language = 'language';
   static const String onboarding = 'onboarding';
+  static const String tempUserId = 'temp_user_id';
  }
 
 class ValidationConstants {

@@ -9,16 +9,14 @@ class BottomNavigationBarWidget extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
+      selectedItemColor: Colors.cyan,
+      unselectedItemColor: Colors.grey,      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Trang chủ',

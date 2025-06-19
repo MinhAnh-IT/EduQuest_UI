@@ -16,10 +16,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();  final _usernameController = TextEditingController();
   bool _isLoading = false;
-  bool _otpSent = false;
+  final bool _otpSent = false;
 
   @override
   void dispose() {
@@ -130,9 +129,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildHeader() {
     return Container(
       alignment: Alignment.center,
-      child: Column(
-        children: [
-          Icon(
+      child: Column(        children: [
+          const Icon(
             Icons.lock_reset_outlined,
             size: 80,
             color: Colors.blue,
@@ -167,14 +165,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildLoginLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
+      children: [        Text(
           AppStrings.rememberPassword,
           style: TextStyle(color: Colors.grey[600]),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(
+          child: const Text(
             AppStrings.backToLogin,
             style: TextStyle(
               color: Colors.blue,
@@ -209,8 +206,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       decoration: BoxDecoration(
         color: Colors.green[50],
         shape: BoxShape.circle,
-      ),
-      child: Icon(
+      ),      child: const Icon(
         Icons.sms_outlined,
         size: 60,
         color: Colors.green,

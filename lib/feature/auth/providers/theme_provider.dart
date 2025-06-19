@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:edu_quest/shared/utils/constants.dart';
+import '../../../../shared/utils/constants.dart';
 
 class ThemeProvider extends ChangeNotifier {
   final SharedPreferences _prefs;

@@ -1,4 +1,4 @@
-import 'package:edu_quest/feature/quiz/models/question_waper.dart';
+import '../../../feature/quiz/models/question_waper.dart';
 
 class StartExamModel {
   final int participationId;

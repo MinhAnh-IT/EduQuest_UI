@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:edu_quest/shared/widgets/exam_app_bar.dart';
+import '../../../shared/widgets/exam_app_bar.dart';
 import '../providers/quiz_provider.dart';
 import '../../../shared/widgets/question_widget.dart';
 
@@ -20,7 +20,7 @@ class _ExamScreenState extends State<ExamScreen> {
       titleText: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Colors.red.withOpacity(0.12),
+            backgroundColor: Colors.red.withValues(alpha: 0.12),
             radius: 16,
             child: const Icon(
               Icons.error_outline,
@@ -53,7 +53,7 @@ class _ExamScreenState extends State<ExamScreen> {
       borderRadius: BorderRadius.circular(16),
       boxShadows: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.05),
+          color: Colors.black.withValues(alpha: 0.05),
           blurRadius: 10,
           offset: const Offset(0, 3),
         ),

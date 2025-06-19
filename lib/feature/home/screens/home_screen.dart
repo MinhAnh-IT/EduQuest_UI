@@ -16,7 +16,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;  final List<Widget> _pages = [
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
     const HomeTab(),
     const ProfileScreen(), // Use ProfileScreen
   ];
@@ -57,7 +59,7 @@ class _HomeTabState extends State<HomeTab> {
   void initState() {
     super.initState();
     _searchController.addListener(_filterClasses);
-    _fetchMyEnrolledClasses();
+    _fetchMyClasses();
   }
 
   @override
@@ -100,6 +102,24 @@ class _HomeTabState extends State<HomeTab> {
       Color(0xFF6D4C41), // Brown
     ];
     return colors[index % colors.length].withValues(alpha: 0.9);
+  }
+
+  void _handleClassTap(BuildContext context, Map<String, String> classData) {
+    final status = classData['status']?.toUpperCase() ?? '';
+    
+    if (status == 'PENDING') {
+      // Hiển thị thông báo cho lớp đang chờ duyệt
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lớp học này đang chờ giáo viên phê duyệt. Bạn chưa thể truy cập chi tiết lớp.'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      // Chuyển đến chi tiết lớp cho các lớp đã được duyệt
+      _navigateToClassDetail(context, classData);
+    }
   }
 
   void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
@@ -211,18 +231,21 @@ class _HomeTabState extends State<HomeTab> {
       context: context,
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
-          builder: (context, setState) {            return AlertDialog(
+          builder: (context, setState) {
+            return AlertDialog(
               title: const Text('Rời lớp học'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [                  Text('Bạn có chắc chắn muốn rời lớp học "${classData['name']}" không?'),
+                children: [
+                  Text('Bạn có chắc chắn muốn rời lớp học "${classData['name']}" không?'),
                   if (isLoading)
                     const Padding(
                       padding: EdgeInsets.only(top: 16.0),
                       child: CircularProgressIndicator(),
                     ),
                 ],
-              ),              actions: <Widget>[
+              ),
+              actions: <Widget>[
                 TextButton(
                   onPressed: isLoading ? null : () {
                     Navigator.of(dialogContext).pop();
@@ -230,7 +253,8 @@ class _HomeTabState extends State<HomeTab> {
                   child: const Text('Hủy'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),                  onPressed: isLoading ? null : () async {
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: isLoading ? null : () async {
                     setState(() {
                       isLoading = true;
                     });
@@ -238,7 +262,8 @@ class _HomeTabState extends State<HomeTab> {
                     final navigator = Navigator.of(dialogContext);
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
                     
-                    try {                      final classId = int.parse(classData['id']!);
+                    try {
+                      final classId = int.parse(classData['id']!);
                       
                       final response = await _enrollmentService.leaveClass(classId);
                       
@@ -253,7 +278,7 @@ class _HomeTabState extends State<HomeTab> {
                           );
                         }
                         // Refresh the list from API
-                        _fetchMyEnrolledClasses();
+                        _fetchMyClasses();
                       } else {
                         navigator.pop();
                         String errorMessage;
@@ -281,7 +306,8 @@ class _HomeTabState extends State<HomeTab> {
                             ),
                           );
                         }
-                      }                    } catch (e) {
+                      }
+                    } catch (e) {
                       navigator.pop();
                       if (mounted) {
                         scaffoldMessenger.showSnackBar(
@@ -296,7 +322,8 @@ class _HomeTabState extends State<HomeTab> {
                         setState(() {
                           isLoading = false;
                         });
-                      }                    }
+                      }
+                    }
                   },
                   child: const Text('Rời lớp'),
                 ),
@@ -341,7 +368,8 @@ class _HomeTabState extends State<HomeTab> {
                     Navigator.of(context).pop();
                   },
                   child: const Text('Hủy'),
-                ),                ElevatedButton(
+                ),
+                ElevatedButton(
                   onPressed: isLoading ? null : () async {
                     String classCode = classCodeController.text.trim();
                     
@@ -377,7 +405,7 @@ class _HomeTabState extends State<HomeTab> {
                           );
                         }
                         // Refresh the list from API
-                        _fetchMyEnrolledClasses();
+                        _fetchMyClasses();
                       } else {
                         navigator.pop(); // Đóng dialog trước khi hiện thông báo lỗi
                         String errorMessage;
@@ -438,15 +466,14 @@ class _HomeTabState extends State<HomeTab> {
       },
     );
   }
-
-  Future<void> _fetchMyEnrolledClasses() async {
+  Future<void> _fetchMyClasses() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final response = await _enrollmentService.getMyEnrolledClasses();
+      final response = await _enrollmentService.getMyClasses();
       
       if (response.status == StatusCode.ok && response.data != null) {
         // Chuyển đổi từ danh sách Enrollment thành định dạng Map để sử dụng lại UI hiện tại
@@ -534,10 +561,12 @@ class _HomeTabState extends State<HomeTab> {
               top: !_isSearching,
               bottom: true,
               left: true,
-              right: true,              child: _isLoading
+              right: true,
+              child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
-                      ? Center(                          child: Column(
+                      ? Center(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
@@ -551,18 +580,20 @@ class _HomeTabState extends State<HomeTab> {
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton(
-                                onPressed: _fetchMyEnrolledClasses,
+                                onPressed: _fetchMyClasses,
                                 child: const Text('Thử lại'),
                               ),
                             ],
                           ),
                         )
-                      : _filteredClasses.isEmpty && _searchController.text.isNotEmpty                          ? const Center(
+                      : _filteredClasses.isEmpty && _searchController.text.isNotEmpty
+                          ? const Center(
                               child: Text(
                                 'Không tìm thấy kết quả nào.',
                                 style: TextStyle(fontSize: 16, color: Colors.grey),
                               ),
-                            )                          : _filteredClasses.isEmpty
+                            )
+                          : _filteredClasses.isEmpty
                               ? Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -578,11 +609,14 @@ class _HomeTabState extends State<HomeTab> {
                                       ),
                                     ],
                                   ),
-                                ): ListView.builder(
+                                )
+                              : ListView.builder(
                                   padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
                                   itemCount: _filteredClasses.length,
                                   itemBuilder: (context, index) {
                                     final classData = _filteredClasses[index];
+                                    final status = classData['status']?.toUpperCase() ?? '';
+                                    
                                     return Card(
                                       color: _getCardColor(index),
                                       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -592,7 +626,11 @@ class _HomeTabState extends State<HomeTab> {
                                       ),
                                       child: ListTile(
                                         contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                                        leading: const Icon(Icons.class_, color: Colors.white, size: 30),
+                                        leading: Icon(
+                                          status == 'PENDING' ? Icons.hourglass_empty : Icons.class_,
+                                          color: Colors.white,
+                                          size: 30,
+                                        ),
                                         title: Text(
                                           classData['name'] ?? '',
                                           style: const TextStyle(
@@ -603,13 +641,28 @@ class _HomeTabState extends State<HomeTab> {
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        subtitle: Text(
-                                          classData['instructor'] ?? 'Giảng viên',                                          style: TextStyle(
-                                            color: Colors.white.withValues(alpha: 0.85),
-                                            fontSize: 14,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              classData['instructor'] ?? 'Giảng viên',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(alpha: 0.85),
+                                                fontSize: 14,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            if (status == 'PENDING')
+                                              const Text(
+                                                'Đang chờ phê duyệt',
+                                                style: TextStyle(
+                                                  color: Colors.yellowAccent,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                         trailing: PopupMenuButton<String>(
                                           icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -626,7 +679,7 @@ class _HomeTabState extends State<HomeTab> {
                                           ],
                                         ),
                                         onTap: () {
-                                          _navigateToClassDetail(context, classData);
+                                          _handleClassTap(context, classData);
                                         },
                                       ),
                                     );
@@ -635,7 +688,8 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
         ],
-      ),      floatingActionButton: FloatingActionButton(
+      ),
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showJoinClassDialog(context);
         },

@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:register_login/feature/auth/models/update_response_model.dart';
+import 'package:register_login/feature/auth/models/Profile_Model.dart';
 import 'package:register_login/feature/auth/services/profile_service.dart';
 
 class ProfileProvider extends ChangeNotifier {
-  UpdateResponse? _profile;
+  ProfileModel? _profile;
   bool _isLoading = false;
   String? _error;
 
-  UpdateResponse? get profile => _profile;
+  ProfileModel? get profile => _profile;
   bool get isLoading => _isLoading;
   String? get error => _error;
 

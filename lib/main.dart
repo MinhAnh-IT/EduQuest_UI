@@ -20,7 +20,7 @@ void main() async {
   
   try {
     final prefs = await SharedPreferences.getInstance();
-    ApiClient.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNSIsImF1ZCI6IkVkdVF1ZXN0QXVkaWVuY2UiLCJpYXQiOjE3NTAyNTg3MzcsInVzZXJuYW1lIjoiaG9hbnZ1MmVlIiwiaXNzIjoiRWR1UXVlc3RJc3N1ZXIiLCJleHAiOjE3NTAyNjIzMzcsInJvbGUiOiJST0xFX1NUVURFTlQifQ.U97Z3JD3f16Hw6-Nrl38ggT95Y2QzEydxRUjByEUJtM';
+    ApiClient.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNSIsImF1ZCI6IkVkdVF1ZXN0QXVkaWVuY2UiLCJpYXQiOjE3NTAyOTUyNzksInVzZXJuYW1lIjoiaG9hbnZ1MmVlIiwiaXNzIjoiRWR1UXVlc3RJc3N1ZXIiLCJleHAiOjE3NTAyOTg4NzksInJvbGUiOiJST0xFX1NUVURFTlQifQ.s0MkoDRH8408lTM5lEs3f0OagTA5XWW4sZqAE3zPU6o';
 
     runApp(MyApp(prefs: prefs));
   } catch (e) {

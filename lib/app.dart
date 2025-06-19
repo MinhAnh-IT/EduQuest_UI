@@ -4,7 +4,6 @@ import 'package:edu_quest/feature/quiz/providers/quiz_provider.dart';
 import 'package:edu_quest/feature/quiz/screens/exam_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:edu_quest/feature/auth/screens/login_screen.dart';
-import 'package:edu_quest/feature/auth/screens/role_selection_screen.dart';
 import 'package:edu_quest/feature/auth/screens/student/student_registration_screen.dart';
 import 'package:edu_quest/feature/auth/screens/otp_verification_screen.dart';
 import 'package:edu_quest/feature/auth/screens/student/student_details_screen.dart';
@@ -51,7 +50,6 @@ class MyApp extends StatelessWidget {
             },
             routes: {
               '/login': (context) => const LoginScreen(),
-              '/role-selection': (context) => const RoleSelectionScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
               '/quiz': (context) => const ExamScreen(),

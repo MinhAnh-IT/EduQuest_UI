@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.2.2
   http: ^1.1.2
   intl: ^0.18.1
+  image_picker: ^1.0.4
   awesome_dialog: ^3.2.0
   another_flushbar: ^1.12.30 
   dio: ^5.8.0+1

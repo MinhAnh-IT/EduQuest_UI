@@ -3,9 +3,21 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';
     }
-    if (!value.contains('@')) {
-      return 'Vui lòng nhập email hợp lệ';
+
+    final emailRegex = RegExp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    );
+
+    if (!emailRegex.hasMatch(value)) {
+      return 'Email không hợp lệ. Ví dụ: example@gmail.com';
     }
+
+    final commonDomains = ['gmail.com'];
+    final domain = value.split('@')[1];
+    if (!commonDomains.contains(domain)) {
+      return 'Email phải có domain hợp lệ (gmail.com)';
+    }
+
     return null;
   }
 
@@ -60,16 +72,12 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập mã số sinh viên';
     }
-    return null;
-  }
-
-  static String? validateEnrolledYear(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Vui lòng nhập năm nhập học';
+    if (value.length < 8 || value.length > 20) {
+      return 'Mã số sinh viên phải từ 8 đến 20 ký tự';
     }
-    final year = int.tryParse(value);
-    if (year == null || year < 1900 || year > DateTime.now().year) {
-      return 'Vui lòng nhập năm hợp lệ';
+    // Kiểm tra chỉ cho phép số
+    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+      return 'Mã số sinh viên chỉ được chứa số';
     }
     return null;
   }

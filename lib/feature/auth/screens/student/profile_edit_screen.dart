@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/feature/auth/providers/profile_provider.dart';
-import 'package:register_login/shared/theme/app_theme.dart';
-import 'package:register_login/shared/utils/validators.dart';
+import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
+import 'package:edu_quest/shared/theme/app_theme.dart';
+import 'package:edu_quest/shared/utils/validators.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({Key? key}) : super(key: key);

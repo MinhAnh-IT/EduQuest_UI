@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:register_login/feature/auth/providers/auth_provider.dart';
-import 'package:register_login/shared/theme/app_theme.dart';
+import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
+import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:register_login/shared/utils/constants.dart';
+import 'package:edu_quest/shared/utils/constants.dart';
 
 import '../../../../shared/utils/validators.dart';
 
@@ -53,7 +53,6 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
         final success = await authProvider.updateStudentDetails(userId, studentDetails);
 
         if (success) {
-          // Xử lý thành công
           await prefs.remove(StorageConstants.tempUserId);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

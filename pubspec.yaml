@@ -1,4 +1,4 @@
-name: register_login
+name: edu_quest
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -41,6 +41,11 @@ dependencies:
   http: ^1.1.2
   intl: ^0.18.1
   image_picker: ^1.0.4
+  awesome_dialog: ^3.2.0
+  another_flushbar: ^1.12.30 
+  dio: ^5.8.0+1
+  flutter_secure_storage: ^9.2.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

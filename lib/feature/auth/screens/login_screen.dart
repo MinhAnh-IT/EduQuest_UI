@@ -1,5 +1,9 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:register_login/shared/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
+import 'package:edu_quest/shared/theme/app_theme.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,9 +25,32 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement login logic
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.login(
+          _usernameController.text, _passwordController.text);
+      if (success) {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.success,
+          animType: AnimType.rightSlide,
+          title: 'Thành công',
+          desc: 'Đăng nhập thành công!',
+          btnOkOnPress: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          btnOkText: 'Vào app',
+          btnOkColor: Colors.blue,
+        ).show();
+      } else {
+        AwesomeDialog(
+                context: context,
+                title: "Thất bại",
+                dialogType: DialogType.error,
+                desc: authProvider.error ?? "Đăng nhập thất bại")
+            .show();
+      }
     }
   }
 
@@ -102,7 +129,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _handleLogin,
-                    child: const Text('Đăng nhập'),
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blue,
+                        textStyle: const TextStyle(fontSize: 17)),
+                    child: const Text("Đăng nhập"),
+                  ),                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Quên mật khẩu?'),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -125,4 +167,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-} 
+}

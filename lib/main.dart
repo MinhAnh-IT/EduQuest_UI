@@ -20,7 +20,7 @@ void main() async {
   
   try {
     final prefs = await SharedPreferences.getInstance();
-    ApiClient.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNSIsImF1ZCI6IkVkdVF1ZXN0QXVkaWVuY2UiLCJpYXQiOjE3NTAyOTUyNzksInVzZXJuYW1lIjoiaG9hbnZ1MmVlIiwiaXNzIjoiRWR1UXVlc3RJc3N1ZXIiLCJleHAiOjE3NTAyOTg4NzksInJvbGUiOiJST0xFX1NUVURFTlQifQ.s0MkoDRH8408lTM5lEs3f0OagTA5XWW4sZqAE3zPU6o';
+    // ApiClient.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNSIsImF1ZCI6IkVkdVF1ZXN0QXVkaWVuY2UiLCJpYXQiOjE3NTAyOTUyNzksInVzZXJuYW1lIjoiaG9hbnZ1MmVlIiwiaXNzIjoiRWR1UXVlc3RJc3N1ZXIiLCJleHAiOjE3NTAyOTg4NzksInJvbGUiOiJST0xFX1NUVURFTlQifQ.s0MkoDRH8408lTM5lEs3f0OagTA5XWW4sZqAE3zPU6o';
 
     runApp(MyApp(prefs: prefs));
   } catch (e) {
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
-            initialRoute: '/profile',
+            initialRoute: '/login',
             onGenerateRoute: (settings) {
               if (settings.name == '/otp-verification') {
                 final args = settings.arguments as Map<String, dynamic>;

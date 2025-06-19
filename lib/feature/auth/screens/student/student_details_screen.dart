@@ -49,6 +49,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
         };
 
         final authProvider = context.read<AuthProvider>();
+        authProvider.clearError();
         final success = await authProvider.updateStudentDetails(userId, studentDetails);
 
         if (success) {
@@ -66,9 +67,13 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
         } else {
           // Xử lý thất bại
           if (mounted) {
+            String errorMsg = authProvider.error ?? 'Cập nhật thông tin thất bại';
+            if (errorMsg.contains('already exists') || errorMsg.contains('Student code')) {
+              errorMsg = 'Mã số sinh viên đã tồn tại!';
+            }
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(authProvider.error ?? 'Cập nhật thông tin thất bại'),
+                content: Text(errorMsg),
                 backgroundColor: Colors.red,
               ),
             );

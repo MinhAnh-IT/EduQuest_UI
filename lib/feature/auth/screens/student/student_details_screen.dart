@@ -102,6 +102,18 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            // Lấy lại arguments nếu cần truyền về OTP
+            final args = ModalRoute.of(context)?.settings.arguments;
+            Navigator.pushReplacementNamed(
+              context,
+              '/otp-verification',
+              arguments: args,
+            );
+          },
+        ),
         title: const Text('Thông tin sinh viên'),
         backgroundColor: Colors.transparent,
         elevation: 0,

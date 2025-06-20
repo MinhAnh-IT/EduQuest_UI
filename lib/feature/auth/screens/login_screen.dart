@@ -26,10 +26,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_formKey.currentState!.validate()) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.clearError();
       final success = await authProvider.login(
           _usernameController.text, _passwordController.text);
-      
+
       if (!mounted) return;
       
       if (success) {

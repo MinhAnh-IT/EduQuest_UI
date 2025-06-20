@@ -16,9 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Class Detail Demo',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
-      ),
-      home: ClassDetailScreen(
-        classDetail: ClassDetail(
+      ),      home: ClassDetailScreen(
+        classId: 1,
+        initialClassDetail: ClassDetail(
           id: 1,
           name: 'Lập trình ứng dụng di động',
           code: 'MOBILE101',

@@ -39,6 +39,21 @@ class ClassDetail {
     );
   }
 
+  /// Factory constructor for API response from Get Class Detail API
+  factory ClassDetail.fromApiResponse(Map<String, dynamic> json) {
+    return ClassDetail(
+      id: json['classId'] as int,
+      name: json['className'] as String,
+      code: 'CLASS${json['classId']}', // Generate code from class ID
+      description: '', // API doesn't return description, set empty
+      instructorName: json['instructorName'] as String,
+      instructorEmail: json['instructorEmail'] as String,
+      studentCount: json['studentCount'] as int,
+      createdAt: DateTime.now(), // API doesn't return creation date, use current time
+      assignments: [], // API doesn't return assignments, set empty list
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -53,7 +68,6 @@ class ClassDetail {
     };
   }
 
-  // Helper methods
   int get pendingAssignmentsCount => 
       assignments.where((assignment) => assignment.status == 'pending').length;
   

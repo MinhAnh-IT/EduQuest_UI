@@ -26,7 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_formKey.currentState!.validate()) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.login(
           _usernameController.text, _passwordController.text);
       
@@ -136,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: Colors.blue,
                         textStyle: const TextStyle(fontSize: 17)),
                     child: const Text("Đăng nhập"),
-                  ),                  const SizedBox(height: 16),
+                  ),                  
+                  const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Navigator.push(

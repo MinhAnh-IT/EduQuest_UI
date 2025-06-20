@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
 import 'package:edu_quest/feature/auth/screens//student/profile_edit_screen.dart';
 import 'package:edu_quest/shared/theme/app_theme.dart';
+import 'package:edu_quest/feature/auth/services/auth_service.dart';
+import 'package:edu_quest/feature/auth/screens/login_screen.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -13,6 +16,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -167,6 +172,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _showLogoutDialog(context);
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Đăng xuất'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 2,
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -215,5 +240,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
       default:
         return 'Không xác định';
     }
+  }
+  void _showLogoutDialog(BuildContext context) {
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Đăng xuất'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Bạn có chắc chắn muốn đăng xuất không?'),
+                  if (isLoading)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isLoading ? null : () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Hủy'),
+                ),
+                ElevatedButton(
+                  onPressed: isLoading ? null : () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    final navigator = Navigator.of(context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+                    try {
+                      final response = await _authService.logout();
+                      final success = response['code'] == 200;
+
+                      if (mounted) {
+                        navigator.pop(); // Close dialog
+                        navigator.pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                              (route) => false,
+                        );
+
+                        if (success) {
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Đăng xuất thành công'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else {
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Đã đăng xuất khỏi ứng dụng'),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        navigator.pop(); // Close dialog
+                        navigator.pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                              (route) => false,
+                        );
+
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đã đăng xuất khỏi ứng dụng'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Đăng xuất'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

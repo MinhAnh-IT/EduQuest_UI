@@ -17,15 +17,17 @@ enum StatusCode {
   userNotFound(430, "Không tìm thấy người dùng"),
   validationError(450, "Lỗi xác thực dữ liệu"),
   emailSendError(501, "Gửi email thất bại"),
-  
+
   notMatch(4002, "Bạn không có quyền nộp bài này!"),
   notIsStudent(4007, "Yêu cầu bạn phải là sinh viên để được tham gia làm bài."),
   participationAlreadyExists(4204, "Bạn đã nộp bài hoặc hết hạn làm bài tập này."),
   expiredExercise(4205, "Bài tập đã hết hạn nộp"),
   participationIsSubmitted(4200, "Bài tập đã được nộp"),
-  unknown(50001, "Unknown error occurred."),
-  inValidToken(401, "Invalid or expired token."),
-  internalServerError(500, "Internal Server Error.");
+  participationNotFound(4045, "Không tìm thấy lượt tham gia bài tập của bạn"),
+  exerciseNotFound(4046, "Không tìm thấy bài tập với ID này"),
+  unknown(50001, "Lỗi không xác định."),
+  inValidToken(401, "Token không hợp lệ hoặc đã hết hạn."),
+  internalServerError(500, "Lỗi máy chủ nội bộ.");
 
   final int code;
   final String message;
@@ -44,5 +46,4 @@ enum StatusCode {
       return null;
     }
   }
-
 }

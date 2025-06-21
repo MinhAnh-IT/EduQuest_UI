@@ -1,41 +1,24 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/result_model.dart';
 import '../../../config/api_config.dart';
+import '../../../core/enums/error_message_resolver.dart';
+import '../../../core/network/api_client.dart';
 
 class ResultService {
-  Future<ResultModel> fetchResult(int exerciseId, String jwtToken) async {
-    final url = Uri.parse("${ApiConfig.baseUrl}${ApiConfig.getResultByExerciseId}/$exerciseId");
-    print('Making request to: $url with token: $jwtToken');
+  Future<ResultModel> fetchResult(int exerciseId) async {
+    final url =
+        '${ApiConfig.baseUrl}${ApiConfig.getResultByExerciseId}/$exerciseId';
 
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $jwtToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await ApiClient.get(url, auth: true);
 
-    print('Response status: ${response.statusCode}');
-    print('Response headers: ${response.headers}');
-    print('Response body: ${response.body}');
+    final body = jsonDecode(response.body);
+    final code = body['code'];
+    final message = body['message'];
 
-    if (response.statusCode == 200) {
-      try {
-        final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
-        print('Parsed JSON: $jsonData');
-
-        final data = jsonData['data'] as Map<String, dynamic>;
-        print('Data section: $data');
-
-        return ResultModel.fromJson(data);
-      } catch (e) {
-        print('JSON parsing error: $e');
-        throw Exception("Lỗi khi parse JSON: $e");
-      }
+    if (code == 200) {
+      return ResultModel.fromJson(body['data']);
     } else {
-      print('HTTP error response: ${response.body}');
-      throw Exception("HTTP Error ${response.statusCode}: ${response.body}");
+      throw Exception(ErrorMessageResolver.resolve(code, message));
     }
   }
 }

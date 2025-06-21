@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/class_detail.dart';
 import '../models/assignment.dart';
-import 'package:intl/intl.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final ClassDetail classDetail;
@@ -344,7 +344,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          // Navigate to assignment detail screen
           _showAssignmentDetail(assignment);
         },
         child: Padding(
@@ -367,7 +366,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 4,
-                    ),                    decoration: BoxDecoration(
+                    ),
+                    decoration: BoxDecoration(
                       color: assignment.statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
@@ -513,7 +513,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
-                      ),                      decoration: BoxDecoration(
+                      ),
+                      decoration: BoxDecoration(
                         color: assignment.statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
@@ -551,13 +552,14 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
 
                 // Due Date
                 Container(
-                  padding: const EdgeInsets.all(16),                  decoration: BoxDecoration(
-                    color: assignment.isOverdue 
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: assignment.isOverdue
                         ? Colors.red.withValues(alpha: 0.1)
                         : Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: assignment.isOverdue 
+                      color: assignment.isOverdue
                           ? Colors.red.withValues(alpha: 0.3)
                           : Colors.blue.withValues(alpha: 0.3),
                     ),
@@ -599,7 +601,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 if (assignment.grade != null) ...[
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.all(16),                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
                       color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
@@ -672,11 +675,62 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       ),
                     ),
                   ),
+
+                const SizedBox(height: 16),
+
+                // View Result Button
+                if (assignment.isSubmitted)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Đóng modal
+                        Navigator.pushNamed(
+                          context,
+                          '/result',
+                          arguments: {'exerciseId': assignment.id}, // Giả định assignment có thuộc tính id
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Xem kết quả',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+enum ConvertStatus {
+  SUBMITTED('Đã nộp'),
+  IN_PROGRESS('Đang xử lý');
+
+  final String message;
+  const ConvertStatus(this.message);
+
+  static String? getMessage(String name) {
+    try {
+      return ConvertStatus.values
+          .firstWhere((e) => e.name == name)
+          .message;
+    } catch (e) {
+      return null;
+    }
   }
 }

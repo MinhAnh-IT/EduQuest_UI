@@ -13,6 +13,7 @@ import 'package:edu_quest/feature/result/screens/result_screen.dart';
 import 'package:edu_quest/feature/result/providers/result_provider.dart';
 import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
 import 'package:edu_quest/feature/auth/providers/theme_provider.dart';
+import 'package:edu_quest/feature/class/providers/class_provider.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
 import 'package:edu_quest/feature/home/screens/home_screen.dart';
 
@@ -23,14 +24,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
+    return MultiProvider(      providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
         ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
         ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
-
+        ChangeNotifierProvider(create: (_) => ClassProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

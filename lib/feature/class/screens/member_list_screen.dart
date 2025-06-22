@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/class_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/class_provider.dart';
 import '../models/student.dart';
-import '../../../core/enums/status_code.dart';
 
 class MemberListScreen extends StatefulWidget {
   final int classId;
@@ -20,35 +20,13 @@ class MemberListScreen extends StatefulWidget {
 }
 
 class _MemberListScreenState extends State<MemberListScreen> {
-  final ClassService _classService = ClassService();
-  List<Student> _students = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-
   @override
   void initState() {
     super.initState();
-    _loadStudents();
-  }
-
-  Future<void> _loadStudents() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+    // Load students using provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ClassProvider>().loadStudents(widget.classId);
     });
-
-    final response = await _classService.getStudentsInClass(widget.classId);
-    
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        if (response.status == StatusCode.ok && response.data != null) {
-          _students = response.data!;
-        } else {
-          _errorMessage = response.message;
-        }
-      });
-    }
   }
 
   @override
@@ -63,16 +41,22 @@ class _MemberListScreenState extends State<MemberListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadStudents,
+            onPressed: () {
+              context.read<ClassProvider>().refreshStudents(widget.classId);
+            },
           ),
         ],
       ),
-      body: _buildBody(),
+      body: Consumer<ClassProvider>(
+        builder: (context, classProvider, child) {
+          return _buildBody(classProvider);
+        },
+      ),
     );
   }
 
-  Widget _buildBody() {
-    if (_isLoading) {
+  Widget _buildBody(ClassProvider classProvider) {
+    if (classProvider.isLoadingStudents) {
       return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
@@ -80,18 +64,17 @@ class _MemberListScreenState extends State<MemberListScreen> {
       );
     }
 
-    if (_errorMessage != null) {
-      return _buildErrorState();
+    if (classProvider.studentsError != null) {
+      return _buildErrorState(classProvider);
     }
 
-    if (_students.isEmpty) {
-      return _buildEmptyState();
+    if (classProvider.students.isEmpty) {
+      return _buildEmptyState(classProvider);
     }
 
-    return _buildStudentsList();
+    return _buildStudentsList(classProvider);
   }
-
-  Widget _buildErrorState() {
+  Widget _buildErrorState(ClassProvider classProvider) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -114,7 +97,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage ?? 'Đã xảy ra lỗi không xác định',
+              classProvider.studentsError ?? 'Đã xảy ra lỗi không xác định',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
@@ -123,7 +106,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _loadStudents,
+              onPressed: () {
+                classProvider.refreshStudents(widget.classId);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
                 foregroundColor: Colors.white,
@@ -139,8 +124,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
     );
   }
-
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ClassProvider classProvider) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -172,7 +156,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _loadStudents,
+              onPressed: () {
+                classProvider.refreshStudents(widget.classId);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
                 foregroundColor: Colors.white,
@@ -188,10 +174,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
     );
   }
-
-  Widget _buildStudentsList() {
+  Widget _buildStudentsList(ClassProvider classProvider) {
     return RefreshIndicator(
-      onRefresh: _loadStudents,
+      onRefresh: () => classProvider.refreshStudents(widget.classId),
       color: Colors.cyan,
       child: Column(
         children: [
@@ -209,7 +194,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${_students.length} học sinh',
+                  '${classProvider.studentsCount} học sinh',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -224,9 +209,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: _students.length,
+              itemCount: classProvider.students.length,
               itemBuilder: (context, index) {
-                final student = _students[index];
+                final student = classProvider.students[index];
                 return _buildStudentCard(student);
               },
             ),

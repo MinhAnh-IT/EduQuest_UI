@@ -3,7 +3,7 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return 'http://192.168.1.2:8080/api';
+      return 'http://192.168.1.25:8080/api';
     }
     return 'http://localhost:8080/api';
   }

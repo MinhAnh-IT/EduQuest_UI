@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
 import '../models/student.dart';
-import '../services/class_service.dart';
-import '../../../core/enums/status_code.dart';
+import '../providers/class_provider.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final int classId;
@@ -21,104 +21,84 @@ class ClassDetailScreen extends StatefulWidget {
 class _ClassDetailScreenState extends State<ClassDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final ClassService _classService = ClassService();
-  
-  ClassDetail? _classDetail;
-  bool _isLoading = true;
-  String? _errorMessage;
-  
-  // Members tab state
-  List<Student> _students = [];
-  bool _isLoadingMembers = false;
-  String? _membersErrorMessage;  @override
+
+  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     
-    // Use initial data if provided, otherwise load from API
-    if (widget.initialClassDetail != null) {
-      _classDetail = widget.initialClassDetail;
-      _isLoading = false;
-    } else {
-      _loadClassDetail();
-    }
-    
-    // Load students for members tab
-    _loadStudents();
-  }
-
-  Future<void> _loadClassDetail() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final response = await _classService.getClassDetail(widget.classId);
+    // Load class data using provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final classProvider = context.read<ClassProvider>();
       
-      if (response.data != null) {
-        setState(() {
-          _classDetail = response.data;
-          _isLoading = false;
-        });
+      // Reset provider state first
+      classProvider.reset();
+      
+      // Use initial data if provided
+      if (widget.initialClassDetail != null) {
+        // Set initial data to provider and then load students
+        classProvider.setInitialClassDetail(widget.initialClassDetail!);
+        classProvider.loadStudents(widget.classId);
       } else {
-        setState(() {
-          _errorMessage = response.message;
-          _isLoading = false;
-        });
+        // Load both class detail and students from API
+        classProvider.loadClassData(widget.classId);
       }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Không thể tải thông tin lớp học: $e';
-        _isLoading = false;
-      });
-    }
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-  @override
+  }@override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(_classDetail?.name ?? 'Chi tiết lớp học'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          if (!_isLoading && _classDetail != null)
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: _loadClassDetail,
+    return Consumer<ClassProvider>(
+      builder: (context, classProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text(classProvider.classDetail?.name ?? 'Chi tiết lớp học'),
+            backgroundColor: Colors.cyan,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            actions: [
+              if (!classProvider.isLoadingClassDetail && classProvider.classDetail != null)
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => classProvider.loadClassData(widget.classId),
+                ),
+            ],
+            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null ? null : TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.white,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              tabs: const [
+                Tab(icon: Icon(Icons.info), text: 'Thông tin'),
+                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
+                Tab(icon: Icon(Icons.people), text: 'Thành viên'),
+              ],
             ),
-        ],        bottom: _isLoading || _classDetail == null ? null : TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-            Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
-            Tab(icon: Icon(Icons.people), text: 'Thành viên'),
+          ),
+          body: _buildBody(classProvider),
+        );
+      },
+    );
+  }  Widget _buildBody(ClassProvider classProvider) {
+    if (classProvider.isLoadingClassDetail) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.cyan),
+            SizedBox(height: 16),
+            Text('Đang tải thông tin lớp học...'),
           ],
         ),
-      ),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.cyan),
       );
     }
 
-    if (_errorMessage != null) {
+    if (classProvider.classDetailError != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -139,16 +119,17 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage!,
+              classProvider.classDetailError!,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[600],
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _loadClassDetail,
+            const SizedBox(height: 24),            ElevatedButton(
+              onPressed: () {
+                classProvider.loadClassData(widget.classId);
+              },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
               child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
             ),
@@ -157,20 +138,35 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       );
     }
 
-    if (_classDetail == null) {
-      return const Center(
-        child: Text('Không tìm thấy thông tin lớp học'),
+    if (classProvider.classDetail == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Không tìm thấy thông tin lớp học'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                classProvider.loadClassData(widget.classId);
+              },
+              child: const Text('Tải lại'),
+            ),
+          ],
+        ),
       );
-    }    return TabBarView(
+    }
+
+    return TabBarView(
       controller: _tabController,
       children: [
-        _buildInfoTab(),
-        _buildAssignmentsTab(),
-        _buildMembersTab(),
+        _buildInfoTab(classProvider),
+        _buildAssignmentsTab(classProvider),
+        _buildMembersTab(classProvider),
       ],
     );
-  }
-  Widget _buildInfoTab() {
+  }Widget _buildInfoTab(ClassProvider classProvider) {
+    final classDetail = classProvider.classDetail!;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -197,7 +193,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _classDetail!.name,
+                    classDetail.name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -206,7 +202,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Mã lớp: ${_classDetail!.code}',
+                    'Mã lớp: ${classDetail.code}',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.white70,
@@ -214,7 +210,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${_classDetail!.studentCount} học sinh',
+                    '${classDetail.studentCount} học sinh',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white70,
@@ -253,7 +249,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _classDetail!.instructorName,
+                    classDetail.instructorName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -261,7 +257,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _classDetail!.instructorEmail,
+                    classDetail.instructorEmail,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -270,7 +266,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 ],
               ),
             ),
-          ),          const SizedBox(height: 16),
+          ),
+
+          const SizedBox(height: 16),
 
           // Statistics Card
           Card(
@@ -302,43 +300,46 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     children: [
                       _buildStatItem(
                         'Tổng số',
-                        _classDetail!.assignments.length.toString(),
+                        classDetail.assignments.length.toString(),
                         Colors.blue,
                         Icons.assignment,
                       ),
                       _buildStatItem(
                         'Chưa nộp',
-                        _classDetail!.pendingAssignmentsCount.toString(),
+                        classDetail.pendingAssignmentsCount.toString(),
                         Colors.orange,
                         Icons.pending,
                       ),
                       _buildStatItem(
                         'Quá hạn',
-                        _classDetail!.overdueAssignmentsCount.toString(),
+                        classDetail.overdueAssignmentsCount.toString(),
                         Colors.red,
                         Icons.warning,
                       ),
                       _buildStatItem(
                         'Đã nộp',
-                        _classDetail!.submittedAssignmentsCount.toString(),
+                        classDetail.submittedAssignmentsCount.toString(),
                         Colors.green,
                         Icons.check_circle,
                       ),
                     ],
-                  ),                ],              ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildAssignmentsTab() {
+  Widget _buildAssignmentsTab(ClassProvider classProvider) {
+    final classDetail = classProvider.classDetail!;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          if (_classDetail!.assignments.isEmpty)
+          if (classDetail.assignments.isEmpty)
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -373,9 +374,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _classDetail!.assignments.length,
+              itemCount: classDetail.assignments.length,
               itemBuilder: (context, index) {
-                final assignment = _classDetail!.assignments[index];
+                final assignment = classDetail.assignments[index];
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   elevation: 2,
@@ -385,7 +386,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: Container(
-                      padding: const EdgeInsets.all(12),                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
                         color: assignment.isSubmitted 
                             ? Colors.green.withValues(alpha: 0.1)
                             : assignment.isOverdue 
@@ -445,7 +447,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       ],
                     ),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
                         color: assignment.isSubmitted 
                             ? Colors.green.withValues(alpha: 0.1)
                             : assignment.isOverdue 
@@ -486,11 +489,10 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ),
     );
   }
-
-  Widget _buildMembersTab() {
+  Widget _buildMembersTab(ClassProvider classProvider) {
     return Column(
       children: [
-        if (_isLoadingMembers)
+        if (classProvider.isLoadingStudents)
           const Expanded(
             child: Center(
               child: CircularProgressIndicator(
@@ -498,7 +500,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
             ),
           )
-        else if (_membersErrorMessage != null)
+        else if (classProvider.studentsError != null)
           Expanded(
             child: Center(
               child: Padding(
@@ -522,7 +524,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      _membersErrorMessage ?? 'Đã xảy ra lỗi không xác định',
+                      classProvider.studentsError ?? 'Đã xảy ra lỗi không xác định',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -531,7 +533,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: _loadStudents,
+                      onPressed: () => classProvider.loadStudents(widget.classId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,
                         foregroundColor: Colors.white,
@@ -547,7 +549,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
             ),
           )
-        else if (_students.isEmpty)
+        else if (classProvider.students.isEmpty)
           Expanded(
             child: Center(
               child: Padding(
@@ -580,7 +582,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: _loadStudents,
+                      onPressed: () => classProvider.loadStudents(widget.classId),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,
                         foregroundColor: Colors.white,
@@ -599,7 +601,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         else
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _loadStudents,
+              onRefresh: () => classProvider.loadStudents(widget.classId),
               color: Colors.cyan,
               child: Column(
                 children: [
@@ -617,7 +619,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${_students.length} học sinh',
+                          '${classProvider.students.length} học sinh',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -632,9 +634,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: _students.length,
+                      itemCount: classProvider.students.length,
                       itemBuilder: (context, index) {
-                        final student = _students[index];
+                        final student = classProvider.students[index];
                         return _buildStudentCard(student);
                       },
                     ),
@@ -646,7 +648,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ],
     );
   }
-
   Widget _buildStudentCard(Student student) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -665,15 +666,20 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
-          child: Text(
-            student.studentName.isNotEmpty 
-                ? student.studentName[0].toUpperCase()
-                : 'S',
-            style: TextStyle(
-              color: Colors.cyan[700],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
+              ? NetworkImage(student.avatarUrl!)
+              : null,
+          child: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
+              ? null
+              : Text(
+                  student.studentName.isNotEmpty 
+                      ? student.studentName[0].toUpperCase()
+                      : 'S',
+                  style: TextStyle(
+                    color: Colors.cyan[700],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
         title: Text(
           student.studentName,
@@ -724,25 +730,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         ),
       ),
     );
-  }
-
-  Future<void> _loadStudents() async {
-    setState(() {
-      _isLoadingMembers = true;
-      _membersErrorMessage = null;
-    });
-
-    final response = await _classService.getStudentsInClass(widget.classId);
-    
-    if (mounted) {
-      setState(() {
-        _isLoadingMembers = false;        if (response.status == StatusCode.ok && response.data != null) {
-          _students = response.data!;
-        } else {
-          _membersErrorMessage = response.message;
-        }
-      });
-    }
   }
 
   Widget _buildStatItem(String title, String count, Color color, IconData icon) {

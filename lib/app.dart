@@ -45,7 +45,8 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(
                   builder: (context) => OtpVerificationScreen(
                     username: args['username'] as String,
-                    registrationData: args['registrationData'] as Map<String, dynamic>,
+                    registrationData:
+                        args['registrationData'] as Map<String, dynamic>,
                   ),
                 );
               }
@@ -57,12 +58,12 @@ class MyApp extends StatelessWidget {
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
               '/quiz': (context) => const ExamScreen(),
-              '/result': (context) => const ResultScreen(
-                exerciseId: 2,
-                jwtToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiYXVkIjoiRWR1UXVlc3RBdWRpZW5jZSIsImlhdCI6MTc1MDMxMTYzNCwidXNlcm5hbWUiOiJzdHVkZW50MSIsImlzcyI6IkVkdVF1ZXN0SXNzdWVyIiwiZXhwIjoxNzUwMzE1MjM0LCJyb2xlIjoiUk9MRV9TVFVERU5UIn0.OWtDMfcqQQyqroVBfgZ_vZ_qUzkoKlmPN3DK1pwV4Mk',
-              ),
+              '/result': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+                return ResultScreen(exerciseId: args['exerciseId'] as int);
+              },
               '/profile': (context) => const ProfileScreen(),
-
             },
           );
         },

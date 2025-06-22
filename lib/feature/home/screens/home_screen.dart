@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/bottom_navigation_bar.dart';
-import '../../profile/screens/profile_screen.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
 import '../../class/models/class_detail.dart';
 import '../../class/models/assignment.dart';
-
+import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
+// import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

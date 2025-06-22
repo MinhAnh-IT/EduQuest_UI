@@ -4,10 +4,12 @@ import '../../../core/network/api_client.dart';
 import '../../../feature/auth/models/user_model.dart';
 import '../../../feature/auth/services/auth_service.dart';
 import '../../../shared/utils/constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
   final AuthService _authService = AuthService();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   User? _currentUser;
   bool _isLoading = false;
   String? _error;
@@ -35,7 +37,7 @@ class AuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
-  
+
   Future<bool> requestPasswordReset(String username) async {
     _setLoading(true);
     try {
@@ -76,7 +78,8 @@ class AuthProvider extends ChangeNotifier {
       final response = await _authService.logout();
       if (response['code'] == 200) {
         _token = null;
-        await _prefs.remove(StorageConstants.token);
+        await _secureStorage.delete(key: 'access_token');
+        await _secureStorage.delete(key: 'refresh_token');
         _setLoading(false);
         return true;
       } else {
@@ -114,7 +117,11 @@ class AuthProvider extends ChangeNotifier {
       if (response['code'] == 200) {
         final data = response['data'];
         _token = data['accessToken'];
-        await _prefs.setString(StorageConstants.token, _token!);
+        final refreshToken = data['refreshToken'];
+
+        await _secureStorage.write(key: 'access_token', value: _token!);
+        await _secureStorage.write(key: 'refresh_token', value: refreshToken);
+
         ApiClient.token = _token;
         _setLoading(false);
         return true;
@@ -132,8 +139,7 @@ class AuthProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       final response = await AuthService.register(payload);
-      
-      // Kiểm tra response thành công với code 201 (CREATED)
+
       if (response['code'] == 201) {
         final data = response['data'] as Map<String, dynamic>;
         final userId = data['id'] as int;
@@ -163,7 +169,6 @@ class AuthProvider extends ChangeNotifier {
         return true;
       } else {
         String errorMessage = response['message'] ?? 'Xác thực OTP thất bại';
-        // Thêm lại logic dịch thuật
         if (errorMessage.contains('Invalid or expired OTP')) {
           errorMessage = 'Mã OTP không hợp lệ hoặc đã hết hạn';
         }
@@ -174,7 +179,6 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       print('Error in verifyOTP: $e');
       String errorMessage = e.toString().replaceAll('Exception: ', '');
-      // Thêm lại logic dịch thuật cho trường hợp exception
       if (errorMessage.contains('Invalid or expired OTP')) {
         errorMessage = 'Mã OTP không hợp lệ hoặc đã hết hạn';
       }
@@ -184,7 +188,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateStudentDetails(int userId, Map<String, dynamic> details) async {
+  Future<bool> updateStudentDetails(
+      int userId, Map<String, dynamic> details) async {
     _setLoading(true);
     try {
       final response = await AuthService.updateStudentDetails(userId, details);
@@ -210,7 +215,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> checkAuthStatus() async {
-    _token = _prefs.getString(StorageConstants.token);
+    _token = await _secureStorage.read(key: 'access_token');
     if (_token != null) {
       ApiClient.token = _token;
     }

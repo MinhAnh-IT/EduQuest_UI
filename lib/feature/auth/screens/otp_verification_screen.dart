@@ -75,7 +75,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
       final success = await authProvider.verifyOTP(widget.username, _otpController.text);
 
       if (success) {
-        Navigator.pushReplacementNamed(
+        Navigator.pushNamed(
           context,
           '/student-details',
           arguments: widget.registrationData,

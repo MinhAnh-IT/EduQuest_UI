@@ -1,4 +1,4 @@
-enum UserRole { instructor, student }
+enum UserRole { INSTRUCTOR, STUDENT }
 
 class User {
   final int? id;
@@ -10,8 +10,8 @@ class User {
   final String? avatarUrl;
   final DateTime? lastLoginAt;
   final DateTime createdAt;
-  final DateTime updatedAt;  bool get isStudent => role == UserRole.student;
-  bool get isInstructor => role == UserRole.instructor;
+  final DateTime updatedAt;  bool get isStudent => role == UserRole.STUDENT;
+  bool get isInstructor => role == UserRole.INSTRUCTOR;
 
   User({
     this.id,

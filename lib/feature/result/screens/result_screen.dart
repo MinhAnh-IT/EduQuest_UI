@@ -8,9 +8,8 @@ import '../../../shared/widgets/exam_app_bar.dart';
 
 class ResultScreen extends StatefulWidget {
   final int exerciseId;
-  final String jwtToken;
 
-  const ResultScreen({super.key, required this.exerciseId, required this.jwtToken});
+  const ResultScreen({super.key, required this.exerciseId});
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -25,7 +24,7 @@ class _ResultScreenState extends State<ResultScreen> {
     print('ResultScreen initialized with exerciseId: ${widget.exerciseId}');
     Future.microtask(() {
       Provider.of<ResultProvider>(context, listen: false)
-          .fetchResult(widget.exerciseId, widget.jwtToken);
+          .fetchResult(widget.exerciseId);
     });
   }
 
@@ -83,9 +82,6 @@ class _ResultScreenState extends State<ResultScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (provider.error != null) {
-      return Center(child: Text(provider.error!));
-    }
 
     final result = provider.result;
     if (result == null || result.questions.isEmpty) {

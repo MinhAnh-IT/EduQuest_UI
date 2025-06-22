@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _selectedRole = ModalRoute.of(context)!.settings.arguments as UserRole;
-      _showStudentForm = _selectedRole == UserRole.student;
+      _showStudentForm = _selectedRole == UserRole.STUDENT;
       setState(() {});
     });
   }
@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'role': _selectedRole,
       };
 
-      if (_selectedRole == UserRole.student) {
+      if (_selectedRole == UserRole.STUDENT) {
         Navigator.pushNamed(
           context,
           '/otp-verification',
@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Đăng ký với vai trò ${_selectedRole == UserRole.student ? 'Sinh viên' : 'Giảng viên'}',
+                  'Đăng ký với vai trò ${_selectedRole == UserRole.STUDENT ? 'Sinh viên' : 'Giảng viên'}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -304,7 +304,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _handleRegister,
-                  child: Text(_selectedRole == UserRole.student 
+                  child: Text(_selectedRole == UserRole.STUDENT 
                     ? 'Tiếp tục' 
                     : 'Tạo tài khoản'),
                 ),

@@ -48,7 +48,6 @@ class EnrollmentService {
             (data) => Enrollment.fromJson(data),
           );
         } else {
-          // API trả về success nhưng không có data (thường là trường hợp PENDING)
           return ApiResponse<Enrollment>(
             status: StatusCode.fromCode(response.data['code']) ?? StatusCode.ok,
             message: response.data['message'] ?? 'Thành công',
@@ -137,7 +136,6 @@ class EnrollmentService {
     }
   }
 
-  // Get My Enrolled Classes (ENROLLED status only)
   Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
     try {
       final response = await _dio.get(ApiConfig.myEnrolledClasses);

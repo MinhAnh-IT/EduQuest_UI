@@ -138,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: Colors.blue,
                         textStyle: const TextStyle(fontSize: 17)),
                     child: const Text("Đăng nhập"),
-                  ),                  const SizedBox(height: 16),
+                  ),                  
+                  const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Navigator.push(

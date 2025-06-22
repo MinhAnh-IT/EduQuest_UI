@@ -59,7 +59,6 @@ class Assignment {
         return Colors.grey;
     }
   }
-
   String get statusText {
     switch (status) {
       case 'submitted':
@@ -71,5 +70,9 @@ class Assignment {
       default:
         return 'Không xác định';
     }
+  }
+
+  String get formattedDueDate {
+    return '${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}/${dueDate.year}';
   }
 }

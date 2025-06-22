@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
-import '../models/assignment.dart';
+import '../models/student.dart';
+import '../providers/class_provider.dart';
 
 class ClassDetailScreen extends StatefulWidget {
-  final ClassDetail classDetail;
+  final int classId;
+  final ClassDetail? initialClassDetail; // Optional initial data
 
   const ClassDetailScreen({
     Key? key,
-    required this.classDetail,
+    required this.classId,
+    this.initialClassDetail,
   }) : super(key: key);
 
   @override
@@ -23,47 +26,147 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    
+    // Load class data using provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final classProvider = context.read<ClassProvider>();
+      
+      // Reset provider state first
+      classProvider.reset();
+      
+      // Use initial data if provided
+      if (widget.initialClassDetail != null) {
+        // Set initial data to provider and then load students
+        classProvider.setInitialClassDetail(widget.initialClassDetail!);
+        classProvider.loadStudents(widget.classId);
+      } else {
+        // Load both class detail and students from API
+        classProvider.loadClassData(widget.classId);
+      }
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  @override
+  }@override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(widget.classDetail.name),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-            Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
-            Tab(icon: Icon(Icons.people), text: 'Thành viên'),
+    return Consumer<ClassProvider>(
+      builder: (context, classProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text(classProvider.classDetail?.name ?? 'Chi tiết lớp học'),
+            backgroundColor: Colors.cyan,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            actions: [
+              if (!classProvider.isLoadingClassDetail && classProvider.classDetail != null)
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => classProvider.loadClassData(widget.classId),
+                ),
+            ],
+            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null ? null : TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.white,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              tabs: const [
+                Tab(icon: Icon(Icons.info), text: 'Thông tin'),
+                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
+                Tab(icon: Icon(Icons.people), text: 'Thành viên'),
+              ],
+            ),
+          ),
+          body: _buildBody(classProvider),
+        );
+      },
+    );
+  }  Widget _buildBody(ClassProvider classProvider) {
+    if (classProvider.isLoadingClassDetail) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.cyan),
+            SizedBox(height: 16),
+            Text('Đang tải thông tin lớp học...'),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildInfoTab(),
-          _buildAssignmentsTab(),
-          _buildMembersTab(),
-        ],
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildInfoTab() {
+    if (classProvider.classDetailError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Không thể tải thông tin lớp học',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              classProvider.classDetailError!,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),            ElevatedButton(
+              onPressed: () {
+                classProvider.loadClassData(widget.classId);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
+              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (classProvider.classDetail == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Không tìm thấy thông tin lớp học'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                classProvider.loadClassData(widget.classId);
+              },
+              child: const Text('Tải lại'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        _buildInfoTab(classProvider),
+        _buildAssignmentsTab(classProvider),
+        _buildMembersTab(classProvider),
+      ],
+    );
+  }Widget _buildInfoTab(ClassProvider classProvider) {
+    final classDetail = classProvider.classDetail!;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -90,7 +193,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.classDetail.name,
+                    classDetail.name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -99,7 +202,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Mã lớp: ${widget.classDetail.code}',
+                    'Mã lớp: ${classDetail.code}',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.white70,
@@ -107,7 +210,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${widget.classDetail.studentCount} học sinh',
+                    '${classDetail.studentCount} học sinh',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white70,
@@ -146,7 +249,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    widget.classDetail.instructorName,
+                    classDetail.instructorName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -154,7 +257,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    widget.classDetail.instructorEmail,
+                    classDetail.instructorEmail,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -164,43 +267,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
             ),
           ),
-
-          const SizedBox(height: 16),
-
-          // Description Card
-          if (widget.classDetail.description.isNotEmpty)
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.description, color: Colors.cyan[600]),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Mô tả',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.classDetail.description,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
           const SizedBox(height: 16),
 
@@ -234,25 +300,25 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     children: [
                       _buildStatItem(
                         'Tổng số',
-                        widget.classDetail.assignments.length.toString(),
+                        classDetail.assignments.length.toString(),
                         Colors.blue,
                         Icons.assignment,
                       ),
                       _buildStatItem(
                         'Chưa nộp',
-                        widget.classDetail.pendingAssignmentsCount.toString(),
+                        classDetail.pendingAssignmentsCount.toString(),
                         Colors.orange,
                         Icons.pending,
                       ),
                       _buildStatItem(
                         'Quá hạn',
-                        widget.classDetail.overdueAssignmentsCount.toString(),
+                        classDetail.overdueAssignmentsCount.toString(),
                         Colors.red,
                         Icons.warning,
                       ),
                       _buildStatItem(
                         'Đã nộp',
-                        widget.classDetail.submittedAssignmentsCount.toString(),
+                        classDetail.submittedAssignmentsCount.toString(),
                         Colors.green,
                         Icons.check_circle,
                       ),
@@ -263,6 +329,405 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildAssignmentsTab(ClassProvider classProvider) {
+    final classDetail = classProvider.classDetail!;
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (classDetail.assignments.isEmpty)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 60),
+                  Icon(
+                    Icons.assignment_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Chưa có bài tập nào',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Bài tập sẽ được hiển thị ở đây khi có',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: classDetail.assignments.length,
+              itemBuilder: (context, index) {
+                final assignment = classDetail.assignments[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    leading: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: assignment.isSubmitted 
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : assignment.isOverdue 
+                                ? Colors.red.withValues(alpha: 0.1)
+                                : Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        assignment.isSubmitted 
+                            ? Icons.check_circle
+                            : assignment.isOverdue 
+                                ? Icons.warning
+                                : Icons.pending,
+                        color: assignment.isSubmitted 
+                            ? Colors.green
+                            : assignment.isOverdue 
+                                ? Colors.red
+                                : Colors.orange,
+                      ),
+                    ),
+                    title: Text(
+                      assignment.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text(
+                          assignment.description,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.schedule,
+                              size: 16,
+                              color: Colors.grey[500],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Hạn nộp: ${assignment.formattedDueDate}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: assignment.isSubmitted 
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : assignment.isOverdue 
+                                ? Colors.red.withValues(alpha: 0.1)
+                                : Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: assignment.isSubmitted 
+                              ? Colors.green.withValues(alpha: 0.3)
+                              : assignment.isOverdue 
+                                  ? Colors.red.withValues(alpha: 0.3)
+                                  : Colors.orange.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        assignment.isSubmitted 
+                            ? 'Đã nộp'
+                            : assignment.isOverdue 
+                                ? 'Quá hạn'
+                                : 'Chưa nộp',
+                        style: TextStyle(
+                          color: assignment.isSubmitted 
+                              ? Colors.green
+                              : assignment.isOverdue 
+                                  ? Colors.red
+                                  : Colors.orange,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+  Widget _buildMembersTab(ClassProvider classProvider) {
+    return Column(
+      children: [
+        if (classProvider.isLoadingStudents)
+          const Expanded(
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+              ),
+            ),
+          )
+        else if (classProvider.studentsError != null)
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red[300],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Lỗi khi tải danh sách thành viên',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      classProvider.studentsError ?? 'Đã xảy ra lỗi không xác định',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => classProvider.loadStudents(widget.classId),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else if (classProvider.students.isEmpty)
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Chưa có học sinh nào',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Lớp học này chưa có học sinh nào tham gia',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => classProvider.loadStudents(widget.classId),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Làm mới'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => classProvider.loadStudents(widget.classId),
+              color: Colors.cyan,
+              child: Column(
+                children: [
+                  // Header with student count
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.people,
+                          color: Colors.cyan[600],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${classProvider.students.length} học sinh',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  // Students list
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: classProvider.students.length,
+                      itemBuilder: (context, index) {
+                        final student = classProvider.students[index];
+                        return _buildStudentCard(student);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+  Widget _buildStudentCard(Student student) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
+          backgroundColor: Colors.cyan[100],
+          backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
+              ? NetworkImage(student.avatarUrl!)
+              : null,
+          child: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
+              ? null
+              : Text(
+                  student.studentName.isNotEmpty 
+                      ? student.studentName[0].toUpperCase()
+                      : 'S',
+                  style: TextStyle(
+                    color: Colors.cyan[700],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+        ),
+        title: Text(
+          student.studentName,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              'MSSV: ${student.studentCode}',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              student.studentEmail,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: student.statusColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: student.statusColor.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            student.statusText,
+            style: TextStyle(
+              color: student.statusColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -297,422 +762,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-
-  Widget _buildAssignmentsTab() {
-    if (widget.classDetail.assignments.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.assignment_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Chưa có bài tập nào',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemCount: widget.classDetail.assignments.length,
-      itemBuilder: (context, index) {
-        final assignment = widget.classDetail.assignments[index];
-        return _buildAssignmentCard(assignment);
-      },
-    );
-  }
-
-  Widget _buildAssignmentCard(Assignment assignment) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          _showAssignmentDetail(assignment);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      assignment.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: assignment.statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: assignment.statusColor.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Text(
-                      assignment.statusText,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: assignment.statusColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                assignment.description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 16,
-                    color: assignment.isOverdue ? Colors.red : Colors.grey[600],
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.dueDate)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: assignment.isOverdue ? Colors.red : Colors.grey[600],
-                      fontWeight: assignment.isOverdue ? FontWeight.w500 : FontWeight.normal,
-                    ),
-                  ),
-                  if (assignment.grade != null) ...[
-                    const Spacer(),
-                    Icon(
-                      Icons.grade,
-                      size: 16,
-                      color: Colors.green[600],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Điểm: ${assignment.grade}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.green[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMembersTab() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Danh sách thành viên',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${widget.classDetail.studentCount} học sinh',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Chức năng này sẽ được cập nhật sau',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAssignmentDetail(Assignment assignment) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        minChildSize: 0.5,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        assignment.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: assignment.statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: assignment.statusColor.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Text(
-                        assignment.statusText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: assignment.statusColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Description
-                Text(
-                  'Mô tả bài tập:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  assignment.description,
-                  style: const TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 24),
-
-                // Due Date
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: assignment.isOverdue
-                        ? Colors.red.withValues(alpha: 0.1)
-                        : Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: assignment.isOverdue
-                          ? Colors.red.withValues(alpha: 0.3)
-                          : Colors.blue.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        color: assignment.isOverdue ? Colors.red : Colors.blue,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hạn nộp bài',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            Text(
-                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.dueDate),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: assignment.isOverdue ? Colors.red : Colors.blue,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Grade (if available)
-                if (assignment.grade != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.green.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.grade,
-                          color: Colors.green,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Điểm số',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                assignment.grade!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 32),
-
-                // Action Buttons
-                if (!assignment.isSubmitted)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Chức năng nộp bài sẽ được cập nhật sau'),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Nộp bài tập',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                const SizedBox(height: 16),
-
-                // View Result Button
-                if (assignment.isSubmitted)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Đóng modal
-                        Navigator.pushNamed(
-                          context,
-                          '/result',
-                          arguments: {'exerciseId': assignment.id}, // Giả định assignment có thuộc tính id
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Xem kết quả',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

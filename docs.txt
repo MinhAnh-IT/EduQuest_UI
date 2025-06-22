@@ -361,6 +361,109 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## Class APIs
+
+### 8. Get Class Detail API
+
+**Endpoint:** `GET /api/classes/{classId}/detail`
+
+**Description:** Retrieves detailed information about a specific class including student count
+
+**Path Parameters:**
+- `classId`: Class ID (number)
+
+**Response:**
+```json
+{
+  "code": 200,
+  "message": "Successfully retrieved class detail",
+  "data": {
+    "classId": 456,
+    "className": "Java Programming",
+    "studentCount": 25,
+    "instructorName": "Dr. Smith",
+    "instructorEmail": "dr.smith@university.edu"
+  }
+}
+```
+
+**Status Codes:**
+- `200` - Success: Successfully retrieved class detail
+- `407` - Class Not Found: Class not found with provided ID
+- `500` - Internal Server Error: Failed to retrieve class detail
+
+**Business Logic:**
+1. Find class by ID in database
+2. Count enrolled students for this class
+3. Map class information to response DTO
+4. Include instructor name and email
+5. Return complete class detail
+
+**Notes:**
+- No authentication required (public information)
+- Student count includes all enrollments regardless of status
+- Returns instructor contact information
+- Useful for class preview or detail pages
+
+---
+
+### 9. Get Students in Class API
+
+**Endpoint:** `GET /api/classes/{classId}/students`
+
+**Description:** Retrieves list of students enrolled in a specific class with their enrollment status
+
+**Path Parameters:**
+- `classId`: Class ID (number)
+
+**Response:**
+```json
+{
+  "code": 200,
+  "message": "Successfully retrieved students in class", // or "No students found in this class" if empty
+  "data": [
+    {
+      "studentId": 123,
+      "studentCode": "STU001",
+      "studentName": "John Doe",
+      "studentEmail": "john.doe@student.edu",
+      "avatarUrl": "https://example.com/avatars/john_doe.jpg",
+      "enrollmentStatus": "ENROLLED"
+    },
+    {
+      "studentId": 124,
+      "studentCode": "STU002", 
+      "studentName": "Jane Smith",
+      "studentEmail": "jane.smith@student.edu",
+      "avatarUrl": "https://example.com/avatars/jane_smith.jpg",
+      "enrollmentStatus": "PENDING"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200` - Success: Successfully retrieved students list (even if empty)
+- `407` - Class Not Found: Class not found with provided ID
+- `500` - Internal Server Error: Failed to retrieve students in class
+
+**Business Logic:**
+1. Find class by ID in database
+2. Get all enrollments for this class
+3. Map enrollment data to student response DTOs
+4. Include student personal information and enrollment status
+5. Return list of students with their enrollment status
+
+**Notes:**
+- No authentication required (public information)
+- Returns students with ALL enrollment statuses (PENDING, ENROLLED, REJECTED)
+- Includes student code, name, email, avatar URL, and enrollment status
+- Avatar URL can be null if student hasn't uploaded an avatar
+- Useful for class roster display and management
+- Message adapts based on whether students are found
+
+---
+
 ## Enum Definitions
 
 ### EnrollmentStatus

@@ -121,10 +121,12 @@ class _HomeTabState extends State<HomeTab> {
       _navigateToClassDetail(context, classData);
     }
   }
-
   void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
-    final classDetail = ClassDetail(
-      id: int.parse(classData['id'] ?? '1'),
+    final classId = int.parse(classData['id'] ?? '1');
+    
+    // Create initial class detail from available data
+    final initialClassDetail = ClassDetail(
+      id: classId,
       name: classData['name'] ?? '',
       code: classData['code'] ?? 'CLASS${classData['id']}',
       description: classData['description'] ?? 'Mô tả lớp học ${classData['name']}',
@@ -132,13 +134,16 @@ class _HomeTabState extends State<HomeTab> {
       instructorEmail: '${classData['instructor']?.toLowerCase().replaceAll(' ', '.').replaceAll('ă', 'a').replaceAll('â', 'a').replaceAll('đ', 'd').replaceAll('ê', 'e').replaceAll('ô', 'o').replaceAll('ơ', 'o').replaceAll('ư', 'u').replaceAll('ì', 'i').replaceAll('í', 'i').replaceAll('ò', 'o').replaceAll('ó', 'o').replaceAll('ù', 'u').replaceAll('ú', 'u').replaceAll('ỳ', 'y').replaceAll('ý', 'y')}@university.edu',
       studentCount: int.parse(classData['studentCount'] ?? '25'),
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
-      assignments: _createSampleAssignments(int.parse(classData['id'] ?? '1')),
+      assignments: _createSampleAssignments(classId),
     );
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ClassDetailScreen(classDetail: classDetail),
+        builder: (context) => ClassDetailScreen(
+          classId: classId,
+          initialClassDetail: initialClassDetail,
+        ),
       ),
     );
   }

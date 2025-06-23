@@ -37,18 +37,18 @@ class ClassDetail {
           ?.map((assignment) => Assignment.fromJson(assignment))
           .toList() ?? [],
     );
-  }
-  /// Factory constructor for API response from Get Class Detail API
+  }  /// Factory constructor for API response from Get Class Detail API
   factory ClassDetail.fromApiResponse(Map<String, dynamic> json) {
     return ClassDetail(
       id: json['classId'] as int,
       name: json['className'] as String,
-      code: 'CLASS${json['classId']}', // Generate code from class ID since API doesn't provide it
-      description: '', // API doesn't return description, set empty
+      // Sử dụng classCode từ API (đã được cập nhật trong API)
+      code: json['classCode'] as String,
+      description: json['description'] as String? ?? '', // Thêm field description nếu có
       instructorName: json['instructorName'] as String,
       instructorEmail: json['instructorEmail'] as String,
       studentCount: json['studentCount'] as int,
-      createdAt: DateTime.now(), // API doesn't return creation date, use current time
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
       assignments: [], // API doesn't return assignments, set empty list - assignments should be loaded separately
     );
   }

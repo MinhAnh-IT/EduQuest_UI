@@ -49,9 +49,27 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
       body: Consumer<ClassProvider>(
         builder: (context, classProvider, child) {
-          return _buildBody(classProvider);
+          return MemberListWidget(classId: widget.classId);
         },
       ),
+    );
+  }
+}
+
+// Extracted widget for reusable member list
+class MemberListWidget extends StatelessWidget {
+  final int classId;
+
+  const MemberListWidget({
+    Key? key,
+    required this.classId,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ClassProvider>(
+      builder: (context, classProvider, child) {
+        return _buildBody(classProvider);
+      },
     );
   }
 
@@ -107,7 +125,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                classProvider.refreshStudents(widget.classId);
+                classProvider.refreshStudents(classId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
@@ -124,6 +142,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
     );
   }
+
   Widget _buildEmptyState(ClassProvider classProvider) {
     return Center(
       child: Padding(
@@ -157,7 +176,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                classProvider.refreshStudents(widget.classId);
+                classProvider.refreshStudents(classId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
@@ -174,9 +193,10 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
     );
   }
+
   Widget _buildStudentsList(ClassProvider classProvider) {
     return RefreshIndicator(
-      onRefresh: () => classProvider.refreshStudents(widget.classId),
+      onRefresh: () => classProvider.refreshStudents(classId),
       color: Colors.cyan,
       child: Column(
         children: [
@@ -194,7 +214,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${classProvider.studentsCount} học sinh',
+                  '${classProvider.students.length} học sinh',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -236,7 +256,8 @@ class _MemberListScreenState extends State<MemberListScreen> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),        leading: CircleAvatar(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
           backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
               ? NetworkImage(student.avatarUrl!)

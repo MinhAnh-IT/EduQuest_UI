@@ -380,6 +380,7 @@ Authorization: Bearer <JWT_TOKEN>
   "data": {
     "classId": 456,
     "className": "Java Programming",
+    "classCode": "JAVA2024",
     "studentCount": 25,
     "instructorName": "Dr. Smith",
     "instructorEmail": "dr.smith@university.edu"
@@ -396,12 +397,13 @@ Authorization: Bearer <JWT_TOKEN>
 1. Find class by ID in database
 2. Count enrolled students for this class
 3. Map class information to response DTO
-4. Include instructor name and email
+4. Include class code, instructor name and email
 5. Return complete class detail
 
 **Notes:**
 - No authentication required (public information)
 - Student count includes all enrollments regardless of status
+- Returns class code for easy identification and joining
 - Returns instructor contact information
 - Useful for class preview or detail pages
 

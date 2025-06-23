@@ -11,8 +11,6 @@ void main() async {
 
     runApp(MyApp(prefs: prefs));
   } catch (e) {
-    print('Error initializing app: $e');
-    // Fallback initialization
     final prefs = await SharedPreferences.getInstance();
     runApp(MyApp(prefs: prefs));
   }

@@ -15,7 +15,6 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           onSelected: (value) {
-            // Xử lý theo lựa chọn
           },
           itemBuilder: (context) => [
             const PopupMenuItem(value: 'option1', child: Text('Tùy chọn 1')),

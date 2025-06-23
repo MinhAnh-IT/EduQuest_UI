@@ -20,7 +20,7 @@ class ApiClient {
       if (token != null) {
         headers['Authorization'] = 'Bearer $token';
       } else {
-        print('Không lấy được token hợp lệ');
+        
       }
     }
 

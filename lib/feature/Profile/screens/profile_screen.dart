@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ClipOval(
                       child: profile.avatarUrl != null
                           ? Image.network(
-                        'http://192.168.1.2:8080${profile.avatarUrl}',
+                        'http://localhost:8080${profile.avatarUrl}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],

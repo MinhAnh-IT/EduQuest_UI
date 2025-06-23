@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
 import '../models/student.dart';
 import '../providers/class_provider.dart';
+import '../data/sample_assignments.dart';
+import '../../../shared/widgets/custom_app_bar.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final int classId;
@@ -20,12 +22,10 @@ class ClassDetailScreen extends StatefulWidget {
 
 class _ClassDetailScreenState extends State<ClassDetailScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
+  late TabController _tabController;  @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     
     // Load class data using provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -45,22 +45,19 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       }
     });
   }
-
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }@override
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ClassProvider>(
-      builder: (context, classProvider, child) {
-        return Scaffold(
+      builder: (context, classProvider, child) {        return Scaffold(
           backgroundColor: Colors.grey[100],
-          appBar: AppBar(
-            title: Text(classProvider.classDetail?.name ?? 'Chi tiết lớp học'),
-            backgroundColor: Colors.cyan,
-            foregroundColor: Colors.white,
-            elevation: 0,
+          appBar: CustomAppBar(
+            title: classProvider.classDetail?.name ?? 'Chi tiết lớp học',
             actions: [
               if (!classProvider.isLoadingClassDetail && classProvider.classDetail != null)
                 IconButton(
@@ -75,7 +72,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               unselectedLabelColor: Colors.white70,
               tabs: const [
                 Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
                 Tab(icon: Icon(Icons.people), text: 'Thành viên'),
               ],
             ),
@@ -151,20 +147,17 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               },
               child: const Text('Tải lại'),
             ),
-          ],
-        ),
+          ],        ),
       );
-    }
-
-    return TabBarView(
+    }    return TabBarView(
       controller: _tabController,
       children: [
         _buildInfoTab(classProvider),
-        _buildAssignmentsTab(classProvider),
         _buildMembersTab(classProvider),
       ],
     );
-  }Widget _buildInfoTab(ClassProvider classProvider) {
+  }
+  Widget _buildInfoTab(ClassProvider classProvider) {
     final classDetail = classProvider.classDetail!;
     
     return SingleChildScrollView(
@@ -261,8 +254,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
-                    ),
-                  ),
+                    ),                  ),
                 ],
               ),
             ),
@@ -270,7 +262,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
 
           const SizedBox(height: 16),
 
-          // Statistics Card
+          // Assignments Card
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -283,10 +275,10 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.analytics, color: Colors.cyan[600]),
+                      Icon(Icons.assignment, color: Colors.cyan[600]),
                       const SizedBox(width: 8),
                       const Text(
-                        'Thống kê bài tập',
+                        'Bài tập',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -295,34 +287,62 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     ],
                   ),
                   const SizedBox(height: 16),
+                  // Assignment stats
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildStatItem(
-                        'Tổng số',
-                        classDetail.assignments.length.toString(),
-                        Colors.blue,
-                        Icons.assignment,
+                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Tổng',
+                          SampleAssignments.createAssignmentsByClassName(classDetail.id, classDetail.name).length.toString(),
+                          Icons.assignment,
+                          Colors.blue,
+                        ),
                       ),
-                      _buildStatItem(
-                        'Chưa nộp',
-                        classDetail.pendingAssignmentsCount.toString(),
-                        Colors.orange,
-                        Icons.pending,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Chưa nộp',
+                          SampleAssignments.createAssignmentsByClassName(classDetail.id, classDetail.name)
+                              .where((a) => a.status == 'pending').length.toString(),
+                          Icons.pending,
+                          Colors.orange,
+                        ),
                       ),
-                      _buildStatItem(
-                        'Quá hạn',
-                        classDetail.overdueAssignmentsCount.toString(),
-                        Colors.red,
-                        Icons.warning,
-                      ),
-                      _buildStatItem(
-                        'Đã nộp',
-                        classDetail.submittedAssignmentsCount.toString(),
-                        Colors.green,
-                        Icons.check_circle,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Đã nộp',
+                          SampleAssignments.createAssignmentsByClassName(classDetail.id, classDetail.name)
+                              .where((a) => a.status == 'submitted' || a.status == 'graded').length.toString(),
+                          Icons.check_circle,
+                          Colors.green,
+                        ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _navigateToAssignments(),
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text(
+                        'Xem chi tiết bài tập',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.cyan,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -332,163 +352,46 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ),
     );
   }
-  Widget _buildAssignmentsTab(ClassProvider classProvider) {
-    final classDetail = classProvider.classDetail!;
-    
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          if (classDetail.assignments.isEmpty)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 60),
-                  Icon(
-                    Icons.assignment_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Chưa có bài tập nào',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Bài tập sẽ được hiển thị ở đây khi có',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: classDetail.assignments.length,
-              itemBuilder: (context, index) {
-                final assignment = classDetail.assignments[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: assignment.isSubmitted 
-                            ? Colors.green.withValues(alpha: 0.1)
-                            : assignment.isOverdue 
-                                ? Colors.red.withValues(alpha: 0.1)
-                                : Colors.orange.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        assignment.isSubmitted 
-                            ? Icons.check_circle
-                            : assignment.isOverdue 
-                                ? Icons.warning
-                                : Icons.pending,
-                        color: assignment.isSubmitted 
-                            ? Colors.green
-                            : assignment.isOverdue 
-                                ? Colors.red
-                                : Colors.orange,
-                      ),
-                    ),
-                    title: Text(
-                      assignment.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          assignment.description,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.schedule,
-                              size: 16,
-                              color: Colors.grey[500],
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Hạn nộp: ${assignment.formattedDueDate}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: assignment.isSubmitted 
-                            ? Colors.green.withValues(alpha: 0.1)
-                            : assignment.isOverdue 
-                                ? Colors.red.withValues(alpha: 0.1)
-                                : Colors.orange.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: assignment.isSubmitted 
-                              ? Colors.green.withValues(alpha: 0.3)
-                              : assignment.isOverdue 
-                                  ? Colors.red.withValues(alpha: 0.3)
-                                  : Colors.orange.withValues(alpha: 0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        assignment.isSubmitted 
-                            ? 'Đã nộp'
-                            : assignment.isOverdue 
-                                ? 'Quá hạn'
-                                : 'Chưa nộp',
-                        style: TextStyle(
-                          color: assignment.isSubmitted 
-                              ? Colors.green
-                              : assignment.isOverdue 
-                                  ? Colors.red
-                                  : Colors.orange,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+
+  Widget _buildQuickStatCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: color,
             ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
+
   Widget _buildMembersTab(ClassProvider classProvider) {
     return Column(
       children: [
@@ -728,58 +631,25 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
             ),
           ),
         ),
-      ),
-    );
+      ),    );
   }
-
-  Widget _buildStatItem(String title, String count, Color color, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          count,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
-
-enum ConvertStatus {
-  SUBMITTED('Đã nộp'),
-  IN_PROGRESS('Đang xử lý');
-
-  final String message;
-  const ConvertStatus(this.message);
-
-  static String? getMessage(String name) {
-    try {
-      return ConvertStatus.values
-          .firstWhere((e) => e.name == name)
-          .message;
-    } catch (e) {
-      return null;
-    }
+  
+  void _navigateToAssignments() {
+    final classProvider = context.read<ClassProvider>();
+    if (classProvider.classDetail != null) {
+      final assignments = SampleAssignments.createAssignmentsByClassName(
+        classProvider.classDetail!.id,
+        classProvider.classDetail!.name,
+      );
+      
+      Navigator.pushNamed(
+        context,
+        '/assignments',
+        arguments: {
+          'assignments': assignments,
+          'className': classProvider.classDetail!.name,
+        },
+      );
+    }  
   }
 }

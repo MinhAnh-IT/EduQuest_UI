@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/assignment.dart';
 import 'package:intl/intl.dart';
+import '../../../shared/widgets/custom_app_bar.dart';
 
 class AssignmentListScreen extends StatelessWidget {
   final List<Assignment> assignments;
@@ -11,16 +12,12 @@ class AssignmentListScreen extends StatelessWidget {
     required this.assignments,
     required this.className,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Bài tập - $className'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
+      appBar: CustomAppBar(
+        title: 'Bài tập - $className',
       ),
       body: _buildAssignmentsList(),
     );

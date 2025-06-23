@@ -14,6 +14,7 @@ import 'package:edu_quest/feature/result/providers/result_provider.dart';
 import 'package:edu_quest/feature/auth/providers/auth_provider.dart';
 import 'package:edu_quest/feature/auth/providers/theme_provider.dart';
 import 'package:edu_quest/feature/class/providers/class_provider.dart';
+import 'package:edu_quest/feature/class/screens/assignment_list_screen.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
 import 'package:edu_quest/feature/home/screens/home_screen.dart';
 
@@ -57,13 +58,20 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
-              '/quiz': (context) => const ExamScreen(),
-              '/result': (context) {
+              '/quiz': (context) => const ExamScreen(),              '/result': (context) {
                 final args = ModalRoute.of(context)!.settings.arguments
                     as Map<String, dynamic>;
                 return ResultScreen(exerciseId: args['exerciseId'] as int);
               },
               '/profile': (context) => const ProfileScreen(),
+              '/assignments': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+                return AssignmentListScreen(
+                  assignments: args['assignments'],
+                  className: args['className'] as String,
+                );
+              },
             },
           );
         },

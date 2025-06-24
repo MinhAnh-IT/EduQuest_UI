@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/class_provider.dart';
 import '../models/student.dart';
+import '../providers/class_provider.dart';
 
 class MemberListScreen extends StatefulWidget {
   final int classId;
   final String className;
-  final int studentCount;
 
   const MemberListScreen({
     Key? key,
     required this.classId,
     required this.className,
-    required this.studentCount,
   }) : super(key: key);
 
   @override
@@ -23,202 +21,175 @@ class _MemberListScreenState extends State<MemberListScreen> {
   @override
   void initState() {
     super.initState();
-    // Load students using provider
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ClassProvider>().loadStudents(widget.classId);
+    // Load students when entering the screen
+    Future.microtask(() {
+      Provider.of<ClassProvider>(context, listen: false)
+          .loadStudents(widget.classId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Thành viên - ${widget.className}'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              context.read<ClassProvider>().refreshStudents(widget.classId);
-            },
-          ),
-        ],
-      ),
-      body: Consumer<ClassProvider>(
-        builder: (context, classProvider, child) {
-          return _buildBody(classProvider);
-        },
-      ),
-    );
-  }
-
-  Widget _buildBody(ClassProvider classProvider) {
-    if (classProvider.isLoadingStudents) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
-        ),
-      );
-    }
-
-    if (classProvider.studentsError != null) {
-      return _buildErrorState(classProvider);
-    }
-
-    if (classProvider.students.isEmpty) {
-      return _buildEmptyState(classProvider);
-    }
-
-    return _buildStudentsList(classProvider);
-  }
-  
-  Widget _buildErrorState(ClassProvider classProvider) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Consumer<ClassProvider>(
+      builder: (context, classProvider, child) {
+        return Column(
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[300],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Lỗi khi tải danh sách thành viên',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              classProvider.studentsError ?? 'Đã xảy ra lỗi không xác định',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                classProvider.refreshStudents(widget.classId);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Thử lại'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  Widget _buildEmptyState(ClassProvider classProvider) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Chưa có học sinh nào',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Lớp học này chưa có học sinh nào tham gia',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                classProvider.refreshStudents(widget.classId);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Làm mới'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  Widget _buildStudentsList(ClassProvider classProvider) {
-    return RefreshIndicator(
-      onRefresh: () => classProvider.refreshStudents(widget.classId),
-      color: Colors.cyan,
-      child: Column(
-        children: [
-          // Header with student count
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.people,
-                  color: Colors.cyan[600],
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '${classProvider.studentsCount} học sinh',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
+            if (classProvider.isLoadingStudents)
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
                   ),
                 ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          // Students list
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: classProvider.students.length,
-              itemBuilder: (context, index) {
-                final student = classProvider.students[index];
-                return _buildStudentCard(student);
-              },
-            ),
-          ),
-        ],
-      ),
+              )
+            else if (classProvider.studentsError != null)
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red[300],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Lỗi khi tải danh sách học sinh đã tham gia',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          classProvider.studentsError ?? 'Đã xảy ra lỗi không xác định',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => classProvider.loadStudents(widget.classId),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.cyan,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Thử lại'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else if (classProvider.students.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Chưa có học sinh nào tham gia',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Lớp học này chưa có học sinh nào được phê duyệt tham gia',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => classProvider.loadStudents(widget.classId),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.cyan,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text('Làm mới'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () => classProvider.loadStudents(widget.classId),
+                  color: Colors.cyan,
+                  child: Column(
+                    children: [
+                      // Header with student count
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        color: Colors.white,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.people,
+                              color: Colors.cyan[600],
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${classProvider.students.length} học sinh đã tham gia',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      // Students list
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: classProvider.students.length,
+                          itemBuilder: (context, index) {
+                            final student = classProvider.students[index];
+                            return _buildStudentCard(student);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -237,13 +208,15 @@ class _MemberListScreenState extends State<MemberListScreen> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),        leading: CircleAvatar(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
           backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
               ? NetworkImage(student.avatarUrl!)
               : null,
-          child: student.avatarUrl == null || student.avatarUrl!.isEmpty
-              ? Text(
+          child: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
+              ? null
+              : Text(
                   student.studentName.isNotEmpty 
                       ? student.studentName[0].toUpperCase()
                       : 'S',
@@ -251,8 +224,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
                     color: Colors.cyan[700],
                     fontWeight: FontWeight.bold,
                   ),
-                )
-              : null,
+                ),
         ),
         title: Text(
           student.studentName,

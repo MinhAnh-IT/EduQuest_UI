@@ -1,41 +1,24 @@
-// ...existing code...
+### 10. Get Enrolled Students in Class API
 
-### 7. Get Students in Class API
+**Endpoint:** `GET /api/classes/{classId}/students/enrolled`
 
-**Endpoint:** `GET /api/classes/{classId}/students`
-
-**Description:** Retrieves list of students enrolled in a specific class with full avatar URLs
+**Description:** Retrieves list of students who are enrolled (approved) in a specific class
 
 **Path Parameters:**
-- `classId` (Long) - ID of the class
-
+- `classId`: Class ID (number)
 **Response:**
 ```json
 {
-  "code": 200,
-  "message": "Successfully retrieved students in class",
-  "data": [
-    {
-      "studentId": 123,
-      "studentCode": "STU001",
-      "studentName": "John Doe",
-      "studentEmail": "john.doe@student.edu",
-      "avatarUrl": "http://localhost:8080/uploads/1750758595037_scaled_download.png",
-      "enrollmentStatus": "ENROLLED"
-    }
-  ]
+    "code": 200,
+    "message": "Successfully retrieved enrolled students in class",
+    "data": [
+        {
+            "studentId": 1,
+            "studentCode": "STU001",
+            "studentName": "Nguyễn Phúc Sơn",
+            "studentEmail": "nguyenphucson93@gmail.com",
+            "avatarUrl": "http://192.168.1.2:8080/uploads/1750758595037_scaled_download.png",
+            "enrollmentStatus": "ENROLLED"
+        }
+    ]
 }
-```
-
-**Status Codes:**
-- `200` - Success: Successfully retrieved students in class
-- `4041` - Class Not Found: Class not found with the provided ID
-- `5000` - Internal Server Error: Unexpected error occurred
-
-**Notes:**
-- Returns all students regardless of enrollment status (PENDING, ENROLLED, REJECTED)
-- Avatar URLs are returned as full URLs with localhost:8080 prefix for frontend display
-- If student has no avatar, avatarUrl will be null
-- Public endpoint - no authentication required
-
-// ...existing code...

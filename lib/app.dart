@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
-            initialRoute: '/home',
+            initialRoute: '/login',
             onGenerateRoute: (settings) {
               if (settings.name == '/otp-verification') {
                 final args = settings.arguments as Map<String, dynamic>;
@@ -66,8 +66,10 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
-
-              '/quiz': (context) => const ExamScreen(),
+              '/quiz': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+                return ExamScreen(exerciseId: args['exerciseId'] as int);
+              },
               '/discussion': (context) =>
                   const DiscussionListScreen(exerciseId: 101,), 
               '/result': (context) {

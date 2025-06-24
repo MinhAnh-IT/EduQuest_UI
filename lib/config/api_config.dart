@@ -4,7 +4,15 @@ class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
 
+<<<<<<< HEAD
       return 'http://192.168.1.2:8080/api';
+=======
+<<<<<<< HEAD
+      return 'http://192.168.1.15:8080/api';
+=======
+      return 'http://localhost:8080/api';
+>>>>>>> 09b553d (Integrate testing api into interface)
+>>>>>>> 60392fb (Integrate testing api into interface)
     }
     return 'http://localhost:8080/api';
   }

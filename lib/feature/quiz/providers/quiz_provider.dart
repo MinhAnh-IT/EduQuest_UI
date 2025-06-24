@@ -45,32 +45,36 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> submit() async {
-    if (startExamModel == null) {
-      errorMessage = "Chưa load thông tin bài thi!";
-      notifyListeners();
-      return;
-    }
-    final participationId = startExamModel!.participationId;
-    final answers = selectedAnswers.whereType<AnswerSelected>().toList();
-
-    if (answers.isEmpty) {
-      errorMessage = "Bạn chưa chọn đáp án nào!";
-      notifyListeners();
-      return;
-    }
-
-    SubmissionRequest request = SubmissionRequest(
-      participationId: participationId,
-      selectedAnswers: answers,
-    );
-    try {
-      await QuizService.submissionExam(request);
-    } catch (e) {
-      errorMessage = (e is Exception)
-          ? e.toString().replaceFirst('Exception: ', '')
-          : "Có lỗi xảy ra trong quá trình nộp bài.";
-      notifyListeners();
-    }
+  Future<bool> submit() async {
+  if (startExamModel == null) {
+    errorMessage = "Chưa load thông tin bài thi!";
+    notifyListeners();
+    return false;
   }
+  final participationId = startExamModel!.participationId;
+  final answers = selectedAnswers.whereType<AnswerSelected>().toList();
+
+  if (answers.isEmpty) {
+    errorMessage = "Bạn chưa chọn đáp án nào!";
+    notifyListeners();
+    return false;
+  }
+
+  SubmissionRequest request = SubmissionRequest(
+    participationId: participationId,
+    selectedAnswers: answers,
+  );
+  try {
+    await QuizService.submissionExam(request);
+    // Nộp thành công
+    return true;
+  } catch (e) {
+    errorMessage = (e is Exception)
+        ? e.toString().replaceFirst('Exception: ', '')
+        : "Có lỗi xảy ra trong quá trình nộp bài.";
+    notifyListeners();
+    return false;
+  }
+}
+
 }

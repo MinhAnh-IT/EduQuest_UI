@@ -33,6 +33,17 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      appBar: AppBar(
+        title: Text('Danh sách bài kiểm tra'),
+        backgroundColor: Colors.cyan,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
+>>>>>>> 60392fb (Integrate testing api into interface)
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -44,6 +55,9 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
           return _buildAssignmentsList(context, provider.assignments);
         },
       ),
+=======
+      body: _buildAssignmentsList(),
+>>>>>>> 09b553d (Integrate testing api into interface)
     );
   }
 
@@ -302,6 +316,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
+<<<<<<< HEAD
                       onPressed: () async {
                         Navigator.pop(context);
                         final result = await Navigator.push(
@@ -315,6 +330,13 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                           Provider.of<ExerciseProvider>(context, listen: false)
                               .fetchAssignments(assignment.classId);
                         }
+=======
+                      onPressed: () {
+                        // Điều hướng đến trang làm bài
+                        Navigator.pushNamed(context, '/quiz', arguments: {
+                          'exerciseId': assignment.id,
+                        });
+>>>>>>> 09b553d (Integrate testing api into interface)
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,

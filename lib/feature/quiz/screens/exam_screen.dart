@@ -6,7 +6,8 @@ import '../providers/quiz_provider.dart';
 import '../../../shared/widgets/question_widget.dart';
 
 class ExamScreen extends StatefulWidget {
-  const ExamScreen({super.key});
+  final int exerciseId;
+  const ExamScreen({Key? key, required this.exerciseId}) : super(key: key);
 
   @override
   State<ExamScreen> createState() => _ExamScreenState();
@@ -152,7 +153,7 @@ class _ExamScreenState extends State<ExamScreen> {
     );
   }
 
-  void _confirmSubmit(BuildContext context) {
+  void _confirmSubmit(BuildContext context) async{
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -173,9 +174,13 @@ class _ExamScreenState extends State<ExamScreen> {
             child: const Text("Hủy"),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async{
               Navigator.of(ctx).pop();
-              context.read<QuizProvider>().submit();
+              final isSuccess = await context.read<QuizProvider>().submit();
+              if (isSuccess) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,

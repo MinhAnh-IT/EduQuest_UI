@@ -53,7 +53,7 @@ class TokenManager {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/auth/refresh'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/refresh-token'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'refreshToken': refreshToken}),
       );
@@ -63,8 +63,8 @@ class TokenManager {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final newAccessToken = data['data']['accessToken']; // Điều chỉnh nếu cần
-        final newRefreshToken = data['data']['refreshToken']; // Nếu có
+        final newAccessToken = data['data']['accessToken'];
+        final newRefreshToken = data['data']['refreshToken'];
         print('Dữ liệu API làm mới: $data');
         await _storage.write(key: 'access_token', value: newAccessToken);
         if (newRefreshToken != null) {

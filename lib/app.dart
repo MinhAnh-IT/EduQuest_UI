@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
-        ChangeNotifierProvider(create: (_) => ExerciseProvider()..fetchAssignments()),
+        ChangeNotifierProvider(create: (_) => ExerciseProvider()),
 
     ],
       child: Consumer<ThemeProvider>(
@@ -70,10 +70,11 @@ class MyApp extends StatelessWidget {
               '/profile': (context) => const ProfileScreen(),
               '/assignments': (context) {
                 final args = ModalRoute.of(context)!.settings.arguments
-                    as Map<String, dynamic>;
+                as Map<String, dynamic>;
                 return AssignmentListScreen(
-                  assignments: args['assignments'],
+                  classId: args['classId'] as int,
                   className: args['className'] as String,
+
                 );
               },
             },

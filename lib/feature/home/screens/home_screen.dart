@@ -4,7 +4,7 @@ import '../../../shared/widgets/custom_app_bar.dart';
 import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
-import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
+import 'package:edu_quest/feature/profile/screens/profile_screen.dart';
 
 // import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
 class HomeScreen extends StatefulWidget {
@@ -121,22 +121,19 @@ class _HomeTabState extends State<HomeTab> {
       _navigateToClassDetail(context, classData);
     }
   }
-  void _navigateToClassDetail(
-      BuildContext context, Map<String, String> classData) {
+  void _navigateToClassDetail(      BuildContext context, Map<String, String> classData) {
     final classId = int.parse(classData['id'] ?? '1');
     
-    // Chỉ truyền classId và để ClassDetailScreen tự load dữ liệu thật từ API
-    // Điều này đảm bảo dữ liệu như mã lớp và email giảng viên là chính xác
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ClassDetailScreen(
           classId: classId,
-          // Không truyền initialClassDetail để buộc load từ API
         ),
       ),
-    );}
-
+    );
+  }
+  
   void _showLeaveClassConfirmationDialog(
       BuildContext context, Map<String, String> classData) {
     bool isLoading = false;

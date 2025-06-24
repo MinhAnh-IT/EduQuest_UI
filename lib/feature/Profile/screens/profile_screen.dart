@@ -1,8 +1,8 @@
 // ... existing code ...
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
-import 'package:edu_quest/feature/auth/screens//student/profile_edit_screen.dart';
+import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
+import 'package:edu_quest/feature/Profile/screens/profile_edit_screen.dart';
 import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:edu_quest/feature/auth/services/auth_service.dart';
 import 'package:edu_quest/feature/auth/screens/login_screen.dart';

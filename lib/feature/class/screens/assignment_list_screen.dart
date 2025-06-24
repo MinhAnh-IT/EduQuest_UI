@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/assignment.dart';
 import 'package:intl/intl.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
 
 class AssignmentListScreen extends StatelessWidget {
   final List<Assignment> assignments;
@@ -16,8 +15,13 @@ class AssignmentListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: CustomAppBar(
-        title: 'Bài tập - $className',
+      appBar: AppBar(
+        title: Text('Danh sách bài kiểm tra '),
+        backgroundColor: Colors.cyan,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false, // Ẩn mũi tên back
+
       ),
       body: _buildAssignmentsList(),
     );
@@ -78,7 +82,7 @@ class AssignmentListScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      assignment.title,
+                      assignment.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -109,15 +113,6 @@ class AssignmentListScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
-                assignment.description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -128,30 +123,31 @@ class AssignmentListScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.dueDate)}',
+                    'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.endAt)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: assignment.isOverdue ? Colors.red : Colors.grey[600],
                       fontWeight: assignment.isOverdue ? FontWeight.w500 : FontWeight.normal,
                     ),
                   ),
-                  if (assignment.grade != null) ...[
-                    const Spacer(),
-                    Icon(
-                      Icons.grade,
-                      size: 16,
-                      color: Colors.green[600],
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.help_outline,
+                    size: 16,
+                    color: Colors.cyan[600],
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                   'Số câu :${assignment.questionCount}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.cyan[700],
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Điểm: ${assignment.grade}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.green[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ],
@@ -185,7 +181,7 @@ class AssignmentListScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        assignment.title,
+                        assignment.name,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -227,10 +223,10 @@ class AssignmentListScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  assignment.description,
-                  style: const TextStyle(fontSize: 14),
-                ),
+                // Text(
+                //   assignment.description,
+                //   style: const TextStyle(fontSize: 14),
+                // ),
                 const SizedBox(height: 24),
 
                 // Due Date
@@ -266,7 +262,7 @@ class AssignmentListScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.dueDate),
+                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.endAt),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -279,57 +275,10 @@ class AssignmentListScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // Grade (if available)
-                if (assignment.grade != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.green.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.grade,
-                          color: Colors.green,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Điểm số',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                assignment.grade!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
                 const SizedBox(height: 32),
 
                 // Action Buttons
-                if (!assignment.isSubmitted)
+                if (!assignment.isSubmitted && !assignment.isExpired)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -350,7 +299,7 @@ class AssignmentListScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Nộp bài tập',
+                        'Bắt đầu làm',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -358,6 +307,66 @@ class AssignmentListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                // ... existing code ...
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: assignment.isDisabled
+                            ? null
+                            : assignment.isSubmitted
+                            ? () {
+                          //Điều hướng sang trang bình luận
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
+                          );
+                        }
+                            : () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Bạn chưa làm bài nên chưa thể thảo luận luận!')),
+                          );
+                        },
+                        icon: const Icon(Icons.comment),
+                        label: const Text('Thảo luận'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: assignment.isDisabled
+                            ? null
+                            : assignment.isSubmitted
+                            ? () {
+                          // Điều hướng sang trang xem kết quả
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
+                          );
+                        }
+                            : () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
+                          );
+                        },
+                        icon: const Icon(Icons.visibility),
+                        label: const Text('Xem kết quả'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+// ... existing code ...
               ],
             ),
           ),

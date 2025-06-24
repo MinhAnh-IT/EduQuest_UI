@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
 import '../models/student.dart';
 import '../providers/class_provider.dart';
+import 'assignment_list_screen.dart';
 import '../data/sample_assignments.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 
@@ -71,7 +72,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               unselectedLabelColor: Colors.white70,
               tabs: const [
                 Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
+                Tab(icon: Icon(Icons.assignment), text: 'Bài kiểm tra'),
                 Tab(icon: Icon(Icons.people), text: 'Thành viên'),
               ],
             ),
@@ -323,31 +324,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ),
     );
   }
-  Map<String, int> _getAssignmentStats(ClassDetail classDetail) {
-    final assignments = SampleAssignments.createAssignmentsByClassName(
-      classDetail.id,
-      classDetail.name,
-    );
-
-    int total = assignments.length;
-    int completed = 0;
-    int pending = 0;
-
-    for (final assignment in assignments) {
-      if (assignment.status == 'submitted' || assignment.status == 'graded') {
-        completed++;
-      } else {
-        pending++;
-      }
-    }
-
-    return {
-      'total': total,
-      'completed': completed,
-      'pending': pending,
-    };
-  }
-
   Widget _buildQuickStatCard(String title, String value, IconData icon, Color color) {
     return Card(
       elevation: 1,
@@ -385,8 +361,33 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         ),
       ),
     );
-  }
+  }  Widget _buildAssignmentsTab(ClassProvider classProvider) {
+    final classDetail = classProvider.classDetail!;
+    final assignments = SampleAssignments.createAssignmentsByClassName(
+      classDetail.id,
+      classDetail.name,
+    );
 
+    if (assignments.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text('Chưa có bài tập nào', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+            const SizedBox(height: 8),
+            Text('Bài tập sẽ được hiển thị ở đây khi có', style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+          ],
+        ),
+      );
+    }
+
+    return AssignmentListScreen(
+      assignments: assignments,
+      className: classDetail.name,
+    );
+  }
   Widget _buildMembersTab(ClassProvider classProvider) {
     return Column(
       children: [
@@ -628,129 +629,28 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         ),
       ),    );
   }
-
-  Widget _buildAssignmentsTab(ClassProvider classProvider) {
-    final classDetail = classProvider.classDetail!;
+  Map<String, int> _getAssignmentStats(ClassDetail classDetail) {
     final assignments = SampleAssignments.createAssignmentsByClassName(
       classDetail.id,
       classDetail.name,
     );
 
-    if (assignments.isEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.assignment_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Chưa có bài tập nào',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      );
+    int total = assignments.length;
+    int completed = 0;
+    int pending = 0;
+
+    for (final assignment in assignments) {
+      if (assignment.status == 'submitted') {
+        completed++;
+      } else {
+        pending++;
+      }
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: assignments.length,
-      itemBuilder: (context, index) {
-        final assignment = assignments[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        assignment.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: assignment.statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: assignment.statusColor.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Text(
-                        assignment.status,
-                        style: TextStyle(
-                          color: assignment.statusColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  assignment.description,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.schedule,
-                      size: 16,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 4),                    Text(
-                      'Hạn nộp: ${assignment.formattedDueDate}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.info_outline,
-                      size: 16,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      assignment.statusText,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    return {
+      'total': total,
+      'completed': completed,
+      'pending': pending,
+    };
   }
 }

@@ -31,17 +31,15 @@ class ApiClient {
       {bool auth = true}) async {
     final uri = Uri.parse(url);
     final response = await http.post(uri,
-        headers: await getHeaders(useAuth: auth),
-        body: jsonEncode(body));
+        headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse = await http.post(uri,
-          headers: await getHeaders(useAuth: auth),
-          body: jsonEncode(body));
+          headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
       return retryResponse;
     }
 
@@ -53,7 +51,7 @@ class ApiClient {
     final response =
         await http.get(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
@@ -70,30 +68,27 @@ class ApiClient {
       {bool auth = false}) async {
     final uri = Uri.parse(url);
     final response = await http.put(uri,
-        headers: await getHeaders(useAuth: auth),
-        body: jsonEncode(body));
+        headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse = await http.put(uri,
-          headers: await getHeaders(useAuth: auth),
-          body: jsonEncode(body));
+          headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
       return retryResponse;
     }
 
     return response;
   }
 
-  static Future<http.Response> delete(String url,
-      {bool auth = false}) async {
+  static Future<http.Response> delete(String url, {bool auth = false}) async {
     final uri = Uri.parse(url);
     final response =
         await http.delete(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');

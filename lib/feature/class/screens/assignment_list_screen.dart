@@ -13,6 +13,7 @@ class AssignmentListScreen extends StatefulWidget {
     required this.classId,
     required this.className,
   }) : super(key: key);
+
   @override
   State<AssignmentListScreen> createState() => _AssignmentListScreenState();
 }
@@ -303,7 +304,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        // TODO: Thay ExamScreen bằng màn hình làm bài thực tế của bạn
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(

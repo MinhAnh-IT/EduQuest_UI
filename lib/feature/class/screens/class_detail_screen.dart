@@ -80,7 +80,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         );
       },
     );
-  }  Widget _buildBody(ClassProvider classProvider) {
+  }
+
+  Widget _buildBody(ClassProvider classProvider) {
     if (classProvider.isLoadingClassDetail) {
       return const Center(
         child: Column(
@@ -122,7 +124,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),            ElevatedButton(
+            const SizedBox(height: 24),            
+            ElevatedButton(
               onPressed: () {
                 classProvider.loadClassData(widget.classId);
               },
@@ -149,7 +152,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
             ),
           ],        ),
       );
-    }    return TabBarView(
+    }    
+    return TabBarView(
       controller: _tabController,
       children: [
         _buildInfoTab(classProvider),
@@ -158,6 +162,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ],
     );
   }
+  
   Widget _buildInfoTab(ClassProvider classProvider) {
     final classDetail = classProvider.classDetail!;
     
@@ -527,6 +532,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ],
     );
   }
+
   Widget _buildStudentCard(Student student) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

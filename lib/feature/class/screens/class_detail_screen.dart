@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/assignment.dart';
 import '../models/class_detail.dart';
 import '../providers/class_provider.dart';
+import '../providers/exercise_provider.dart';
+import 'assignment_list_screen.dart';
 import '../data/sample_assignments.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import 'assignment_list_screen.dart';
@@ -71,7 +74,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               unselectedLabelColor: Colors.white70,
               tabs: const [
                 Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
+                Tab(icon: Icon(Icons.assignment), text: 'Bài kiểm tra'),
                 Tab(icon: Icon(Icons.people), text: 'Thành viên'),
               ],
             ),
@@ -266,16 +269,52 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
           ),
         ],
       ),
-    );  }
+    );
+  }
+  Widget _buildAssignmentsTab(ClassProvider classProvider) {
+    return Consumer<ExerciseProvider>(
+      builder: (context, exerciseProvider, child) {
+        if (exerciseProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (exerciseProvider.error != null) {
+          return Center(child: Text('Error: ${exerciseProvider.error}'));
+        }
+
+        // Lấy classId hiện tại
+        final int? classId = classProvider.classDetail?.id;
+
+        // Lọc assignments theo classId và ép kiểu về List<Assignment>
+        final classAssignments = classId == null
+            ? <Assignment>[]
+            : exerciseProvider.assignments
+            .where((a) => a.classId == classId)
+            .toList()
+            .cast<Assignment>();
+
+        if (classAssignments.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text('Chưa có bài tập nào', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+                const SizedBox(height: 8),
+                Text('Bài tập sẽ được hiển thị ở đây khi có', style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+              ],
+            ),
+          );
+        }
+
+        return AssignmentListScreen(
+          assignments: classAssignments,
+          className: classProvider.classDetail?.name ?? 'Tất cả bài tập',
+        );
+      },
+    );
+  }
   Widget _buildMembersTab(ClassProvider classProvider) {
     return MemberListWidget(classId: widget.classId);
-  }  Widget _buildAssignmentsTab(ClassProvider classProvider) {
-    final classDetail = classProvider.classDetail!;
-    final assignments = SampleAssignments.createAssignmentsByClassName(
-      classDetail.id,
-      classDetail.name,
-    );
-
-    return AssignmentListWidget(assignments: assignments);
   }
 }

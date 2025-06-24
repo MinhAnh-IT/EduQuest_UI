@@ -3,6 +3,7 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
+
       return 'http://192.168.100.31:8080/api';
     }
     return 'http://localhost:8080/api';
@@ -17,7 +18,7 @@ class ApiConfig {
   static const String updateStudentDetails = '/auth/students/{userId}/details';
   static const String verifyOtp = '/auth/verify-otp';
   static const String resendOtp = '/auth/resend-otp';
-  static const String getProfile = '/update/me';
+  static const String getProfile = '/Profile/me';
   static const String updateProfile = '/update/profile';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
@@ -28,10 +29,11 @@ class ApiConfig {
   static const String leaveClass = '/enrollments/leave';
   static const String myClasses = '/enrollments/my-classes';
   static const String myEnrolledClasses = '/enrollments/my-enrolled-classes';
-
+  
   // Exercise
   static const String startExam = '/participations/exercises';
   static const String submissionExam = '/participations/exercises/submit';
+  static const String getExercisesForStudent = '/exam/exercises';
   // Result
   static const String getResultByExerciseId = '/results';
 

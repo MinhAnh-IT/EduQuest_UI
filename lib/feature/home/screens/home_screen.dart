@@ -4,8 +4,10 @@ import '../../../shared/widgets/custom_app_bar.dart';
 import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
-import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
-
+import '../../class/models/class_detail.dart';
+import 'package:edu_quest/feature/Profile/screens/profile_screen.dart';
+// import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
+import '../../class/models/assignment.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -123,7 +125,36 @@ class _HomeTabState extends State<HomeTab> {
       );
     }
   }
+  void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
+    final classId = int.parse(classData['id'] ?? '1');
+    
+    // Create initial class detail from available data
+    final initialClassDetail = ClassDetail(
+      id: classId,
+      name: classData['name'] ?? '',
+      code: classData['code'] ?? 'CLASS${classData['id']}',
+      description: classData['description'] ?? 'Mô tả lớp học ${classData['name']}',
+      instructorName: classData['instructor'] ?? '',
+      instructorEmail: '${classData['instructor']?.toLowerCase().replaceAll(' ', '.').replaceAll('ă', 'a').replaceAll('â', 'a').replaceAll('đ', 'd').replaceAll('ê', 'e').replaceAll('ô', 'o').replaceAll('ơ', 'o').replaceAll('ư', 'u').replaceAll('ì', 'i').replaceAll('í', 'i').replaceAll('ò', 'o').replaceAll('ó', 'o').replaceAll('ù', 'u').replaceAll('ú', 'u').replaceAll('ỳ', 'y').replaceAll('ý', 'y')}@university.edu',
+      studentCount: int.parse(classData['studentCount'] ?? '25'),
+      createdAt: DateTime.now().subtract(const Duration(days: 30)),
+      assignments: const [],
+    );
 
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClassDetailScreen(
+          classId: classId,
+          initialClassDetail: initialClassDetail,
+        ),
+      ),
+    );
+  }
+
+
+
+  
   void _showLeaveClassConfirmationDialog(
       BuildContext context, Map<String, String> classData) {
     bool isLoading = false;

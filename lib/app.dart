@@ -1,5 +1,5 @@
-import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
-import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
+import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
+import 'package:edu_quest/feature/Profile/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../feature/quiz/providers/quiz_provider.dart';
@@ -18,6 +18,8 @@ import 'package:edu_quest/feature/class/screens/assignment_list_screen.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
 import 'package:edu_quest/feature/home/screens/home_screen.dart';
 
+import 'feature/class/providers/exercise_provider.dart';
+
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
 
@@ -32,7 +34,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
-      ],
+        ChangeNotifierProvider(create: (_) => ExerciseProvider()..fetchAssignments()),
+
+    ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(

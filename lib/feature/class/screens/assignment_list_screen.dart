@@ -279,7 +279,7 @@ class AssignmentListScreen extends StatelessWidget {
                 const SizedBox(height: 32),
 
                 // Action Buttons
-                if (!assignment.isSubmitted)
+                if (!assignment.isSubmitted && !assignment.isExpired)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

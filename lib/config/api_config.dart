@@ -17,7 +17,7 @@ class ApiConfig {
   static const String updateStudentDetails = '/auth/students/{userId}/details';
   static const String verifyOtp = '/auth/verify-otp';
   static const String resendOtp = '/auth/resend-otp';
-  static const String getProfile = '/update/me';
+  static const String getProfile = '/Profile/me';
   static const String updateProfile = '/update/profile';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';

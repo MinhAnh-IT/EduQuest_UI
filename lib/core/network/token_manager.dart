@@ -10,14 +10,12 @@ class TokenManager {
     final accessToken = await _storage.read(key: 'access_token');
     print('Access Token: $accessToken');
     if (accessToken == null) {
-      print('Không có access token, đang làm mới...');
       return await _refreshAccessToken();
     }
 
     final secondsLeft = _secondsUntilExpire(accessToken);
     print('Số giây đến khi hết hạn: $secondsLeft');
     if (secondsLeft == null || secondsLeft < 120) {
-      print('Token đã hết hạn hoặc sắp hết hạn, đang làm mới...');
       return await _refreshAccessToken();
     }
     return accessToken;
@@ -65,11 +63,9 @@ class TokenManager {
         final data = jsonDecode(response.body);
         final newAccessToken = data['data']['accessToken'];
         final newRefreshToken = data['data']['refreshToken'];
-        print('Dữ liệu API làm mới: $data');
         await _storage.write(key: 'access_token', value: newAccessToken);
         if (newRefreshToken != null) {
           await _storage.write(key: 'refresh_token', value: newRefreshToken);
-          print('Đã lưu refresh token mới: $newRefreshToken');
         }
         return newAccessToken;
       } else {

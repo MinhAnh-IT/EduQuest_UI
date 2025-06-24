@@ -62,7 +62,8 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
-              '/quiz': (context) => const ExamScreen(),              '/result': (context) {
+              '/quiz': (context) => const ExamScreen(),              
+              '/result': (context) {
                 final args = ModalRoute.of(context)!.settings.arguments
                     as Map<String, dynamic>;
                 return ResultScreen(exerciseId: args['exerciseId'] as int);

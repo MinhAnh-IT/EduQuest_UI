@@ -13,7 +13,6 @@ class AssignmentListScreen extends StatefulWidget {
     required this.classId,
     required this.className,
   }) : super(key: key);
-
   @override
   State<AssignmentListScreen> createState() => _AssignmentListScreenState();
 }
@@ -33,13 +32,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Danh sách bài kiểm tra'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {

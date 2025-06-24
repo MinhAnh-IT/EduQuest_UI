@@ -49,27 +49,9 @@ class _MemberListScreenState extends State<MemberListScreen> {
       ),
       body: Consumer<ClassProvider>(
         builder: (context, classProvider, child) {
-          return MemberListWidget(classId: widget.classId);
+          return _buildBody(classProvider);
         },
       ),
-    );
-  }
-}
-
-// Extracted widget for reusable member list
-class MemberListWidget extends StatelessWidget {
-  final int classId;
-
-  const MemberListWidget({
-    Key? key,
-    required this.classId,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ClassProvider>(
-      builder: (context, classProvider, child) {
-        return _buildBody(classProvider);
-      },
     );
   }
 
@@ -92,6 +74,7 @@ class MemberListWidget extends StatelessWidget {
 
     return _buildStudentsList(classProvider);
   }
+  
   Widget _buildErrorState(ClassProvider classProvider) {
     return Center(
       child: Padding(
@@ -125,7 +108,7 @@ class MemberListWidget extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                classProvider.refreshStudents(classId);
+                classProvider.refreshStudents(widget.classId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
@@ -142,7 +125,6 @@ class MemberListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildEmptyState(ClassProvider classProvider) {
     return Center(
       child: Padding(
@@ -176,7 +158,7 @@ class MemberListWidget extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                classProvider.refreshStudents(classId);
+                classProvider.refreshStudents(widget.classId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.cyan,
@@ -193,10 +175,9 @@ class MemberListWidget extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildStudentsList(ClassProvider classProvider) {
     return RefreshIndicator(
-      onRefresh: () => classProvider.refreshStudents(classId),
+      onRefresh: () => classProvider.refreshStudents(widget.classId),
       color: Colors.cyan,
       child: Column(
         children: [
@@ -214,7 +195,7 @@ class MemberListWidget extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${classProvider.students.length} học sinh',
+                  '${classProvider.studentsCount} học sinh',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -256,8 +237,7 @@ class MemberListWidget extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
+        contentPadding: const EdgeInsets.all(16),        leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
           backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
               ? NetworkImage(student.avatarUrl!)

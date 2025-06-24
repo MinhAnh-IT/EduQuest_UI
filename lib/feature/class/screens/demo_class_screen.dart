@@ -40,13 +40,13 @@ class ClassDetailScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        assignment.title,
+                        assignment.name,
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text(assignment.description),
-                      const SizedBox(height: 8),
+                      // Text(assignment.description),
+                      // const SizedBox(height: 8),
                       Row(
                         children: [
                           Chip(

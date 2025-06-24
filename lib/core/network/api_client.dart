@@ -34,7 +34,7 @@ class ApiClient {
         headers: await getHeaders(useAuth: auth),
         body: jsonEncode(body));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
@@ -53,7 +53,7 @@ class ApiClient {
     final response =
         await http.get(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
@@ -73,7 +73,7 @@ class ApiClient {
         headers: await getHeaders(useAuth: auth),
         body: jsonEncode(body));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
@@ -93,7 +93,7 @@ class ApiClient {
     final response =
         await http.delete(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 401) {
+    if (auth && response.statusCode == 403) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
         throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');

@@ -3,7 +3,7 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return 'http://192.168.1.2:8080/api';
+      return 'http://192.168.1.15:8080/api';
     }
     return 'http://localhost:8080/api';
   }
@@ -27,10 +27,11 @@ class ApiConfig {
   static const String leaveClass = '/enrollments/leave';
   static const String myClasses = '/enrollments/my-classes';
   static const String myEnrolledClasses = '/enrollments/my-enrolled-classes';
-
+  
   // Exercise
   static const String startExam = '/participations/exercises';
   static const String submissionExam = '/participations/exercises/submit';
+  static const String getExercisesForStudent = '/exam/exercises';
   // Result
   static const String getResultByExerciseId = '/results';
 

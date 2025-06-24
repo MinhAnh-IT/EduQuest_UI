@@ -1,33 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/assignment.dart';
+import '../providers/exercise_provider.dart';
 import 'package:intl/intl.dart';
 
-class AssignmentListScreen extends StatelessWidget {
-  final List<Assignment> assignments;
+class AssignmentListScreen extends StatefulWidget {
+  final int classId;
   final String className;
 
   const AssignmentListScreen({
     Key? key,
-    required this.assignments,
+    required this.classId,
     required this.className,
   }) : super(key: key);
+  @override
+  State<AssignmentListScreen> createState() => _AssignmentListScreenState();
+}
+
+class _AssignmentListScreenState extends State<AssignmentListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Lấy danh sách bài tập khi vào màn hình
+    Future.microtask(() {
+      Provider.of<ExerciseProvider>(context, listen: false)
+          .fetchAssignments(widget.classId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Danh sách bài kiểm tra '),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false, // Ẩn mũi tên back
-
+      body: Consumer<ExerciseProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (provider.error != null) {
+            return Center(child: Text('Lỗi: ${provider.error}'));
+          }
+          return _buildAssignmentsList(context, provider.assignments);
+        },
       ),
-      body: _buildAssignmentsList(),
     );
   }
 
-  Widget _buildAssignmentsList() {
+  Widget _buildAssignmentsList(BuildContext context, List<Assignment> assignments) {
     if (assignments.isEmpty) {
       return Center(
         child: Column(
@@ -95,10 +114,10 @@ class AssignmentListScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: assignment.statusColor.withValues(alpha: 0.1),
+                      color: assignment.statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: assignment.statusColor.withValues(alpha: 0.3),
+                        color: assignment.statusColor.withOpacity(0.3),
                       ),
                     ),
                     child: Text(
@@ -141,7 +160,7 @@ class AssignmentListScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 2),
                   Text(
-                   'Số câu :${assignment.questionCount}',
+                    'Số câu :${assignment.questionCount}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.cyan[700],
@@ -157,8 +176,8 @@ class AssignmentListScreen extends StatelessWidget {
     );
   }
 
-  void _showAssignmentDetail(BuildContext context, Assignment assignment) {
-    showModalBottomSheet(
+  void _showAssignmentDetail(BuildContext context, Assignment assignment) async {
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -194,10 +213,10 @@ class AssignmentListScreen extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: assignment.statusColor.withValues(alpha: 0.1),
+                        color: assignment.statusColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: assignment.statusColor.withValues(alpha: 0.3),
+                          color: assignment.statusColor.withOpacity(0.3),
                         ),
                       ),
                       child: Text(
@@ -233,14 +252,14 @@ class AssignmentListScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: assignment.isOverdue 
-                        ? Colors.red.withValues(alpha: 0.1)
-                        : Colors.blue.withValues(alpha: 0.1),
+                    color: assignment.isOverdue
+                        ? Colors.red.withOpacity(0.1)
+                        : Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: assignment.isOverdue 
-                          ? Colors.red.withValues(alpha: 0.3)
-                          : Colors.blue.withValues(alpha: 0.3),
+                      color: assignment.isOverdue
+                          ? Colors.red.withOpacity(0.3)
+                          : Colors.blue.withOpacity(0.3),
                     ),
                   ),
                   child: Row(
@@ -282,13 +301,20 @@ class AssignmentListScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Chức năng nộp bài sẽ được cập nhật sau'),
+                        // TODO: Thay ExamScreen bằng màn hình làm bài thực tế của bạn
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Placeholder(), // ExamScreen(assignment: assignment)
                           ),
                         );
+                        if (result == true) {
+                          // Reload lại danh sách khi nộp bài thành công
+                          Provider.of<ExerciseProvider>(context, listen: false)
+                              .fetchAssignments(assignment.classId);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,
@@ -307,7 +333,6 @@ class AssignmentListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                // ... existing code ...
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -317,7 +342,6 @@ class AssignmentListScreen extends StatelessWidget {
                             ? null
                             : assignment.isSubmitted
                             ? () {
-                          //Điều hướng sang trang bình luận
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
@@ -344,7 +368,6 @@ class AssignmentListScreen extends StatelessWidget {
                             ? null
                             : assignment.isSubmitted
                             ? () {
-                          // Điều hướng sang trang xem kết quả
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
@@ -366,7 +389,6 @@ class AssignmentListScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-// ... existing code ...
               ],
             ),
           ),

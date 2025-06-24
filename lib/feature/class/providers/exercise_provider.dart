@@ -12,12 +12,12 @@ class ExerciseProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchAssignments() async {
+  Future<void> fetchAssignments(int classId) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
     try {
-      final exercises = await _service.fetchExercises();
+      final exercises = await _service.fetchExercises(classId);
       // Nếu exercises đã là List<Assignment>:
       _assignments = exercises;
       // Nếu exercises là List<Map<String, dynamic>>:

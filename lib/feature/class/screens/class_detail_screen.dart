@@ -4,7 +4,6 @@ import '../models/class_detail.dart';
 import '../models/student.dart';
 import '../providers/class_provider.dart';
 import 'assignment_list_screen.dart';
-import '../data/sample_assignments.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 
 class ClassDetailScreen extends StatefulWidget {
@@ -34,14 +33,14 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       
       // Reset provider state first
       classProvider.reset();
-      
-      // Use initial data if provided
+        // Use initial data if provided
       if (widget.initialClassDetail != null) {
-        // Set initial data to provider and then load students
+        // Set initial data to provider and then load students and assignments
         classProvider.setInitialClassDetail(widget.initialClassDetail!);
         classProvider.loadStudents(widget.classId);
+        classProvider.loadAssignments(widget.classId);
       } else {
-        // Load both class detail and students from API
+        // Load class detail, students and assignments from API
         classProvider.loadClassData(widget.classId);
       }
     });
@@ -287,11 +286,10 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                     ],
                   ),                  const SizedBox(height: 16),
                   Row(
-                    children: [
-                      Expanded(
+                    children: [                      Expanded(
                         child: _buildQuickStatCard(
                           'Tổng bài tập',
-                          _getAssignmentStats(classDetail)['total'].toString(),
+                          _getAssignmentStats(classProvider)['total'].toString(),
                           Icons.assignment_outlined,
                           Colors.blue,
                         ),
@@ -300,7 +298,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       Expanded(
                         child: _buildQuickStatCard(
                           'Đã làm',
-                          _getAssignmentStats(classDetail)['completed'].toString(),
+                          _getAssignmentStats(classProvider)['completed'].toString(),
                           Icons.assignment_turned_in,
                           Colors.green,
                         ),
@@ -309,7 +307,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       Expanded(
                         child: _buildQuickStatCard(
                           'Chưa làm',
-                          _getAssignmentStats(classDetail)['pending'].toString(),
+                          _getAssignmentStats(classProvider)['pending'].toString(),
                           Icons.assignment_late_outlined,
                           Colors.orange,
                         ),
@@ -361,33 +359,15 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         ),
       ),
     );
-  }  Widget _buildAssignmentsTab(ClassProvider classProvider) {
-    final classDetail = classProvider.classDetail!;
-    final assignments = SampleAssignments.createAssignmentsByClassName(
-      classDetail.id,
-      classDetail.name,
-    );
-
-    if (assignments.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text('Chưa có bài tập nào', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
-            const SizedBox(height: 8),
-            Text('Bài tập sẽ được hiển thị ở đây khi có', style: TextStyle(fontSize: 14, color: Colors.grey[500])),
-          ],
-        ),
-      );
-    }
-
+  }  
+  
+  Widget _buildAssignmentsTab(ClassProvider classProvider) {
     return AssignmentListScreen(
-      assignments: assignments,
-      className: classDetail.name,
+      classId: widget.classId,
+      className: classProvider.classDetail?.name ?? 'Tất cả bài tập',
     );
   }
+
   Widget _buildMembersTab(ClassProvider classProvider) {
     return Column(
       children: [
@@ -629,23 +609,13 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         ),
       ),    );
   }
-  Map<String, int> _getAssignmentStats(ClassDetail classDetail) {
-    final assignments = SampleAssignments.createAssignmentsByClassName(
-      classDetail.id,
-      classDetail.name,
-    );
+  
+  Map<String, int> _getAssignmentStats(ClassProvider classProvider) {
+    final assignments = classProvider.assignments;
 
     int total = assignments.length;
-    int completed = 0;
-    int pending = 0;
-
-    for (final assignment in assignments) {
-      if (assignment.status == 'submitted') {
-        completed++;
-      } else {
-        pending++;
-      }
-    }
+    int completed = assignments.where((assignment) => assignment.isSubmitted).length;
+    int pending = total - completed;
 
     return {
       'total': total,

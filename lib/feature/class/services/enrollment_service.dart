@@ -34,7 +34,6 @@ class EnrollmentService {
     ));
   }
 
-  // Join Class
   Future<ApiResponse<Enrollment>> joinClass(String classCode) async {
     try {
       final response = await _dio.post(
@@ -74,7 +73,6 @@ class EnrollmentService {
     }
   }
 
-  // Leave Class
   Future<ApiResponse<void>> leaveClass(int classId) async {
     try {
       final response = await _dio.delete('${ApiConfig.leaveClass}/$classId');
@@ -97,7 +95,6 @@ class EnrollmentService {
     }
   }
 
-  // Get student's enrolled classes
   Future<ApiResponse<List<Enrollment>>> getMyClasses() async {
     try {
       final response = await _dio.get(ApiConfig.myClasses);
@@ -135,7 +132,9 @@ class EnrollmentService {
         message: 'Đã xảy ra lỗi không mong muốn: $e',
       );
     }
-  }  Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
+  }  
+  
+  Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
     try {
       final response = await ApiClient.get(ApiConfig.myEnrolledClasses, auth: true);
 

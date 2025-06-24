@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import '../models/assignment.dart';
 import '../models/class_detail.dart';
 import '../models/student.dart';
 import '../services/class_service.dart';
+import '../services/exercise_service.dart';
 import '../../../core/enums/status_code.dart';
 
 class ClassProvider extends ChangeNotifier {
   final ClassService _classService = ClassService();
+  final ExerciseService _exerciseService = ExerciseService();
 
   // Class detail state
   ClassDetail? _classDetail;
@@ -17,6 +20,11 @@ class ClassProvider extends ChangeNotifier {
   bool _isLoadingStudents = false;
   String? _studentsError;
 
+  // Assignments state
+  List<Assignment> _assignments = [];
+  bool _isLoadingAssignments = false;
+  String? _assignmentsError;
+
   // Getters
   ClassDetail? get classDetail => _classDetail;
   bool get isLoadingClassDetail => _isLoadingClassDetail;
@@ -25,6 +33,10 @@ class ClassProvider extends ChangeNotifier {
   List<Student> get students => _students;
   bool get isLoadingStudents => _isLoadingStudents;
   String? get studentsError => _studentsError;
+
+  List<Assignment> get assignments => _assignments;
+  bool get isLoadingAssignments => _isLoadingAssignments;
+  String? get assignmentsError => _assignmentsError;
 
   // Helper getters
   int get studentsCount => _students.length;
@@ -77,6 +89,25 @@ class ClassProvider extends ChangeNotifier {
     }
   }
 
+  // Load assignments/exercises in class
+  Future<void> loadAssignments(int classId) async {
+    _isLoadingAssignments = true;
+    _assignmentsError = null;
+    notifyListeners();
+
+    try {
+      final assignments = await _exerciseService.fetchExercises(classId);
+      _assignments = assignments;
+      _assignmentsError = null;
+    } catch (e) {
+      _assignmentsError = 'Không thể tải danh sách bài tập: $e';
+      _assignments = [];
+    } finally {
+      _isLoadingAssignments = false;
+      notifyListeners();
+    }
+  }
+
   // Refresh class detail
   Future<void> refreshClassDetail(int classId) async {
     await loadClassDetail(classId);
@@ -87,11 +118,17 @@ class ClassProvider extends ChangeNotifier {
     await loadStudents(classId);
   }
 
+  // Refresh assignments
+  Future<void> refreshAssignments(int classId) async {
+    await loadAssignments(classId);
+  }
+
   // Load both class detail and students
   Future<void> loadClassData(int classId) async {
     await Future.wait([
       loadClassDetail(classId),
       loadStudents(classId),
+      loadAssignments(classId),
     ]);
   }
 
@@ -107,10 +144,17 @@ class ClassProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear assignments error
+  void clearAssignmentsError() {
+    _assignmentsError = null;
+    notifyListeners();
+  }
+
   // Clear all errors
   void clearAllErrors() {
     _classDetailError = null;
     _studentsError = null;
+    _assignmentsError = null;
     notifyListeners();
   }
 
@@ -123,6 +167,10 @@ class ClassProvider extends ChangeNotifier {
     _students = [];
     _isLoadingStudents = false;
     _studentsError = null;
+    
+    _assignments = [];
+    _isLoadingAssignments = false;
+    _assignmentsError = null;
     
     notifyListeners();
   }

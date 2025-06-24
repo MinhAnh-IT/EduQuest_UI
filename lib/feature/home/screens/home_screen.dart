@@ -6,6 +6,7 @@ import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
 import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
 
+// import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -101,10 +102,12 @@ class _HomeTabState extends State<HomeTab> {
     ];
     return colors[index % colors.length].withValues(alpha: 0.9);
   }
+
   void _handleClassTap(BuildContext context, Map<String, String> classData) {
     final status = classData['status']?.toUpperCase() ?? '';
 
     if (status == 'PENDING') {
+      // Hiển thị thông báo cho lớp đang chờ duyệt
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -114,15 +117,25 @@ class _HomeTabState extends State<HomeTab> {
         ),
       );
     } else {
-      final classId = int.parse(classData['id'] ?? '1');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClassDetailScreen(classId: classId),
-        ),
-      );
+      // Chuyển đến chi tiết lớp cho các lớp đã được duyệt
+      _navigateToClassDetail(context, classData);
     }
   }
+  void _navigateToClassDetail(
+      BuildContext context, Map<String, String> classData) {
+    final classId = int.parse(classData['id'] ?? '1');
+    
+    // Chỉ truyền classId và để ClassDetailScreen tự load dữ liệu thật từ API
+    // Điều này đảm bảo dữ liệu như mã lớp và email giảng viên là chính xác
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClassDetailScreen(
+          classId: classId,
+          // Không truyền initialClassDetail để buộc load từ API
+        ),
+      ),
+    );}
 
   void _showLeaveClassConfirmationDialog(
       BuildContext context, Map<String, String> classData) {
@@ -183,7 +196,9 @@ class _HomeTabState extends State<HomeTab> {
                                     content: Text('Đã rời lớp học thành công!'),
                                     backgroundColor: Colors.green,
                                   ),
-                                );                              }
+                                );
+                              }
+                              // Refresh the list from API
                               _fetchMyClasses();
                             } else {
                               navigator.pop();
@@ -309,10 +324,12 @@ class _HomeTabState extends State<HomeTab> {
 
                           try {
                             final response =
-                                await _enrollmentService.joinClass(classCode);                            if (response.status == StatusCode.ok ||
+                                await _enrollmentService.joinClass(classCode);
+
+                            if (response.status == StatusCode.ok ||
                                 response.status.code == 200 ||
                                 response.status.code == 201) {
-                              navigator.pop();
+                              navigator.pop(); // Đóng dialog
                               if (mounted) {
                                 scaffoldMessenger.showSnackBar(
                                   const SnackBar(
@@ -323,9 +340,11 @@ class _HomeTabState extends State<HomeTab> {
                                   ),
                                 );
                               }
+                              // Refresh the list from API
                               _fetchMyClasses();
                             } else {
-                              navigator.pop();
+                              navigator
+                                  .pop(); // Đóng dialog trước khi hiện thông báo lỗi
                               String errorMessage;
                               switch (response.status) {
                                 case StatusCode.classCodeRequired:
@@ -361,8 +380,10 @@ class _HomeTabState extends State<HomeTab> {
                                   ),
                                 );
                               }
-                            }                          } catch (e) {
-                            navigator.pop();
+                            }
+                          } catch (e) {
+                            navigator
+                                .pop(); // Đóng dialog trước khi hiện thông báo lỗi
                             if (mounted) {
                               scaffoldMessenger.showSnackBar(
                                 const SnackBar(
@@ -398,13 +419,19 @@ class _HomeTabState extends State<HomeTab> {
     });
 
     try {
-      final response = await _enrollmentService.getMyClasses();      if (response.status == StatusCode.ok && response.data != null) {
+      final response = await _enrollmentService.getMyClasses();
+
+      if (response.status == StatusCode.ok && response.data != null) {
+        // Chuyển đổi từ danh sách Enrollment thành định dạng Map để sử dụng lại UI hiện tại
         final List<Map<String, String>> classes =
             response.data!.map((enrollment) {
           return {
             'name': enrollment.className,
             'instructor': enrollment.instructorName,
             'id': enrollment.classId.toString(),
+            'code': 'CLASS${enrollment.classId}',
+            'description': 'Trạng thái: ${enrollment.status}',
+            'studentCount': '0',
             'enrollmentId': enrollment.enrollmentId.toString(),
             'status': enrollment.status,
           };

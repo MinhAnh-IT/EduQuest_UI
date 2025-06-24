@@ -12,7 +12,6 @@ class AssignmentListScreen extends StatelessWidget {
     required this.assignments,
     required this.className,
   }) : super(key: key);
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,23 +19,8 @@ class AssignmentListScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Bài tập - $className',
       ),
-      body: AssignmentListWidget(assignments: assignments),
+      body: _buildAssignmentsList(),
     );
-  }
-}
-
-// Extracted widget for reusable assignment list
-class AssignmentListWidget extends StatelessWidget {
-  final List<Assignment> assignments;
-
-  const AssignmentListWidget({
-    Key? key,
-    required this.assignments,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildAssignmentsList();
   }
 
   Widget _buildAssignmentsList() {

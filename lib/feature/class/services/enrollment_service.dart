@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../models/enrollment.dart';
 import '../../auth/models/api_response.dart';
@@ -134,25 +135,25 @@ class EnrollmentService {
         message: 'Đã xảy ra lỗi không mong muốn: $e',
       );
     }
-  }
-
-  Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
+  }  Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
     try {
-      final response = await _dio.get(ApiConfig.myEnrolledClasses);
+      final response = await ApiClient.get(ApiConfig.myEnrolledClasses, auth: true);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['data'] as List<dynamic>;
+        final responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'] as List<dynamic>;
         final enrollments = data.map((json) => Enrollment.fromJson(json)).toList();
         
         return ApiResponse<List<Enrollment>>(
           status: StatusCode.ok,
-          message: response.data['message'] ?? 'Thành công',
+          message: responseData['message'] ?? 'Thành công',
           data: enrollments,
         );
       } else {
+        final responseData = json.decode(response.body);
         return ApiResponse<List<Enrollment>>(
-          status: StatusCode.fromCode(response.data['code']) ?? StatusCode.internalServerError,
-          message: response.data['message'] ?? 'Đã xảy ra lỗi',
+          status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
+          message: responseData['message'] ?? 'Đã xảy ra lỗi',
         );
       }
     } on DioException catch (e) {

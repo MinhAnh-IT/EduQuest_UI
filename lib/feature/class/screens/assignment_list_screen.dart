@@ -34,8 +34,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 2766176 (fix conflict while  rebase from develop to dicussion)
       appBar: AppBar(
         title: Text('Danh sách bài kiểm tra'),
         backgroundColor: Colors.cyan,
@@ -55,9 +58,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
           return _buildAssignmentsList(context, provider.assignments);
         },
       ),
-=======
-      body: _buildAssignmentsList(),
->>>>>>> 09b553d (Integrate testing api into interface)
     );
   }
 
@@ -317,6 +317,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
 <<<<<<< HEAD
+<<<<<<< HEAD
                       onPressed: () async {
                         Navigator.pop(context);
                         final result = await Navigator.push(
@@ -331,12 +332,12 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                               .fetchAssignments(assignment.classId);
                         }
 =======
+=======
+>>>>>>> 2766176 (fix conflict while  rebase from develop to dicussion)
                       onPressed: () {
-                        // Điều hướng đến trang làm bài
                         Navigator.pushNamed(context, '/quiz', arguments: {
                           'exerciseId': assignment.id,
                         });
->>>>>>> 09b553d (Integrate testing api into interface)
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,

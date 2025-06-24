@@ -5,9 +5,9 @@ import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
 import '../../class/models/class_detail.dart';
-import '../../class/models/assignment.dart';
 import 'package:edu_quest/feature/Profile/screens/profile_screen.dart';
 // import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
+import '../../class/models/assignment.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -54,7 +54,7 @@ class _HomeTabState extends State<HomeTab> {
   bool _isLoading = false;
   String? _errorMessage;
   final TextEditingController _searchController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -103,22 +103,26 @@ class _HomeTabState extends State<HomeTab> {
     ];
     return colors[index % colors.length].withValues(alpha: 0.9);
   }
-
   void _handleClassTap(BuildContext context, Map<String, String> classData) {
     final status = classData['status']?.toUpperCase() ?? '';
-    
+
     if (status == 'PENDING') {
-      // Hiển thị thông báo cho lớp đang chờ duyệt
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Lớp học này đang chờ giáo viên phê duyệt. Bạn chưa thể truy cập chi tiết lớp.'),
+          content: Text(
+              'Lớp học này đang chờ giáo viên phê duyệt. Bạn chưa thể truy cập chi tiết lớp.'),
           backgroundColor: Colors.orange,
           duration: Duration(seconds: 3),
         ),
       );
     } else {
-      // Chuyển đến chi tiết lớp cho các lớp đã được duyệt
-      _navigateToClassDetail(context, classData);
+      final classId = int.parse(classData['id'] ?? '1');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ClassDetailScreen(classId: classId),
+        ),
+      );
     }
   }
   void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
@@ -150,9 +154,11 @@ class _HomeTabState extends State<HomeTab> {
 
 
 
-  void _showLeaveClassConfirmationDialog(BuildContext context, Map<String, String> classData) {
+  
+  void _showLeaveClassConfirmationDialog(
+      BuildContext context, Map<String, String> classData) {
     bool isLoading = false;
-    
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -163,7 +169,8 @@ class _HomeTabState extends State<HomeTab> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Bạn có chắc chắn muốn rời lớp học "${classData['name']}" không?'),
+                  Text(
+                      'Bạn có chắc chắn muốn rời lớp học "${classData['name']}" không?'),
                   if (isLoading)
                     const Padding(
                       padding: EdgeInsets.only(top: 16.0),
@@ -173,84 +180,94 @@ class _HomeTabState extends State<HomeTab> {
               ),
               actions: <Widget>[
                 TextButton(
-                  onPressed: isLoading ? null : () {
-                    Navigator.of(dialogContext).pop();
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          Navigator.of(dialogContext).pop();
+                        },
                   child: const Text('Hủy'),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: isLoading ? null : () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    
-                    final navigator = Navigator.of(dialogContext);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    
-                    try {
-                      final classId = int.parse(classData['id']!);
-                      
-                      final response = await _enrollmentService.leaveClass(classId);
-                      
-                      if (response.status == StatusCode.ok) {
-                        navigator.pop();
-                        if (mounted) {
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Đã rời lớp học thành công!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        }
-                        // Refresh the list from API
-                        _fetchMyClasses();
-                      } else {
-                        navigator.pop();
-                        String errorMessage;
-                        switch (response.status) {
-                          case StatusCode.authenticationRequired:
-                            errorMessage = 'Bạn cần đăng nhập để rời lớp học';
-                            break;
-                          case StatusCode.userNotAStudent:
-                            errorMessage = 'Chỉ sinh viên mới có thể rời lớp học';
-                            break;
-                          case StatusCode.classNotFoundById:
-                            errorMessage = 'Không tìm thấy lớp học này';
-                            break;
-                          case StatusCode.studentNotEnrolledInClass:
-                            errorMessage = 'Bạn chưa tham gia lớp học này';
-                            break;
-                          default:
-                            errorMessage = response.message.isNotEmpty ? response.message : 'Không thể rời lớp học. Vui lòng thử lại sau.';
-                        }
-                        if (mounted) {
-                          scaffoldMessenger.showSnackBar(
-                            SnackBar(
-                              content: Text(errorMessage),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      navigator.pop();
-                      if (mounted) {
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+
+                          final navigator = Navigator.of(dialogContext);
+                          final scaffoldMessenger =
+                              ScaffoldMessenger.of(context);
+
+                          try {
+                            final classId = int.parse(classData['id']!);
+
+                            final response =
+                                await _enrollmentService.leaveClass(classId);
+
+                            if (response.status == StatusCode.ok) {
+                              navigator.pop();
+                              if (mounted) {
+                                scaffoldMessenger.showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Đã rời lớp học thành công!'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );                              }
+                              _fetchMyClasses();
+                            } else {
+                              navigator.pop();
+                              String errorMessage;
+                              switch (response.status) {
+                                case StatusCode.authenticationRequired:
+                                  errorMessage =
+                                      'Bạn cần đăng nhập để rời lớp học';
+                                  break;
+                                case StatusCode.userNotAStudent:
+                                  errorMessage =
+                                      'Chỉ sinh viên mới có thể rời lớp học';
+                                  break;
+                                case StatusCode.classNotFoundById:
+                                  errorMessage = 'Không tìm thấy lớp học này';
+                                  break;
+                                case StatusCode.studentNotEnrolledInClass:
+                                  errorMessage =
+                                      'Bạn chưa tham gia lớp học này';
+                                  break;
+                                default:
+                                  errorMessage = response.message.isNotEmpty
+                                      ? response.message
+                                      : 'Không thể rời lớp học. Vui lòng thử lại sau.';
+                              }
+                              if (mounted) {
+                                scaffoldMessenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            navigator.pop();
+                            if (mounted) {
+                              scaffoldMessenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          }
+                        },
                   child: const Text('Rời lớp'),
                 ),
               ],
@@ -264,7 +281,7 @@ class _HomeTabState extends State<HomeTab> {
   void _showJoinClassDialog(BuildContext context) {
     final TextEditingController classCodeController = TextEditingController();
     bool isLoading = false;
-    
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -290,99 +307,111 @@ class _HomeTabState extends State<HomeTab> {
               ),
               actions: <Widget>[
                 TextButton(
-                  onPressed: isLoading ? null : () {
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                        },
                   child: const Text('Hủy'),
                 ),
                 ElevatedButton(
-                  onPressed: isLoading ? null : () async {
-                    String classCode = classCodeController.text.trim();
-                    
-                    if (classCode.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Vui lòng nhập mã lớp'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
-                      return;
-                    }
-                    
-                    setState(() {
-                      isLoading = true;
-                    });
-                    
-                    final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    
-                    try {
-                      final response = await _enrollmentService.joinClass(classCode);
-                      
-                      if (response.status == StatusCode.ok || response.status.code == 200 || response.status.code == 201) {
-                        navigator.pop(); // Đóng dialog
-                        if (mounted) {
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Tham gia lớp học thành công! Đang chờ phê duyệt từ giảng viên.'),
-                              backgroundColor: Colors.green,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        }
-                        // Refresh the list from API
-                        _fetchMyClasses();
-                      } else {
-                        navigator.pop(); // Đóng dialog trước khi hiện thông báo lỗi
-                        String errorMessage;
-                        switch (response.status) {
-                          case StatusCode.classCodeRequired:
-                            errorMessage = 'Vui lòng nhập mã lớp';
-                            break;
-                          case StatusCode.authenticationRequired:
-                            errorMessage = 'Bạn cần đăng nhập để tham gia lớp học';
-                            break;
-                          case StatusCode.userNotAStudent:
-                            errorMessage = 'Chỉ sinh viên mới có thể tham gia lớp học';
-                            break;
-                          case StatusCode.classNotFoundByCode:
-                            errorMessage = 'Không tìm thấy lớp học với mã này. Vui lòng kiểm tra lại mã lớp.';
-                            break;
-                          case StatusCode.studentAlreadyEnrolledInClass:
-                            errorMessage = 'Bạn đã tham gia lớp học này rồi';
-                            break;
-                          default:
-                            errorMessage = response.message.isNotEmpty ? response.message : 'Không thể tham gia lớp học. Vui lòng thử lại sau.';
-                        }
-                        if (mounted) {
-                          scaffoldMessenger.showSnackBar(
-                            SnackBar(
-                              content: Text(errorMessage),
-                              backgroundColor: Colors.red,
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      navigator.pop(); // Đóng dialog trước khi hiện thông báo lỗi
-                      if (mounted) {
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.'),
-                            backgroundColor: Colors.red,
-                            duration: Duration(seconds: 4),
-                          ),
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
-                  },
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          String classCode = classCodeController.text.trim();
+
+                          if (classCode.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Vui lòng nhập mã lớp'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+
+                          setState(() {
+                            isLoading = true;
+                          });
+
+                          final navigator = Navigator.of(context);
+                          final scaffoldMessenger =
+                              ScaffoldMessenger.of(context);
+
+                          try {
+                            final response =
+                                await _enrollmentService.joinClass(classCode);                            if (response.status == StatusCode.ok ||
+                                response.status.code == 200 ||
+                                response.status.code == 201) {
+                              navigator.pop();
+                              if (mounted) {
+                                scaffoldMessenger.showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Tham gia lớp học thành công! Đang chờ phê duyệt từ giảng viên.'),
+                                    backgroundColor: Colors.green,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                              _fetchMyClasses();
+                            } else {
+                              navigator.pop();
+                              String errorMessage;
+                              switch (response.status) {
+                                case StatusCode.classCodeRequired:
+                                  errorMessage = 'Vui lòng nhập mã lớp';
+                                  break;
+                                case StatusCode.authenticationRequired:
+                                  errorMessage =
+                                      'Bạn cần đăng nhập để tham gia lớp học';
+                                  break;
+                                case StatusCode.userNotAStudent:
+                                  errorMessage =
+                                      'Chỉ sinh viên mới có thể tham gia lớp học';
+                                  break;
+                                case StatusCode.classNotFoundByCode:
+                                  errorMessage =
+                                      'Không tìm thấy lớp học với mã này. Vui lòng kiểm tra lại mã lớp.';
+                                  break;
+                                case StatusCode.studentAlreadyEnrolledInClass:
+                                  errorMessage =
+                                      'Bạn đã tham gia lớp học này rồi';
+                                  break;
+                                default:
+                                  errorMessage = response.message.isNotEmpty
+                                      ? response.message
+                                      : 'Không thể tham gia lớp học. Vui lòng thử lại sau.';
+                              }
+                              if (mounted) {
+                                scaffoldMessenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: Colors.red,
+                                    duration: const Duration(seconds: 4),
+                                  ),
+                                );
+                              }
+                            }                          } catch (e) {
+                            navigator.pop();
+                            if (mounted) {
+                              scaffoldMessenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.'),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 4),
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          }
+                        },
                   child: const Text('Tham gia'),
                 ),
               ],
@@ -392,6 +421,7 @@ class _HomeTabState extends State<HomeTab> {
       },
     );
   }
+
   Future<void> _fetchMyClasses() async {
     setState(() {
       _isLoading = true;
@@ -399,23 +429,18 @@ class _HomeTabState extends State<HomeTab> {
     });
 
     try {
-      final response = await _enrollmentService.getMyClasses();
-      
-      if (response.status == StatusCode.ok && response.data != null) {
-        // Chuyển đổi từ danh sách Enrollment thành định dạng Map để sử dụng lại UI hiện tại
-        final List<Map<String, String>> classes = response.data!.map((enrollment) {
+      final response = await _enrollmentService.getMyClasses();      if (response.status == StatusCode.ok && response.data != null) {
+        final List<Map<String, String>> classes =
+            response.data!.map((enrollment) {
           return {
             'name': enrollment.className,
             'instructor': enrollment.instructorName,
             'id': enrollment.classId.toString(),
-            'code': 'CLASS${enrollment.classId}',
-            'description': 'Trạng thái: ${enrollment.status}',
-            'studentCount': '0',
             'enrollmentId': enrollment.enrollmentId.toString(),
             'status': enrollment.status,
           };
         }).toList();
-        
+
         setState(() {
           _allClasses = classes;
           _filteredClasses = classes;
@@ -470,14 +495,16 @@ class _HomeTabState extends State<HomeTab> {
                       : null,
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 20.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(color: Colors.cyan, width: 1.5),
+                    borderSide:
+                        const BorderSide(color: Colors.cyan, width: 1.5),
                   ),
                 ),
               ),
@@ -497,12 +524,14 @@ class _HomeTabState extends State<HomeTab> {
                             children: [
                               const Text(
                                 'Không thể tải danh sách lớp học',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 _errorMessage!,
-                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.grey[700]),
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton(
@@ -512,11 +541,13 @@ class _HomeTabState extends State<HomeTab> {
                             ],
                           ),
                         )
-                      : _filteredClasses.isEmpty && _searchController.text.isNotEmpty
+                      : _filteredClasses.isEmpty &&
+                              _searchController.text.isNotEmpty
                           ? const Center(
                               child: Text(
                                 'Không tìm thấy kết quả nào.',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                             )
                           : _filteredClasses.isEmpty
@@ -526,34 +557,46 @@ class _HomeTabState extends State<HomeTab> {
                                     children: [
                                       const Text(
                                         'Bạn chưa tham gia lớp học nào',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 16),
                                       ElevatedButton(
-                                        onPressed: () => _showJoinClassDialog(context),
+                                        onPressed: () =>
+                                            _showJoinClassDialog(context),
                                         child: const Text('Tham gia lớp học'),
                                       ),
                                     ],
                                   ),
                                 )
                               : ListView.builder(
-                                  padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 8),
+                                  padding: const EdgeInsets.only(
+                                      top: 8, left: 8, right: 8, bottom: 8),
                                   itemCount: _filteredClasses.length,
                                   itemBuilder: (context, index) {
                                     final classData = _filteredClasses[index];
-                                    final status = classData['status']?.toUpperCase() ?? '';
-                                    
+                                    final status =
+                                        classData['status']?.toUpperCase() ??
+                                            '';
+
                                     return Card(
                                       color: _getCardColor(index),
-                                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 6, horizontal: 8),
                                       elevation: 2,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: ListTile(
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 20.0,
+                                                horizontal: 16.0),
                                         leading: Icon(
-                                          status == 'PENDING' ? Icons.hourglass_empty : Icons.class_,
+                                          status == 'PENDING'
+                                              ? Icons.hourglass_empty
+                                              : Icons.class_,
                                           color: Colors.white,
                                           size: 30,
                                         ),
@@ -568,12 +611,15 @@ class _HomeTabState extends State<HomeTab> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         subtitle: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              classData['instructor'] ?? 'Giảng viên',
+                                              classData['instructor'] ??
+                                                  'Giảng viên',
                                               style: TextStyle(
-                                                color: Colors.white.withValues(alpha: 0.85),
+                                                color: Colors.white
+                                                    .withValues(alpha: 0.85),
                                                 fontSize: 14,
                                               ),
                                               maxLines: 1,
@@ -591,13 +637,16 @@ class _HomeTabState extends State<HomeTab> {
                                           ],
                                         ),
                                         trailing: PopupMenuButton<String>(
-                                          icon: const Icon(Icons.more_vert, color: Colors.white),
+                                          icon: const Icon(Icons.more_vert,
+                                              color: Colors.white),
                                           onSelected: (String value) {
                                             if (value == 'leave') {
-                                              _showLeaveClassConfirmationDialog(context, classData);
+                                              _showLeaveClassConfirmationDialog(
+                                                  context, classData);
                                             }
                                           },
-                                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                          itemBuilder: (BuildContext context) =>
+                                              <PopupMenuEntry<String>>[
                                             const PopupMenuItem<String>(
                                               value: 'leave',
                                               child: Text('Rời lớp học'),

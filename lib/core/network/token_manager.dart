@@ -53,7 +53,7 @@ class TokenManager {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/auth/refresh'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/refresh-token'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'refreshToken': refreshToken}),
       );

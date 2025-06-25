@@ -147,7 +147,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                                 ? Image.file(_selectedImage!, fit: BoxFit.cover)
                                 : profile.avatarUrl != null
                                 ? Image.network(
-                              'http://192.168.1.15:8080${profile.avatarUrl}',
+                              'http://localhost:8080${profile.avatarUrl}',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Container(
                                 color: Colors.grey[200],

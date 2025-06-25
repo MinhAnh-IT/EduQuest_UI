@@ -63,9 +63,9 @@ class ClassService {
       );
     }
   }
-  Future<ApiResponse<List<Student>>> getStudentsInClass(int classId) async {
+    Future<ApiResponse<List<Student>>> getStudentsInClass(int classId) async {
     try {
-      final url = Uri.parse('$baseUrl/classes/$classId/students');
+      final url = Uri.parse('$baseUrl/classes/$classId/students/enrolled');
       
       final response = await http.get(
         url,

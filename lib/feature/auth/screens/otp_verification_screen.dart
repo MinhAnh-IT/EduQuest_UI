@@ -7,12 +7,22 @@ class OtpVerificationScreen extends StatefulWidget {
   final String username;
 
   final Map<String, dynamic> registrationData;
+  final bool autoSendOtp;
 
   const OtpVerificationScreen({
     super.key,
     required this.username,
     required this.registrationData,
+    this.autoSendOtp = false,
   });
+  static OtpVerificationScreen fromRouteSettings(RouteSettings settings) {
+    final args = settings.arguments as Map<String, dynamic>;
+    return OtpVerificationScreen(
+      username: args['username'],
+      registrationData: args['registrationData'] ?? {},
+      autoSendOtp: args['autoSendOtp'] ?? false,
+    );
+  }
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -38,7 +48,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
         curve: Curves.easeIn,
       ),
     );
-    // _sendOTP();
+    if (widget.autoSendOtp) {
+      _resendOTP();
+    }
     _animationController.forward();
   }
 
@@ -49,16 +61,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     super.dispose();
   }
 
-  Future<void> _sendOTP() async {
-    final authProvider = context.read<AuthProvider>();
-    await authProvider.resendOTP(widget.username);
-  }
-
   Future<void> _verifyOTP() async {
 
     if (_otpController.text.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           backgroundColor: Colors.red,
           content: Text(
             'Vui lòng nhập đủ 6 số',
@@ -82,7 +89,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             backgroundColor: Colors.red,
             content: Text(
               'Xác minh OTP thất bại. Vui lòng thử lại!',
@@ -97,7 +104,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
           backgroundColor: Colors.red, // <-- ĐẶT MÀU NỀN SNACKBAR LÀ MÀU ĐỎ
           content: Text(
             'Lỗi: ${e.toString().replaceAll('Exception: ', '')}. Vui lòng thử lại sau!', // Thêm replaceAll để làm sạch thông báo lỗi Exception:
-            style: TextStyle(color: Colors.white), // <-- ĐẶT MÀU CHỮ LÀ MÀU TRẮNG
+            style: const TextStyle(color: Colors.white), // <-- ĐẶT MÀU CHỮ LÀ MÀU TRẮNG
           ),
         ),
       );

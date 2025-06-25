@@ -63,7 +63,7 @@ class Assignment {
   bool get isDisabled => isNotStarted && !isExpired;
 
   Color get statusColor {
-    switch (status) {
+    switch (status) { 
       case 'IN_PROGRESS':
         return Colors.blue;
       case 'SUBMITTED':

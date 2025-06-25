@@ -1,6 +1,5 @@
 import 'package:edu_quest/feature/discussion/providers/discussion_provider.dart';
 import 'package:edu_quest/shared/utils/accessTokenUtill.dart';
-import 'package:edu_quest/shared/widgets/bottom_navigation_bar.dart';
 import 'package:edu_quest/shared/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +13,11 @@ class DiscussionListScreen extends StatefulWidget {
 
   @override
   State<DiscussionListScreen> createState() => _DiscussionListScreenState();
+
+  
 }
 
 class _DiscussionListScreenState extends State<DiscussionListScreen> {
-  int _currentIndex = 0;
   int? _currentUserId;
 
   @override
@@ -208,14 +208,6 @@ class _DiscussionListScreenState extends State<DiscussionListScreen> {
               );
             },
           );
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBarWidget(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
         },
       ),
     );

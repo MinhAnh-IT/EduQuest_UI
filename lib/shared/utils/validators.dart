@@ -4,9 +4,8 @@ class Validators {
       return 'Vui lòng nhập email';
     }
 
-    final emailRegex = RegExp(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    );
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     if (!emailRegex.hasMatch(value)) {
       return 'Email không hợp lệ. Ví dụ: example@gmail.com';
@@ -46,14 +45,15 @@ class Validators {
     }
     return null;
   }
-  
 
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập mật khẩu';
     }
-    if (value.length < 6) {
-      return 'Mật khẩu phải có ít nhất 6 ký tự';
+    final regex = RegExp(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+    if (!regex.hasMatch(value)) {
+      return 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt và tối thiểu 8 ký tự';
     }
     return null;
   }
@@ -75,7 +75,6 @@ class Validators {
     if (value.length < 8 || value.length > 20) {
       return 'Mã số sinh viên phải từ 8 đến 20 ký tự';
     }
-    // Kiểm tra chỉ cho phép số
     if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
       return 'Mã số sinh viên chỉ được chứa số';
     }
@@ -88,4 +87,4 @@ class Validators {
     }
     return null;
   }
-} 
+}

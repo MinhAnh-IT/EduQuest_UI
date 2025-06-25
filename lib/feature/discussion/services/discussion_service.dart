@@ -27,7 +27,12 @@ class DiscussionApiService {
 
     if (resBody['code'] == 200) {
       return Discussion.fromJson(resBody['data']);
-    } else {
+    } else if (resBody['code'] == StatusCode.exerciseNotExpiredYet.code) {
+      throw Exception(StatusCode.exerciseNotExpiredYet.message);
+    } else if (resBody['code'] == StatusCode.exerciseNotFound.code) {
+      throw Exception(StatusCode.exerciseNotFound.message);
+    } 
+    else {
       throw Exception(resBody['message'] ?? 'Có lỗi xảy ra khi tạo thảo luận!');
     }
   }
@@ -40,7 +45,7 @@ class DiscussionApiService {
       auth: true,
     );
     final body = jsonDecode(response.body);
-    if (body['code'] == 200 && body['data'] != null) {
+    if (body['code'] == StatusCode.ok.code && body['data'] != null) {
       return Discussion.fromJson(body['data']);
     } else {
       throw Exception(body['message'] ?? 'Cập nhật thảo luận thất bại');

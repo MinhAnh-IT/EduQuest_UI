@@ -1,3 +1,4 @@
+import 'package:edu_quest/shared/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';

@@ -22,7 +22,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   @override
   void initState() {
     super.initState();
-    // Lấy danh sách bài tập khi vào màn hình
     Future.microtask(() {
       Provider.of<ExerciseProvider>(context, listen: false)
           .fetchAssignments(widget.classId);
@@ -33,20 +32,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 2766176 (fix conflict while  rebase from develop to dicussion)
-      appBar: AppBar(
-        title: Text('Danh sách bài kiểm tra'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
->>>>>>> 60392fb (Integrate testing api into interface)
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -252,6 +237,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                 ),
                 const SizedBox(height: 16),
 
+                // Description
                 Text(
                   'Mô tả bài tập:',
                   style: TextStyle(
@@ -261,6 +247,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
+
                 const SizedBox(height: 24),
 
                 Container(
@@ -313,46 +300,24 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                 ),
                 const SizedBox(height: 32),
 
+                // Action Buttons
                 if (!assignment.isSubmitted && !assignment.isExpired)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
                       onPressed: () async {
                         Navigator.pop(context);
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-<<<<<<< HEAD
-                            builder: (context) => Placeholder(), // ExamScreen(assignment: assignment)
-                          ),
-                        );
-                        if (result == true) {
-                          // Reload lại danh sách khi nộp bài thành công
-                          Provider.of<ExerciseProvider>(context, listen: false)
-                              .fetchAssignments(assignment.classId);
-                        }
-=======
-=======
->>>>>>> 2766176 (fix conflict while  rebase from develop to dicussion)
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/quiz', arguments: {
-                          'exerciseId': assignment.id,
-                        });
-=======
                             builder: (context) =>
-                                const Placeholder(), 
+                                Placeholder(),
                           ),
                         );
                         if (result == true) {
                           Provider.of<ExerciseProvider>(context, listen: false)
                               .fetchAssignments(assignment.classId);
                         }
->>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,
@@ -378,7 +343,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : (assignment.isExpired || assignment.isSubmitted)
+                            : assignment.isSubmitted
                                 ? () {
                                     Navigator.pushNamed(
                                         context, '/discussion-list',
@@ -386,14 +351,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                                           'exerciseId': assignment.id,
                                         });
                                   }
-                                : () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Bạn chưa làm bài nên chưa thể thảo luận luận!')),
-                                    );
-                                  },
+                                : null,
                         icon: const Icon(Icons.comment),
                         label: const Text('Thảo luận'),
                         style: ElevatedButton.styleFrom(
@@ -407,21 +365,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : (assignment.isExpired || assignment.isSubmitted)
+                            : (assignment.isSubmitted || assignment.isExpired)
                                 ? () {
                                     Navigator.pushNamed(context, '/result',
                                         arguments: {
                                           'exerciseId': assignment.id,
                                         });
                                   }
-                                : () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
-                                    );
-                                  },
+                                : null,
                         icon: const Icon(Icons.visibility),
                         label: const Text('Xem kết quả'),
                         style: ElevatedButton.styleFrom(

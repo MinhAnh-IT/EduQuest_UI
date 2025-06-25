@@ -7,7 +7,8 @@ import '../../../shared/widgets/question_widget.dart';
 
 class ExamScreen extends StatefulWidget {
   final int exerciseId;
-  const ExamScreen({Key? key, required this.exerciseId}) : super(key: key);
+  const ExamScreen({Key? key, required this.exerciseId}
+  ) : super(key: key);
 
   @override
   State<ExamScreen> createState() => _ExamScreenState();
@@ -129,7 +130,7 @@ class _ExamScreenState extends State<ExamScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => QuizProvider()..loadQuestions(),
+      create: (_) => QuizProvider()..loadQuestions(widget.exerciseId),
       child: Consumer<QuizProvider>(
         builder: (context, quizProvider, _) {
           final errorMessage = quizProvider.errorMessage;
@@ -179,7 +180,9 @@ class _ExamScreenState extends State<ExamScreen> {
               final isSuccess = await context.read<QuizProvider>().submit();
               if (isSuccess) {
                 // ignore: use_build_context_synchronously
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pop();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
               }
             },
             style: ElevatedButton.styleFrom(

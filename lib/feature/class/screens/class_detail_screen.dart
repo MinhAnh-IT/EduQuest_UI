@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
 import '../providers/class_provider.dart';
-
 import 'assignment_list_screen.dart';
 import '../../../shared/widgets/custom_app_bar.dart';
 import 'member_list_screen.dart';

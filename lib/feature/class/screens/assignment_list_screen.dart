@@ -61,7 +61,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  Widget _buildAssignmentsList(BuildContext context, List<Assignment> assignments) {
+  Widget _buildAssignmentsList(
+      BuildContext context, List<Assignment> assignments) {
     if (assignments.isEmpty) {
       return Center(
         child: Column(
@@ -160,8 +161,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.endAt)}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: assignment.isOverdue ? Colors.red : Colors.grey[600],
-                      fontWeight: assignment.isOverdue ? FontWeight.w500 : FontWeight.normal,
+                      color:
+                          assignment.isOverdue ? Colors.red : Colors.grey[600],
+                      fontWeight: assignment.isOverdue
+                          ? FontWeight.w500
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -191,7 +195,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  void _showAssignmentDetail(BuildContext context, Assignment assignment) async {
+  void _showAssignmentDetail(
+      BuildContext context, Assignment assignment) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -247,7 +252,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Description
                 Text(
                   'Mô tả bài tập:',
                   style: TextStyle(
@@ -257,13 +261,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Text(
-                //   assignment.description,
-                //   style: const TextStyle(fontSize: 14),
-                // ),
                 const SizedBox(height: 24),
 
-                // Due Date
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -296,11 +295,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                               ),
                             ),
                             Text(
-                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.endAt),
+                              DateFormat('dd/MM/yyyy - HH:mm')
+                                  .format(assignment.endAt),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: assignment.isOverdue ? Colors.red : Colors.blue,
+                                color: assignment.isOverdue
+                                    ? Colors.red
+                                    : Colors.blue,
                               ),
                             ),
                           ],
@@ -311,18 +313,21 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Action Buttons
                 if (!assignment.isSubmitted && !assignment.isExpired)
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
                       onPressed: () async {
                         Navigator.pop(context);
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
+<<<<<<< HEAD
                             builder: (context) => Placeholder(), // ExamScreen(assignment: assignment)
                           ),
                         );
@@ -338,6 +343,16 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                         Navigator.pushNamed(context, '/quiz', arguments: {
                           'exerciseId': assignment.id,
                         });
+=======
+                            builder: (context) =>
+                                const Placeholder(), 
+                          ),
+                        );
+                        if (result == true) {
+                          Provider.of<ExerciseProvider>(context, listen: false)
+                              .fetchAssignments(assignment.classId);
+                        }
+>>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.cyan,
@@ -363,19 +378,22 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
-                            ? () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
-                          );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài nên chưa thể thảo luận luận!')),
-                          );
-                        },
+                            : (assignment.isExpired || assignment.isSubmitted)
+                                ? () {
+                                    Navigator.pushNamed(
+                                        context, '/discussion-list',
+                                        arguments: {
+                                          'exerciseId': assignment.id,
+                                        });
+                                  }
+                                : () {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Bạn chưa làm bài nên chưa thể thảo luận luận!')),
+                                    );
+                                  },
                         icon: const Icon(Icons.comment),
                         label: const Text('Thảo luận'),
                         style: ElevatedButton.styleFrom(
@@ -389,19 +407,21 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
-                            ? () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
-                          );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
-                          );
-                        },
+                            : (assignment.isExpired || assignment.isSubmitted)
+                                ? () {
+                                    Navigator.pushNamed(context, '/result',
+                                        arguments: {
+                                          'exerciseId': assignment.id,
+                                        });
+                                  }
+                                : () {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
+                                    );
+                                  },
                         icon: const Icon(Icons.visibility),
                         label: const Text('Xem kết quả'),
                         style: ElevatedButton.styleFrom(

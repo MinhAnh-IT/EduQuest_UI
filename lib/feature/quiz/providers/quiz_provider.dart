@@ -12,7 +12,7 @@ class QuizProvider extends ChangeNotifier {
   bool isLoading = true;
   String? errorMessage;
 
-  Future<void> loadQuestions([int exerciseId = 1]) async {
+  Future<void> loadQuestions(int exerciseId) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();

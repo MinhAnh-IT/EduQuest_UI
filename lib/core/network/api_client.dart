@@ -23,7 +23,6 @@ class ApiClient {
         
       }
     }
-
     return headers;
   }
 

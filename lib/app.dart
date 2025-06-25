@@ -87,6 +87,13 @@ class MyApp extends StatelessWidget {
 
                 );
               },
+              '/discussion-list': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+                return DiscussionListScreen(
+                  exerciseId: args['exerciseId'] as int,
+                );
+              },
             },
           );
         },

@@ -3,6 +3,7 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
+<<<<<<< HEAD
 
 <<<<<<< HEAD
       return 'http://192.168.1.2:8080/api';
@@ -13,6 +14,9 @@ class ApiConfig {
       return 'http://localhost:8080/api';
 >>>>>>> 09b553d (Integrate testing api into interface)
 >>>>>>> 60392fb (Integrate testing api into interface)
+=======
+      return 'http://192.168.1.15:8080/api';
+>>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
     }
     return 'http://localhost:8080/api';
   }
@@ -30,8 +34,7 @@ class ApiConfig {
   static const String updateProfile = '/update/profile';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
-  static const String verifyOtpForgotPassword =
-      '/auth/verify-otp-forgot-password';
+  static const String verifyOtpForgotPassword = '/auth/verify-otp-forgot-password';
   static const String logout = '/auth/logout';
   static const String joinClass = '/enrollments/join';
   static const String leaveClass = '/enrollments/leave';
@@ -43,10 +46,14 @@ class ApiConfig {
   static const String submissionExam = '/participations/exercises/submit';
   static const String getExercisesForStudent = '/exam/exercises';
   // Result
-  static const String getResultByExerciseId = '/results';
+  static const String getResultByExerciseId = '/participations/exercises';
 
+  // Discussion
+  static const String getDiscussionsByExerciseId = '/discussions/exercises';
+  
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
 }

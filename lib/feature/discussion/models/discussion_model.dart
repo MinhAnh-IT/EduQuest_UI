@@ -1,35 +1,31 @@
 class Discussion {
-  final String id;
-  final int exerciseId;
-  final String title;
-  final String authorName;
-  final DateTime createdAt;
+  final int id;
+  final String content;
+  final int createdById;
+  final String createdByName;
+  final String? avatarUrl;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Discussion({
     required this.id,
-    required this.exerciseId,
-    required this.title,
-    required this.authorName,
-    required this.createdAt,
-  });
-}
-
-class DiscussionComment {
-  final String id;
-  final String discussionId;
-  final String authorName;
-  final String avatarUrl;
-  final String content;
-  final DateTime createdAt;
-  final int votes;
-
-  DiscussionComment({
-    required this.id,
-    required this.discussionId,
-    required this.authorName,
-    required this.avatarUrl,
     required this.content,
-    required this.createdAt,
-    required this.votes,
+    required this.createdById,
+    required this.createdByName,
+    this.avatarUrl,
+    this.createdAt,
+    this.updatedAt,
   });
+
+  factory Discussion.fromJson(Map<String, dynamic> json) => Discussion(
+        id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+        content: json['content'] ?? '',
+        createdById: json['createdById'] is int
+            ? json['createdById']
+            : int.tryParse(json['createdById'].toString()) ?? 0,
+        createdByName: json['createdByName'] ?? '',
+        avatarUrl: json['avatarUrl'],
+        createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+        updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      );
 }

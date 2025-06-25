@@ -21,7 +21,6 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
-    print('ResultScreen initialized with exerciseId: ${widget.exerciseId}');
     Future.microtask(() {
       Provider.of<ResultProvider>(context, listen: false)
           .fetchResult(widget.exerciseId);

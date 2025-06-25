@@ -1,55 +1,60 @@
+import 'dart:convert';
+import 'package:edu_quest/config/api_config.dart';
+import 'package:edu_quest/core/enums/status_code.dart';
+import 'package:edu_quest/core/network/api_client.dart';
 import 'package:edu_quest/feature/discussion/models/discussion_model.dart';
 
 class DiscussionApiService {
-  final _mockDiscussions = [
-    Discussion(
-      id: "1",
-      exerciseId: 101,
-      title: "Nộp muộn bị trừ điểm không?",
-      authorName: "Lan",
-      createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
-    ),
-    Discussion(
-      id: "2",
-      exerciseId: 101,
-      title: "Đáp án đúng là gì vậy mọi người?",
-      authorName: "Long",
-      createdAt: DateTime.now().subtract(const Duration(minutes: 20)),
-    ),
-  ];
-
-  final _mockComments = [
-    DiscussionComment(
-      id: "c1",
-      discussionId: "1",
-      authorName: "Lan",
-      avatarUrl: "https://i.pravatar.cc/40?img=2",
-      content: "Mình nghĩ nộp muộn bị trừ 10% điểm.",
-      createdAt: DateTime.now().subtract(const Duration(minutes: 2)),
-      votes: 1,
-    ),
-    DiscussionComment(
-      id: "c2",
-      discussionId: "1",
-      authorName: "Bạn",
-      avatarUrl: "https://i.pravatar.cc/40?img=3",
-      content: "Cảm ơn bạn nhé!",
-      createdAt: DateTime.now().subtract(const Duration(minutes: 1)),
-      votes: 0,
-    ),
-  ];
-
   Future<List<Discussion>> fetchDiscussionsByExercise(int exerciseId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return _mockDiscussions.where((d) => d.exerciseId == exerciseId).toList();
+    final url = '${ApiConfig.baseUrl}${ApiConfig.getDiscussionsByExerciseId}/$exerciseId';
+    final response = await ApiClient.get(url, auth: true);
+    final Map<String, dynamic> body = jsonDecode(response.body);
+
+    if (body['code'] == StatusCode.ok.code) {
+      return (body['data'] as List).map((e) => Discussion.fromJson(e)).toList();
+    }
+    throw Exception(body['message'] ?? "Có lỗi xảy ra khi lấy thảo luận");
   }
 
-  Future<List<DiscussionComment>> fetchComments(String discussionId) async {
-    await Future.delayed(const Duration(milliseconds: 180));
-    return _mockComments.where((c) => c.discussionId == discussionId).toList();
+  Future<Discussion> createDiscussion(int exerciseId, String content) async {
+    final url = '${ApiConfig.baseUrl}/discussions';
+    final body = {
+      'exerciseId': exerciseId,
+      'content': content,
+    };
+    final response = await ApiClient.post(url, body, auth: true);
+    final Map<String, dynamic> resBody = jsonDecode(response.body);
+
+    if (resBody['code'] == 200) {
+      return Discussion.fromJson(resBody['data']);
+    } else {
+      throw Exception(resBody['message'] ?? 'Có lỗi xảy ra khi tạo thảo luận!');
+    }
   }
 
-  Future<void> postComment(String discussionId, String content) async {
-    await Future.delayed(const Duration(milliseconds: 120));
+  Future<Discussion> editDiscussion(String discussionId, String newContent) async {
+    final url = '${ApiConfig.baseUrl}/discussions/$discussionId';
+    final response = await ApiClient.put(
+      url,
+      {'content': newContent},
+      auth: true,
+    );
+    final body = jsonDecode(response.body);
+    if (body['code'] == 200 && body['data'] != null) {
+      return Discussion.fromJson(body['data']);
+    } else {
+      throw Exception(body['message'] ?? 'Cập nhật thảo luận thất bại');
+    }
+  }
+
+  Future<bool> deleteDiscussion(String discussionId) async {
+    final url = '${ApiConfig.baseUrl}/discussions/$discussionId';
+    final response = await ApiClient.delete(url, auth: true);
+    final body = jsonDecode(response.body);
+    if (body['code'] == 200 && body['data'] == true) {
+      return true;
+    } else {
+      throw Exception(body['message'] ?? 'Xoá thảo luận thất bại');
+    }
   }
 }

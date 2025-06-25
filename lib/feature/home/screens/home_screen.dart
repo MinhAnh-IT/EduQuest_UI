@@ -4,9 +4,13 @@ import '../../../shared/widgets/custom_app_bar.dart';
 import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
+<<<<<<< HEAD
 import 'package:edu_quest/feature/profile/screens/profile_screen.dart';
 
 // import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
+=======
+import 'package:edu_quest/feature/Profile/screens/profile_screen.dart';
+>>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -121,6 +125,7 @@ class _HomeTabState extends State<HomeTab> {
       _navigateToClassDetail(context, classData);
     }
   }
+<<<<<<< HEAD
   void _navigateToClassDetail(      BuildContext context, Map<String, String> classData) {
     final classId = int.parse(classData['id'] ?? '1');
     
@@ -134,6 +139,9 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
   
+=======
+
+>>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
   void _showLeaveClassConfirmationDialog(
       BuildContext context, Map<String, String> classData) {
     bool isLoading = false;

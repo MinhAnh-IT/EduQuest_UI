@@ -1,62 +1,72 @@
-// providers/discussion_provider.dart
-
+import 'package:flutter/foundation.dart';
 import 'package:edu_quest/feature/discussion/models/discussion_model.dart';
 import 'package:edu_quest/feature/discussion/services/discussion_service.dart';
-import 'package:flutter/foundation.dart';
 
 class DiscussionProvider extends ChangeNotifier {
   final DiscussionApiService api;
   DiscussionProvider({required this.api});
 
   List<Discussion> discussions = [];
-  List<DiscussionComment> comments = [];
   bool loading = false;
+  String? errorMessage;
 
-  // Load discussion theo bài tập
   Future<void> loadDiscussionsByExercise(int exerciseId) async {
     loading = true;
+    errorMessage = null;
     notifyListeners();
-    discussions = await api.fetchDiscussionsByExercise(exerciseId);
+    try {
+      discussions = await api.fetchDiscussionsByExercise(exerciseId);
+    } catch (e) {
+      errorMessage = e.toString();
+    }
     loading = false;
     notifyListeners();
   }
 
-  Future<void> addDiscussion(
-      int exerciseId, String title, String authorName) async {
-    discussions.add(
-      Discussion(
-        id: DateTime.now().toString(),
-        exerciseId: exerciseId,
-        title: title,
-        authorName: authorName,
-        createdAt: DateTime.now(),
-      ),
-    );
-    notifyListeners();
-  }
-
-  Future<void> loadComments(String discussionId) async {
+  Future<void> addDiscussion(int exerciseId, String content) async {
     loading = true;
+    errorMessage = null;
     notifyListeners();
-    comments = await api.fetchComments(discussionId);
+    try {
+      final discussion = await api.createDiscussion(exerciseId, content);
+      discussions.insert(0, discussion);
+    } catch (e) {
+      errorMessage = e.toString();
+    }
     loading = false;
     notifyListeners();
   }
 
-  Future<void> addComment(String discussionId, String content) async {
-    await api.postComment(discussionId, content);
-    comments.insert(
-      0,
-      DiscussionComment(
-        id: DateTime.now().toString(),
-        discussionId: discussionId,
-        authorName: "Bạn",
-        avatarUrl: "https://i.pravatar.cc/40?img=4",
-        content: content,
-        createdAt: DateTime.now(),
-        votes: 0,
-      ),
-    );
+  Future<void> editDiscussion(String discussionId, String newContent) async {
+    loading = true;
+    errorMessage = null;
+    notifyListeners();
+    try {
+      final updated = await api.editDiscussion(discussionId, newContent);
+      final idx = discussions.indexWhere((d) => d.id.toString() == discussionId);
+      if (idx != -1) {
+        discussions[idx] = updated;
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+    loading = false;
+    notifyListeners();
+  }
+
+  Future<void> deleteDiscussion(String discussionId) async {
+    loading = true;
+    errorMessage = null;
+    notifyListeners();
+    try {
+      final ok = await api.deleteDiscussion(discussionId);
+      if (ok) {
+        discussions.removeWhere((d) => d.id.toString() == discussionId);
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+    loading = false;
     notifyListeners();
   }
 }

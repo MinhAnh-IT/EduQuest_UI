@@ -6,8 +6,7 @@ import '../../../core/network/api_client.dart';
 
 class ResultService {
   Future<ResultModel> fetchResult(int exerciseId) async {
-    final url =
-        '${ApiConfig.baseUrl}${ApiConfig.getResultByExerciseId}/$exerciseId';
+    final url ='${ApiConfig.baseUrl}${ApiConfig.getResultByExerciseId}/$exerciseId/result';
 
     final response = await ApiClient.get(url, auth: true);
 

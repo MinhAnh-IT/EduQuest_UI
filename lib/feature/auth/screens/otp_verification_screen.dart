@@ -7,12 +7,22 @@ class OtpVerificationScreen extends StatefulWidget {
   final String username;
 
   final Map<String, dynamic> registrationData;
+  final bool autoSendOtp;
 
   const OtpVerificationScreen({
     super.key,
     required this.username,
     required this.registrationData,
+    this.autoSendOtp = false,
   });
+  static OtpVerificationScreen fromRouteSettings(RouteSettings settings) {
+    final args = settings.arguments as Map<String, dynamic>;
+    return OtpVerificationScreen(
+      username: args['username'],
+      registrationData: args['registrationData'] ?? {},
+      autoSendOtp: args['autoSendOtp'] ?? false,
+    );
+  }
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -38,7 +48,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
         curve: Curves.easeIn,
       ),
     );
-    // _sendOTP();
+    if (widget.autoSendOtp) {
+      _resendOTP();
+    }
     _animationController.forward();
   }
 

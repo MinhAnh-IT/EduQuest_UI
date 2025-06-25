@@ -68,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
             arguments: {
               'username': _usernameController.text,
               'registrationData': <String, dynamic>{},
+              'autoSendOtp': true,
             },
           );
         },

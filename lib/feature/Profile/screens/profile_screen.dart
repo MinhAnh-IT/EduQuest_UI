@@ -8,6 +8,8 @@ import 'package:edu_quest/feature/auth/screens/login_screen.dart';
 import 'package:edu_quest/core/utils/auth_utils.dart';
 import 'package:edu_quest/shared/widgets/custom_app_bar.dart';
 
+import '../../../config/api_config.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -132,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ClipOval(
                       child: profile.avatarUrl != null
                           ? Image.network(
-                        'http://192.168.1.2:8080${profile.avatarUrl}',
+                        '${ApiConfig.baseUrl}${profile.avatarUrl}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],

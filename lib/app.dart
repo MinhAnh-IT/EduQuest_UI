@@ -65,6 +65,8 @@ class MyApp extends StatelessWidget {
               '/home': (context) => const HomeScreen(),
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
+              '/otp-verification': (context) =>
+                  OtpVerificationScreen.fromRouteSettings(ModalRoute.of(context)!.settings),
               '/student-details': (context) => const StudentDetailsScreen(),
               '/quiz': (context) {
                 final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;

@@ -1,3 +1,4 @@
+import 'package:edu_quest/feature/quiz/screens/exam_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/assignment.dart';
@@ -311,7 +312,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                Placeholder(),
+                                ExamScreen(exerciseId: assignment.id),
                           ),
                         );
                         if (result == true) {

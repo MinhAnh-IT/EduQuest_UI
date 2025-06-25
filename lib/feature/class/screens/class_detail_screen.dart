@@ -8,7 +8,7 @@ import 'member_list_screen.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final int classId;
-  final ClassDetail? initialClassDetail; // Optional initial data
+  final ClassDetail? initialClassDetail; 
 
   const ClassDetailScreen({
     Key? key,
@@ -224,7 +224,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
 
           const SizedBox(height: 16),
 
-          // Instructor Info Card
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(

@@ -20,6 +20,7 @@ import 'package:edu_quest/feature/class/providers/class_provider.dart';
 import 'package:edu_quest/feature/class/screens/assignment_list_screen.dart';
 import 'package:edu_quest/shared/utils/constants.dart';
 import 'package:edu_quest/feature/home/screens/home_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'feature/class/providers/exercise_provider.dart';
 
@@ -30,7 +31,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(      providers: [
+    return MultiProvider(
+      providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
         ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
@@ -39,23 +41,21 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
         ChangeNotifierProvider(create: (_) => ExerciseProvider()),
-
-    ],
+      ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
-            initialRoute: '/home',
+            home: AuthGate(prefs: prefs),
             onGenerateRoute: (settings) {
               if (settings.name == '/otp-verification') {
                 final args = settings.arguments as Map<String, dynamic>;
                 return MaterialPageRoute(
                   builder: (context) => OtpVerificationScreen(
                     username: args['username'] as String,
-                    registrationData:
-                        args['registrationData'] as Map<String, dynamic>,
+                    registrationData: args['registrationData'] as Map<String, dynamic>,
                   ),
                 );
               }
@@ -70,26 +70,21 @@ class MyApp extends StatelessWidget {
                 final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
                 return ExamScreen(exerciseId: args['exerciseId'] as int);
               },
-              '/discussion': (context) =>
-                  const DiscussionListScreen(exerciseId: 101,), 
+              '/discussion': (context) => const DiscussionListScreen(exerciseId: 101,),
               '/result': (context) {
-                final args = ModalRoute.of(context)!.settings.arguments
-                    as Map<String, dynamic>;
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
                 return ResultScreen(exerciseId: args['exerciseId'] as int);
               },
               '/profile': (context) => const ProfileScreen(),
               '/assignments': (context) {
-                final args = ModalRoute.of(context)!.settings.arguments
-                as Map<String, dynamic>;
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
                 return AssignmentListScreen(
                   classId: args['classId'] as int,
                   className: args['className'] as String,
-
                 );
               },
               '/discussion-list': (context) {
-                final args = ModalRoute.of(context)!.settings.arguments
-                    as Map<String, dynamic>;
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
                 return DiscussionListScreen(
                   exerciseId: args['exerciseId'] as int,
                 );
@@ -98,6 +93,48 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  final SharedPreferences prefs;
+  const AuthGate({super.key, required this.prefs});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  late Future<bool> _isLoggedIn;
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  Future<bool> checkLogin() async {
+    final refreshToken = await _secureStorage.read(key: 'refresh_token');
+    if (refreshToken == null) return false;
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoggedIn = checkLogin();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _isLoggedIn,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (snapshot.data == true) {
+          return const HomeScreen();
+        } else {
+          return const LoginScreen();
+        }
+      },
     );
   }
 }

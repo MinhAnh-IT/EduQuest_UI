@@ -106,7 +106,6 @@ class _HomeTabState extends State<HomeTab> {
     final status = classData['status']?.toUpperCase() ?? '';
 
     if (status == 'PENDING') {
-      // Hiển thị thông báo cho lớp đang chờ duyệt
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -116,7 +115,6 @@ class _HomeTabState extends State<HomeTab> {
         ),
       );
     } else {
-      // Chuyển đến chi tiết lớp cho các lớp đã được duyệt
       _navigateToClassDetail(context, classData);
     }
   }
@@ -195,7 +193,6 @@ class _HomeTabState extends State<HomeTab> {
                                   ),
                                 );
                               }
-                              // Refresh the list from API
                               _fetchMyClasses();
                             } else {
                               navigator.pop();
@@ -326,7 +323,7 @@ class _HomeTabState extends State<HomeTab> {
                             if (response.status == StatusCode.ok ||
                                 response.status.code == 200 ||
                                 response.status.code == 201) {
-                              navigator.pop(); // Đóng dialog
+                              navigator.pop(); 
                               if (mounted) {
                                 scaffoldMessenger.showSnackBar(
                                   const SnackBar(
@@ -337,11 +334,10 @@ class _HomeTabState extends State<HomeTab> {
                                   ),
                                 );
                               }
-                              // Refresh the list from API
                               _fetchMyClasses();
                             } else {
                               navigator
-                                  .pop(); // Đóng dialog trước khi hiện thông báo lỗi
+                                  .pop(); 
                               String errorMessage;
                               switch (response.status) {
                                 case StatusCode.classCodeRequired:
@@ -380,7 +376,7 @@ class _HomeTabState extends State<HomeTab> {
                             }
                           } catch (e) {
                             navigator
-                                .pop(); // Đóng dialog trước khi hiện thông báo lỗi
+                                .pop(); 
                             if (mounted) {
                               scaffoldMessenger.showSnackBar(
                                 const SnackBar(
@@ -419,7 +415,6 @@ class _HomeTabState extends State<HomeTab> {
       final response = await _enrollmentService.getMyClasses();
 
       if (response.status == StatusCode.ok && response.data != null) {
-        // Chuyển đổi từ danh sách Enrollment thành định dạng Map để sử dụng lại UI hiện tại
         final List<Map<String, String>> classes =
             response.data!.map((enrollment) {
           return {

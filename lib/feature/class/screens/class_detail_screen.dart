@@ -54,7 +54,8 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
   @override
   Widget build(BuildContext context) {
     return Consumer<ClassProvider>(
-      builder: (context, classProvider, child) {        return Scaffold(
+      builder: (context, classProvider, child) {        
+        return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: CustomAppBar(
             title: classProvider.classDetail?.name ?? 'Chi tiết lớp học',
@@ -64,11 +65,13 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                   icon: const Icon(Icons.refresh),
                   onPressed: () => classProvider.loadClassData(widget.classId),
                 ),
-            ],            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null ? null : TabBar(
+            ],
+            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null ? null : TabBar(
               controller: _tabController,
               indicatorColor: Colors.white,
               labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,              tabs: const [
+              unselectedLabelColor: Colors.white70,              
+              tabs: const [
                 Tab(icon: Icon(Icons.info), text: 'Thông tin'),
                 Tab(icon: Icon(Icons.assignment), text: 'Bài kiểm tra'),
                 Tab(icon: Icon(Icons.people), text: 'Học sinh'),

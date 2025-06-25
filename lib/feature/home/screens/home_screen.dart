@@ -120,7 +120,8 @@ class _HomeTabState extends State<HomeTab> {
       _navigateToClassDetail(context, classData);
     }
   }
-  void _navigateToClassDetail(      BuildContext context, Map<String, String> classData) {
+  
+  void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
     final classId = int.parse(classData['id'] ?? '1');
     
     Navigator.push(

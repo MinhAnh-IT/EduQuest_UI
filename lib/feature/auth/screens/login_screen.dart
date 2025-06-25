@@ -26,37 +26,67 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.clearError();
-      final success = await authProvider.login(
-          _usernameController.text, _passwordController.text);
+  if (_formKey.currentState!.validate()) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    authProvider.clearError();
+    bool isNotVerified = false;
 
-      if (!mounted) return;
-      
-      if (success) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.success,
-          animType: AnimType.rightSlide,
-          title: 'Thành công',
-          desc: 'Đăng nhập thành công!',
-          btnOkOnPress: () {
-            Navigator.pushReplacementNamed(context, '/home');
-          },
-          btnOkText: 'Vào app',
-          btnOkColor: Colors.blue,
-        ).show();
-      } else {
-        AwesomeDialog(
-                context: context,
-                title: "Thất bại",
-                dialogType: DialogType.error,
-                desc: authProvider.error ?? "Đăng nhập thất bại")
-            .show();
-      }
+    final success = await authProvider.login(
+      _usernameController.text,
+      _passwordController.text,
+      onUserNotVerified: () {
+        isNotVerified = true;
+      },
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.rightSlide,
+        title: 'Thành công',
+        desc: 'Đăng nhập thành công!',
+        btnOkOnPress: () {
+          Navigator.pushReplacementNamed(context, '/home');
+        },
+        btnOkText: 'Vào app',
+        btnOkColor: Colors.blue,
+      ).show();
+    } else if (isNotVerified) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.infoReverse,
+        animType: AnimType.rightSlide,
+        title: 'Tài khoản chưa xác thực',
+        desc: 'Tài khoản của bạn chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản!',
+        btnOkOnPress: () {
+          Navigator.pushReplacementNamed(
+            context,
+            '/otp-verification',
+            arguments: {
+              'username': _usernameController.text,
+              'registrationData': <String, dynamic>{},
+            },
+          );
+        },
+        btnOkText: 'Xác thực ngay',
+        btnOkColor: Colors.orange,
+      ).show();
+    } else {
+      AwesomeDialog(
+        context: context,
+        title: "Thất bại",
+        dialogType: DialogType.error,
+        btnOkOnPress: () {},
+        btnOkText: 'Đóng',
+        desc: authProvider.error ?? "Đăng nhập thất bại",
+      ).show();
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -26,9 +26,11 @@ enum StatusCode {
   participationNotFound(4045, "Không tìm thấy lượt tham gia bài tập của bạn"),
   exerciseNotExpiredYet(4205, "Bài tập chưa hết hạn, bạn không thể tạo thảo luận"),
   exerciseNotFound(4046, "Không tìm thấy bài tập với ID này"),
+  userNotVerified(4102, "Tài khoản chưa được xác minh. Vui lòng kiểm tra email để xác minh tài khoản của bạn."),
   unknown(50001, "Lỗi không xác định."),
   inValidToken(401, "Token không hợp lệ hoặc đã hết hạn."),
   internalServerError(500, "Lỗi máy chủ nội bộ.");
+
   
 
   final int code;

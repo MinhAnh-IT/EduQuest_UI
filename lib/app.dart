@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
-            initialRoute: '/login',
+            home: AuthGate(prefs: prefs),
             onGenerateRoute: (settings) {
               if (settings.name == '/otp-verification') {
                 final args = settings.arguments as Map<String, dynamic>;

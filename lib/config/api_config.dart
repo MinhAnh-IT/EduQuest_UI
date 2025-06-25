@@ -3,24 +3,10 @@ import 'dart:io';
 class ApiConfig {
   static String get baseUrl {
     if (Platform.isAndroid) {
-<<<<<<< HEAD
-
-<<<<<<< HEAD
       return 'http://192.168.1.2:8080/api';
-=======
-<<<<<<< HEAD
-      return 'http://192.168.1.15:8080/api';
-=======
-      return 'http://localhost:8080/api';
->>>>>>> 09b553d (Integrate testing api into interface)
->>>>>>> 60392fb (Integrate testing api into interface)
-=======
-      return 'http://192.168.1.15:8080/api';
->>>>>>> 80fdf70 (feat(discussion): integrate WebSocket for create/list/comment/like)
     }
     return 'http://localhost:8080/api';
   }
-
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);

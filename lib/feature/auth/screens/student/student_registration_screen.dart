@@ -61,6 +61,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
             arguments: {
               'username': _usernameController.text,
               'registrationData': registrationData,
+              'autoSendOtp': false,
             }
           );
         } else if (mounted) {

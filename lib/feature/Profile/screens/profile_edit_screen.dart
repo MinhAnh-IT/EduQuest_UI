@@ -6,6 +6,8 @@ import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
 import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:edu_quest/shared/utils/validators.dart';
 
+import '../../../config/api_config.dart';
+
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({Key? key}) : super(key: key);
 
@@ -147,7 +149,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                                 ? Image.file(_selectedImage!, fit: BoxFit.cover)
                                 : profile.avatarUrl != null
                                 ? Image.network(
-                              'http://localhost:8080${profile.avatarUrl}',
+                              '${ApiConfig.baseUrl}${profile.avatarUrl}',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Container(
                                 color: Colors.grey[200],

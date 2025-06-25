@@ -341,6 +341,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       ),
                     ),
                   ),
+                // ... existing code ...
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -348,19 +349,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
+                            : (assignment.isExpired || assignment.isSubmitted)
                             ? () {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
                           );
                         }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài nên chưa thể thảo luận luận!')),
-                          );
-                        },
+                            : null,
                         icon: const Icon(Icons.comment),
                         label: const Text('Thảo luận'),
                         style: ElevatedButton.styleFrom(
@@ -374,19 +370,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
+                            : (assignment.isExpired || assignment.isSubmitted)
                             ? () {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
                           );
                         }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
-                          );
-                        },
+                            : null,
                         icon: const Icon(Icons.visibility),
                         label: const Text('Xem kết quả'),
                         style: ElevatedButton.styleFrom(
@@ -397,6 +388,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     ),
                   ],
                 ),
+// ... existing code ...
               ],
             ),
           ),

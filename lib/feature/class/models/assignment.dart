@@ -60,7 +60,7 @@ class Assignment {
   bool get isOverdue => DateTime.now().isAfter(endAt) && (status == null || status == 'pending');
 
   // Disable nút nếu chưa làm bài hoặc quá hạn
-  bool get isDisabled => isNotStarted || isExpired;
+  bool get isDisabled => isNotStarted && !isExpired;
 
   Color get statusColor {
     switch (status) {

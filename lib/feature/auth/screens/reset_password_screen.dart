@@ -6,13 +6,12 @@ import '../../../shared/widgets/custom_button.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
 
-
 class ResetPasswordScreen extends StatefulWidget {
   final String username;
   final String otp;
 
   const ResetPasswordScreen({
-    Key? key, 
+    Key? key,
     required this.username,
     required this.otp,
   }) : super(key: key);
@@ -34,7 +33,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
-  
+
   void _resetPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
@@ -42,25 +41,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         final success = await authProvider.resetPassword(
-              widget.username, 
-              _passwordController.text
-            );
+            widget.username, _passwordController.text);
 
         if (!mounted) return;
-        
+
         if (success) {
           _showSuccessDialog();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.error ?? 'Đặt lại mật khẩu thất bại'), 
+              content: Text(authProvider.error ?? 'Đặt lại mật khẩu thất bại'),
               backgroundColor: Colors.red,
             ),
           );
         }
       } catch (e) {
         if (!mounted) return;
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to reset password: ${e.toString()}'),
@@ -78,7 +75,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,      appBar: AppBar(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
         title: const Text(AppStrings.resetPasswordTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -91,7 +89,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [                const SizedBox(height: 20),
+              children: [
+                const SizedBox(height: 20),
                 _buildHeader(),
                 const SizedBox(height: 50),
                 CustomTextField(
@@ -110,7 +109,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       });
                     },
                   ),
-                  validator: Validators.validatePassword,                ),
+                  validator: Validators.validatePassword,
+                ),
                 const SizedBox(height: 20),
                 CustomTextField(
                   controller: _confirmPasswordController,
@@ -120,7 +120,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   obscureText: !_showConfirmPassword,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _showConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                      _showConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -128,7 +130,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       });
                     },
                   ),
-                  validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),                ),
+                  validator: (value) => Validators.validateConfirmPassword(
+                      value, _passwordController.text),
+                ),
                 const SizedBox(height: 20),
                 _buildPasswordRequirements(),
                 const SizedBox(height: 40),
@@ -145,7 +149,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildHeader() {    return Container(
+  Widget _buildHeader() {
+    return Container(
       alignment: Alignment.center,
       child: const Column(
         children: [
@@ -172,6 +177,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
     );
   }
+
   Widget _buildPasswordRequirements() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -207,6 +213,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
     );
   }
+
   Widget _buildRequirementItem(String text, bool isMet) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -232,7 +239,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void _showSuccessDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false,      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
         title: const Row(
           children: [
             Icon(
@@ -256,4 +264,3 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 }
-

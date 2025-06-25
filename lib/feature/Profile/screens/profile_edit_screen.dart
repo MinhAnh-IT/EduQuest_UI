@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
 import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:edu_quest/shared/utils/validators.dart';
+import 'package:edu_quest/shared/widgets/custom_app_bar.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final profile = context.read<ProfileProvider>().profile;
       if (profile != null) {
-        _emailController.text = profile.email ?? '';
+        _emailController.text = profile.email;
       }
     });
   }
@@ -98,14 +99,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Chỉnh sửa hồ sơ'),
+      appBar: CustomAppBar(
+        title: 'Chỉnh sửa hồ sơ',
         backgroundColor: AppTheme.primaryColor,
-        elevation: 0,
+        foregroundColor: Colors.white,
         actions: [
           TextButton(
             onPressed: _saveProfile,
-            child: const Text('', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text('Lưu', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

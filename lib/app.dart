@@ -110,9 +110,12 @@ class _AuthGateState extends State<AuthGate> {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<bool> checkLogin() async {
-    final refreshToken = await _secureStorage.read(key: 'refresh_token');
-    if (refreshToken == null) return false;
-    return true;
+    try {
+      final refreshToken = await _secureStorage.read(key: 'refresh_token');
+      return refreshToken != null && refreshToken.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
@@ -126,9 +129,29 @@ class _AuthGateState extends State<AuthGate> {
     return FutureBuilder<bool>(
       future: _isLoggedIn,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Colors.cyan),
+                  SizedBox(height: 16),
+                  Text('Đang kiểm tra trạng thái đăng nhập...'),
+                ],
+              ),
+            ),
+          );
         }
+        
+        if (snapshot.hasError) {
+          return const LoginScreen();
+        }
+        
+        if (!snapshot.hasData) {
+          return const LoginScreen();
+        }
+        
         if (snapshot.data == true) {
           return const HomeScreen();
         } else {

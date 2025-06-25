@@ -5,6 +5,7 @@ import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
 import 'package:edu_quest/feature/profile/screens/profile_screen.dart';
+import 'package:edu_quest/core/utils/auth_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -507,27 +508,53 @@ class _HomeTabState extends State<HomeTab> {
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
                       ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Không thể tải danh sách lớp học',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _errorMessage!,
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.grey[700]),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _fetchMyClasses,
-                                child: const Text('Thử lại'),
-                              ),
-                            ],
-                          ),
+                          child: _errorMessage!.contains('Authentication required')
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_outline,
+                                      size: 64,
+                                      color: Colors.red,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Phiên đăng nhập đã hết hạn',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Vui lòng đăng nhập lại để tiếp tục',
+                                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton(
+                                      onPressed: () => AuthUtils.clearTokensAndRedirectToLogin(context),
+                                      child: const Text('Đăng nhập lại'),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Không thể tải danh sách lớp học',
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.grey[700]),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ElevatedButton(
+                                      onPressed: _fetchMyClasses,
+                                      child: const Text('Thử lại'),
+                                    ),
+                                  ],
+                                ),
                         )
                       : _filteredClasses.isEmpty &&
                               _searchController.text.isNotEmpty

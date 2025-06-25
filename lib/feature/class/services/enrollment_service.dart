@@ -4,6 +4,7 @@ import '../../auth/models/api_response.dart';
 import '../../../config/api_config.dart';
 import '../../../core/enums/status_code.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/exceptions/auth_exception.dart';
 
 class EnrollmentService {
   Future<ApiResponse<Enrollment>> joinClass(String classCode) async {
@@ -84,6 +85,11 @@ class EnrollmentService {
           message: responseData['message'] ?? 'Đã xảy ra lỗi',
         );
       }
+    } on AuthException {
+      return ApiResponse<List<Enrollment>>(
+        status: StatusCode.badRequest,
+        message: 'Authentication required',
+      );
     } catch (e) {
       return ApiResponse<List<Enrollment>>(
         status: StatusCode.internalServerError,

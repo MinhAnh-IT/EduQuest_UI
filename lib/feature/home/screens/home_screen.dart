@@ -6,7 +6,6 @@ import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
 import 'package:edu_quest/feature/profile/screens/profile_screen.dart';
 
-// import 'package:edu_quest/shared/theme/bottom_nav_bar_screen.dart'; // XÓA DÒNG NÀY nếu không cần
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

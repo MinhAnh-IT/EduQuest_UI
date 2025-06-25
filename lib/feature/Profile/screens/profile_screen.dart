@@ -1,4 +1,3 @@
-// ... existing code ...
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
@@ -95,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ClipOval(
                       child: profile.avatarUrl != null
                           ? Image.network(
-                        'http://192.168.1.2:8080${profile.avatarUrl}',
+                        'http://localhost:8080${profile.avatarUrl}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],
@@ -146,7 +145,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Nút chỉnh sửa
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -283,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       final success = response['code'] == 200;
 
                       if (mounted) {
-                        navigator.pop(); // Close dialog
+                        navigator.pop(); 
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => const LoginScreen()),
                               (route) => false,
@@ -307,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     } catch (e) {
                       if (mounted) {
-                        navigator.pop(); // Close dialog
+                        navigator.pop(); 
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => const LoginScreen()),
                               (route) => false,

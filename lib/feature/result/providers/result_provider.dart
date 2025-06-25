@@ -18,10 +18,8 @@ class ResultProvider extends ChangeNotifier {
     } catch (e) {
       result = null;
 
-      // Gỡ bỏ "Exception: " tiền tố nếu có
       final errorMessage = e.toString().replaceFirst('Exception: ', '');
 
-      // Nếu thông điệp trùng với thông điệp trong StatusCode, ưu tiên dùng trực tiếp
       if (StatusCode.values.any((code) => code.message == errorMessage)) {
         error = errorMessage;
       } else {

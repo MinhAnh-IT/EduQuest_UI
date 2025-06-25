@@ -1,5 +1,8 @@
 import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
 import 'package:edu_quest/feature/Profile/screens/profile_screen.dart';
+import 'package:edu_quest/feature/discussion/providers/discussion_provider.dart';
+import 'package:edu_quest/feature/discussion/screens/discusion_list_screen.dart';
+import 'package:edu_quest/feature/discussion/services/discussion_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../feature/quiz/providers/quiz_provider.dart';
@@ -31,6 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider(prefs)),
         ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
+        ChangeNotifierProvider(create: (_) => DiscussionProvider(api: DiscussionApiService())),
         ChangeNotifierProvider(create: (_) => ResultProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => ClassProvider()),
@@ -62,7 +66,12 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const StudentRegistrationScreen(),
               '/student-details': (context) => const StudentDetailsScreen(),
-              '/quiz': (context) => const ExamScreen(),              
+              '/quiz': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+                return ExamScreen(exerciseId: args['exerciseId'] as int);
+              },
+              '/discussion': (context) =>
+                  const DiscussionListScreen(exerciseId: 101,), 
               '/result': (context) {
                 final args = ModalRoute.of(context)!.settings.arguments
                     as Map<String, dynamic>;
@@ -76,6 +85,13 @@ class MyApp extends StatelessWidget {
                   classId: args['classId'] as int,
                   className: args['className'] as String,
 
+                );
+              },
+              '/discussion-list': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+                return DiscussionListScreen(
+                  exerciseId: args['exerciseId'] as int,
                 );
               },
             },

@@ -343,7 +343,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
+                            : (assignment.isSubmitted || assignment.isExpired)
                                 ? () {
                                     Navigator.pushNamed(
                                         context, '/discussion-list',

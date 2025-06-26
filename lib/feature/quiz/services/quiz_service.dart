@@ -27,7 +27,9 @@ class QuizService {
       throw Exception(StatusCode.participationAlreadyExists.message);
     } else if (code == StatusCode.participationIsSubmitted.code){
       throw Exception(StatusCode.participationIsSubmitted.message);
-    }else {
+    } else if(code == StatusCode.exerciseNotAvailable.code){
+      throw Exception(StatusCode.exerciseNotAvailable.message);
+    } else{
       throw Exception(message.isNotEmpty ? message : "Có lỗi xảy ra");
     }
   }

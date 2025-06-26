@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:edu_quest/core/enums/convert_status.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -109,7 +110,7 @@ class _ResultScreenState extends State<ResultScreen> {
             style: const TextStyle(fontSize: 18),
           ),
           Text(
-            "Trạng thái: ${result.status}",
+            "Trạng thái: ${ConvertStatus.getMessage(result.status) ?? result.status}",
             style: const TextStyle(fontSize: 16),
           ),
           Text(

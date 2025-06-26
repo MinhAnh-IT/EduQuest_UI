@@ -1,4 +1,4 @@
-inimport 'dart:convert';
+import 'dart:convert';
 import '../../../../../config/api_config.dart';
 import '../../../../../core/network/api_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,24 +6,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthService {
   final FlutterSecureStorage _storage;
 
-  AuthService() : _storage = const FlutterSecureStorage();  
+  AuthService() : _storage = const FlutterSecureStorage();
   Future<Map<String, dynamic>> requestPasswordReset(String username) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.forgotPassword}';
-    final response = await ApiClient.post(url, {
-      'username': username.trim()
-    });
+    final response = await ApiClient.post(url, {'username': username.trim()});
     return jsonDecode(response.body);
   }
-  
-  Future<Map<String, dynamic>> resetPassword(String username, String newPassword) async {
+
+  Future<Map<String, dynamic>> resetPassword(
+      String username, String newPassword) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.resetPassword}';
-    final response = await ApiClient.post(url, {
-      'username': username.trim(),
-      'newPassword': newPassword
-    });
+    final response = await ApiClient.post(
+        url, {'username': username.trim(), 'newPassword': newPassword});
     return jsonDecode(response.body);
   }
-  
+
   // Logout
   Future<Map<String, dynamic>> logout() async {
     try {
@@ -38,51 +35,43 @@ class AuthService {
           'data': null
         };
       }
-      
+
       final url = '${ApiConfig.baseUrl}${ApiConfig.logout}';
-      final response = await ApiClient.post(url, {
-        'refreshToken': refreshToken
-      }, auth: true);
-      
+      final response =
+          await ApiClient.post(url, {'refreshToken': refreshToken}, auth: true);
+
       // Clear stored tokens after logout attempt (regardless of response)
       await _storage.delete(key: 'access_token');
       await _storage.delete(key: 'refresh_token');
       ApiClient.token = null;
-      
+
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
         // Even if server logout fails, we've cleared local tokens
-        return {
-          'code': 200,
-          'message': 'Logged out locally',
-          'data': null
-        };
+        return {'code': 200, 'message': 'Logged out locally', 'data': null};
       }
     } catch (e) {
       // Clear tokens even if there's an error
       await _storage.delete(key: 'access_token');
       await _storage.delete(key: 'refresh_token');
       ApiClient.token = null;
-      
-      return {
-        'code': 200,
-        'message': 'Logged out locally',
-        'data': null
-      };
+
+      return {'code': 200, 'message': 'Logged out locally', 'data': null};
     }
   }
+
   // Verify OTP for forgot password
-  Future<Map<String, dynamic>> verifyOTPForgotPassword(String username, String otp) async {
+  Future<Map<String, dynamic>> verifyOTPForgotPassword(
+      String username, String otp) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtpForgotPassword}';
-    final response = await ApiClient.post(url, {
-      'username': username.trim(),
-      'otp': otp.trim()
-    });
+    final response = await ApiClient.post(
+        url, {'username': username.trim(), 'otp': otp.trim()});
     return jsonDecode(response.body);
   }
 
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.login}';
     final response = await ApiClient.post(url, {
       'username': username,
@@ -92,20 +81,22 @@ class AuthService {
     return jsonDecode(response.body);
   }
 
-  static Future<Map<String, dynamic>> register(Map<String, dynamic> payload) async {
+  static Future<Map<String, dynamic>> register(
+      Map<String, dynamic> payload) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.register}';
     final response = await ApiClient.post(url, payload);
     return jsonDecode(response.body);
   }
 
-  static Future<Map<String, dynamic>> verifyOtp(String username, String otp) async {
+  static Future<Map<String, dynamic>> verifyOtp(
+      String username, String otp) async {
     final url = '${ApiConfig.baseUrl}${ApiConfig.verifyOtp}';
 
     print('Request URL: $url');
     print('Request body: ${jsonEncode({
-      'username': username,
-      'otp': otp,
-    })}');
+          'username': username,
+          'otp': otp,
+        })}');
 
     final response = await ApiClient.post(url, {
       'username': username,
@@ -125,8 +116,10 @@ class AuthService {
     }
   }
 
-  static Future<Map<String, dynamic>> updateStudentDetails(int userId, Map<String, dynamic> details) async {
-    final url = '${ApiConfig.baseUrl}${ApiConfig.updateStudentDetails.replaceAll('{userId}', userId.toString())}';
+  static Future<Map<String, dynamic>> updateStudentDetails(
+      int userId, Map<String, dynamic> details) async {
+    final url =
+        '${ApiConfig.baseUrl}${ApiConfig.updateStudentDetails.replaceAll('{userId}', userId.toString())}';
 
     print('Request URL: $url');
     print('Request body: ${jsonEncode(details)}');
@@ -154,7 +147,8 @@ class AuthService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to resend OTP: ${response.statusCode} - ${response.body}');
+      throw Exception(
+          'Failed to resend OTP: ${response.statusCode} - ${response.body}');
     }
   }
 }

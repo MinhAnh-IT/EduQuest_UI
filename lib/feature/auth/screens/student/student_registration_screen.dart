@@ -264,7 +264,6 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     );
   }
 
-// Hàm build input field với label cố định, icon đổi màu khi focus
   Widget _buildInputField({
     required TextEditingController controller,
     required String label,

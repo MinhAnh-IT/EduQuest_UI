@@ -29,7 +29,7 @@ class ProfileModel {
       name: json['name'],
       role: UserRole.values.firstWhere(
             (role) => role.toString().split('.').last.toUpperCase() == (json['role']?.toString().toUpperCase() ?? ''),
-        orElse: () => UserRole.STUDENT, // hoặc UserRole.INSTRUCTOR nếu bạn muốn mặc định là giảng viên
+        orElse: () => UserRole.STUDENT,
       ),
       studentCode: json['studentCode'],
     );

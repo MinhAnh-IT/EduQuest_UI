@@ -101,14 +101,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: Colors.red, // <-- ĐẶT MÀU NỀN SNACKBAR LÀ MÀU ĐỎ
+          backgroundColor: Colors.red,
           content: Text(
-            'Lỗi: ${e.toString().replaceAll('Exception: ', '')}. Vui lòng thử lại sau!', // Thêm replaceAll để làm sạch thông báo lỗi Exception:
-            style: const TextStyle(color: Colors.white), // <-- ĐẶT MÀU CHỮ LÀ MÀU TRẮNG
+            'Lỗi: ${e.toString().replaceAll('Exception: ', '')}. Vui lòng thử lại sau!',
+            style: const TextStyle(color: Colors.white),
           ),
         ),
       );
-      print('Error during OTP verification: $e'); // Log lỗi để debug
     }
   }
 
@@ -118,7 +117,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     });
     try {
       final authProvider = context.read<AuthProvider>();
-      await authProvider.resendOTP(widget.username);  // Dùng username để resend
+      await authProvider.resendOTP(widget.username);
     } finally {
       setState(() {
         _isResending = false;

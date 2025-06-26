@@ -173,7 +173,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
                               fontSize: 12,
                             ),
                           ),
-                          keyboardType: TextInputType.number, // Chỉ hiện bàn phím số
+                          keyboardType: TextInputType.number,
                           validator: (value) => Validators.validateStudentCode(value),
                         ),
                         const SizedBox(height: 24),

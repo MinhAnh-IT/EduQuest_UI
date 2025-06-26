@@ -1,3 +1,4 @@
+import 'package:edu_quest/feature/quiz/screens/exam_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/assignment.dart';
@@ -47,7 +48,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  Widget _buildAssignmentsList(BuildContext context, List<Assignment> assignments) {
+  Widget _buildAssignmentsList(
+      BuildContext context, List<Assignment> assignments) {
     if (assignments.isEmpty) {
       return Center(
         child: Column(
@@ -139,6 +141,24 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
               Row(
                 children: [
                   Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Colors.orange[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Ngày bắt đầu: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.startAt)}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.orange[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(
                     Icons.schedule,
                     size: 16,
                     color: assignment.isOverdue ? Colors.red : Colors.grey[600],
@@ -148,8 +168,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.endAt)}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: assignment.isOverdue ? Colors.red : Colors.grey[600],
-                      fontWeight: assignment.isOverdue ? FontWeight.w500 : FontWeight.normal,
+                      color:
+                          assignment.isOverdue ? Colors.red : Colors.grey[600],
+                      fontWeight: assignment.isOverdue
+                          ? FontWeight.w500
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -172,6 +195,24 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   ),
                 ],
               ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.timer,
+                    size: 16,
+                    color: Colors.purple[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Thời gian: ${assignment.durationMinutes} phút',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.purple[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -179,7 +220,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  void _showAssignmentDetail(BuildContext context, Assignment assignment) async {
+  void _showAssignmentDetail(
+      BuildContext context, Assignment assignment) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -247,156 +289,204 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Text(
-                //   assignment.description,
-                //   style: const TextStyle(fontSize: 14),
-                // ),
-                const SizedBox(height: 24),
 
-                // Due Date
                 Container(
                   padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: assignment.isOverdue
-                        // ignore: deprecated_member_use
-                        ? Colors.red.withOpacity(0.1)
-                        // ignore: deprecated_member_use
-                        : Colors.blue.withOpacity(0.1),
+                    color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: assignment.isOverdue
-                        // ignore: deprecated_member_use
-                          ? Colors.red.withOpacity(0.3)
-                          // ignore: deprecated_member_use
-                          : Colors.blue.withOpacity(0.3),
+                      color: Colors.grey[300]!,
                     ),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.schedule,
-                        color: assignment.isOverdue ? Colors.red : Colors.blue,
+                      // Ngày bắt đầu
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today, color: Colors.orange, size: 18),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Ngày bắt đầu: ',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            DateFormat('dd/MM/yyyy - HH:mm').format(assignment.startAt),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hạn nộp bài',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
+                      const SizedBox(height: 8),
+                      // Hạn nộp bài
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            color: assignment.isOverdue ? Colors.red : Colors.blue,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Hạn nộp: ',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            DateFormat('dd/MM/yyyy - HH:mm').format(assignment.endAt),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: assignment.isOverdue ? Colors.red : Colors.blue,
                             ),
-                            Text(
-                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.endAt),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: assignment.isOverdue ? Colors.red : Colors.blue,
-                              ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Thời gian làm bài
+                      Row(
+                        children: [
+                          const Icon(Icons.timer, color: Colors.purple, size: 18),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Thời gian làm bài: ',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            '${assignment.durationMinutes} phút',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.purple,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Số câu hỏi
+                      Row(
+                        children: [
+                          const Icon(Icons.help_outline, color: Colors.cyan, size: 18),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Số câu hỏi: ',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                          Text(
+                            '${assignment.questionCount}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.cyan,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Action Buttons
-                if (!assignment.isSubmitted && !assignment.isExpired)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Placeholder(), 
-                          ),
-                        );
-                        if (result == true) {
-                          // ignore: use_build_context_synchronously
-                          Provider.of<ExerciseProvider>(context, listen: false)
-                              .fetchAssignments(assignment.classId);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.cyan,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Bắt đầu làm',
+                if (assignment.isNotStartedYet)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Text(
+                        'Chưa tới ngày kiểm tra',
                         style: TextStyle(
+                          color: Colors.yellow[800],
+                          fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: assignment.isDisabled
-                            ? null
-                            : assignment.isSubmitted
-                            ? () {
+                if (!assignment.isNotStartedYet) ...[
+                  if (!assignment.isSubmitted && !assignment.isExpired)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang bình luận')),
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExamScreen(exerciseId: assignment.id),
+                            ),
                           );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài nên chưa thể thảo luận luận!')),
-                          );
+                          if (result == true) {
+                            Provider.of<ExerciseProvider>(context, listen: false)
+                                .fetchAssignments(assignment.classId);
+                          }
                         },
-                        icon: const Icon(Icons.comment),
-                        label: const Text('Thảo luận'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Colors.cyan,
                           foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Bắt đầu làm',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: assignment.isDisabled
-                            ? null
-                            : assignment.isSubmitted
-                            ? () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang kết quả')),
-                          );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
-                          );
-                        },
-                        icon: const Icon(Icons.visibility),
-                        label: const Text('Xem kết quả'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: assignment.isDisabled
+                              ? null
+                              : (assignment.isSubmitted || assignment.isExpired)
+                              ? () {
+                            Navigator.pushNamed(
+                                context, '/discussion-list',
+                                arguments: {
+                                  'exerciseId': assignment.id,
+                                });
+                          }
+                              : null,
+                          icon: const Icon(Icons.comment),
+                          label: const Text('Thảo luận'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: assignment.isDisabled
+                              ? null
+                              : (assignment.isSubmitted || assignment.isExpired)
+                              ? () {
+                            Navigator.pushNamed(context, '/result',
+                                arguments: {
+                                  'exerciseId': assignment.id,
+                                });
+                          }
+                              : null,
+                          icon: const Icon(Icons.visibility),
+                          label: const Text('Xem kết quả'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

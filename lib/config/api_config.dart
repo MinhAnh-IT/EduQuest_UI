@@ -7,6 +7,7 @@ class ApiConfig {
     }
     return 'http://localhost:8080/api';
   }
+
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
@@ -20,13 +21,14 @@ class ApiConfig {
   static const String updateProfile = '/update/profile';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resetPassword = '/auth/reset-password';
-  static const String verifyOtpForgotPassword = '/auth/verify-otp-forgot-password';
+  static const String verifyOtpForgotPassword =
+      '/auth/verify-otp-forgot-password';
   static const String logout = '/auth/logout';
   static const String joinClass = '/enrollments/join';
   static const String leaveClass = '/enrollments/leave';
   static const String myClasses = '/enrollments/my-classes';
   static const String myEnrolledClasses = '/enrollments/my-enrolled-classes';
-  
+
   // Exercise
   static const String startExam = '/participations/exercises';
   static const String submissionExam = '/participations/exercises/submit';
@@ -36,10 +38,9 @@ class ApiConfig {
 
   // Discussion
   static const String getDiscussionsByExerciseId = '/discussions/exercises';
-  
+
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
-
 }

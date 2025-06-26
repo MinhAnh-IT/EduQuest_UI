@@ -1,3 +1,4 @@
+import 'package:edu_quest/feature/quiz/screens/exam_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/assignment.dart';
@@ -22,7 +23,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   @override
   void initState() {
     super.initState();
-    // Lấy danh sách bài tập khi vào màn hình
     Future.microtask(() {
       Provider.of<ExerciseProvider>(context, listen: false)
           .fetchAssignments(widget.classId);
@@ -33,13 +33,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Danh sách bài kiểm tra'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -54,7 +47,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  Widget _buildAssignmentsList(BuildContext context, List<Assignment> assignments) {
+  Widget _buildAssignmentsList(
+      BuildContext context, List<Assignment> assignments) {
     if (assignments.isEmpty) {
       return Center(
         child: Column(
@@ -153,8 +147,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     'Hạn nộp: ${DateFormat('dd/MM/yyyy HH:mm').format(assignment.endAt)}',
                     style: TextStyle(
                       fontSize: 12,
-                      color: assignment.isOverdue ? Colors.red : Colors.grey[600],
-                      fontWeight: assignment.isOverdue ? FontWeight.w500 : FontWeight.normal,
+                      color:
+                          assignment.isOverdue ? Colors.red : Colors.grey[600],
+                      fontWeight: assignment.isOverdue
+                          ? FontWeight.w500
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -184,7 +181,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  void _showAssignmentDetail(BuildContext context, Assignment assignment) async {
+  void _showAssignmentDetail(
+      BuildContext context, Assignment assignment) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -250,13 +248,9 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Text(
-                //   assignment.description,
-                //   style: const TextStyle(fontSize: 14),
-                // ),
+
                 const SizedBox(height: 24),
 
-                // Due Date
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -289,11 +283,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                               ),
                             ),
                             Text(
-                              DateFormat('dd/MM/yyyy - HH:mm').format(assignment.endAt),
+                              DateFormat('dd/MM/yyyy - HH:mm')
+                                  .format(assignment.endAt),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: assignment.isOverdue ? Colors.red : Colors.blue,
+                                color: assignment.isOverdue
+                                    ? Colors.red
+                                    : Colors.blue,
                               ),
                             ),
                           ],
@@ -311,15 +308,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        // TODO: Thay ExamScreen bằng màn hình làm bài thực tế của bạn
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Placeholder(), // ExamScreen(assignment: assignment)
+                            builder: (context) =>
+                                ExamScreen(exerciseId: assignment.id),
                           ),
                         );
                         if (result == true) {
-                          // Reload lại danh sách khi nộp bài thành công
                           Provider.of<ExerciseProvider>(context, listen: false)
                               .fetchAssignments(assignment.classId);
                         }
@@ -348,19 +344,15 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
-                            ? () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
-                          );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài nên chưa thể thảo luận luận!')),
-                          );
-                        },
+                            : (assignment.isSubmitted || assignment.isExpired)
+                                ? () {
+                                    Navigator.pushNamed(
+                                        context, '/discussion-list',
+                                        arguments: {
+                                          'exerciseId': assignment.id,
+                                        });
+                                  }
+                                : null,
                         icon: const Icon(Icons.comment),
                         label: const Text('Thảo luận'),
                         style: ElevatedButton.styleFrom(
@@ -374,19 +366,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       child: ElevatedButton.icon(
                         onPressed: assignment.isDisabled
                             ? null
-                            : assignment.isSubmitted
-                            ? () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
-                          );
-                        }
-                            : () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn chưa làm bài kiểm tra nên không thể xem kết quả!')),
-                          );
-                        },
+                            : (assignment.isSubmitted || assignment.isExpired)
+                                ? () {
+                                    Navigator.pushNamed(context, '/result',
+                                        arguments: {
+                                          'exerciseId': assignment.id,
+                                        });
+                                  }
+                                : null,
                         icon: const Icon(Icons.visibility),
                         label: const Text('Xem kết quả'),
                         style: ElevatedButton.styleFrom(

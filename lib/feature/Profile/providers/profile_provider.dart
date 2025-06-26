@@ -21,7 +21,6 @@ class ProfileProvider extends ChangeNotifier {
       _profile = await ProfileService.getCurrentUser();
     } on AuthException {
       _error = 'Authentication required';
-      // Có thể thêm logic để clear tokens và redirect về login
     } catch (e) {
       String errorMessage = e.toString();
       if (errorMessage.contains('Exception:')) {

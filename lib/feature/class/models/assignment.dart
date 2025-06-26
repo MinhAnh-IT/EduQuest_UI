@@ -7,7 +7,7 @@ class Assignment {
   final DateTime startAt;
   final DateTime endAt;
   final int durationMinutes;
-  final String? status; // "IN_PROGRESS", "SUBMITTED", "EXPIRED", hoặc null
+  final String? status;
   final int questionCount;
 
   Assignment({
@@ -47,20 +47,17 @@ class Assignment {
     };
   }
 
-  // Đã nộp bài
   bool get isSubmitted => status == 'SUBMITTED';
 
-  // Chưa làm bài (status null, 'NOT_STARTED', hoặc 'pending')
   bool get isNotStarted => status == null || status == 'NOT_STARTED' || status == 'pending';
 
-  // Quá hạn (status là 'EXPIRED' hoặc đã quá hạn thực tế)
   bool get isExpired => status == 'EXPIRED' || isOverdue;
 
-  // Đã quá hạn thực tế (so sánh thời gian hiện tại với endAt)
   bool get isOverdue => DateTime.now().isAfter(endAt) && (status == null || status == 'pending');
 
-  // Disable nút nếu chưa làm bài hoặc quá hạn
   bool get isDisabled => isNotStarted && !isExpired;
+
+  bool get isNotStartedYet => DateTime.now().isBefore(startAt);
 
   Color get statusColor {
     switch (status) { 

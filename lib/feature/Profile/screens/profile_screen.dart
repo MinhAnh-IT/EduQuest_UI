@@ -28,10 +28,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context.read<ProfileProvider>().loadProfile();
     });
   }
-
-  // ... existing import ...
-// ... existing class ProfileScreen ...
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

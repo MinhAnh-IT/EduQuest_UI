@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../providers/result_provider.dart';
 import '../../../shared/widgets/result_question_widget.dart';
 import '../../../shared/widgets/exam_app_bar.dart';
+//import convert_status.dart';
+import '../../../core/enums/convert_status.dart';
 
 class ResultScreen extends StatefulWidget {
   final int exerciseId;
@@ -81,7 +83,6 @@ class _ResultScreenState extends State<ResultScreen> {
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
 
     final result = provider.result;
     if (result == null || result.questions.isEmpty) {
@@ -169,9 +170,8 @@ class _ResultScreenState extends State<ResultScreen> {
         return Scaffold(
           appBar: ExamAppBar(
             title: "Kết quả bài làm",
-          showSubmitButton: false,
+            showSubmitButton: false,
           ),
-
           body: _buildBody(context, provider),
         );
       },

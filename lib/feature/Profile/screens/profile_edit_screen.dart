@@ -148,9 +148,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           child: ClipOval(
                             child: _selectedImage != null
                                 ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                                : profile.avatarUrl != null
+                                : (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
                                 ? Image.network(
-                              '${ApiConfig.baseUrl}${profile.avatarUrl}',
+                              profile.avatarUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => Container(
                                 color: Colors.grey[200],

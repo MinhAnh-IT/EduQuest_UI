@@ -20,14 +20,14 @@ class ProfileProvider extends ChangeNotifier {
     try {
       _profile = await ProfileService.getCurrentUser();
     } on AuthException {
-      _error = 'Authentication required';
+      _error = 'Yêu cầu xác thực';
       // Có thể thêm logic để clear tokens và redirect về login
     } catch (e) {
       String errorMessage = e.toString();
       if (errorMessage.contains('Exception:')) {
         _error = errorMessage.replaceFirst('Exception: ', '');
       } else {
-        _error = 'An unexpected error occurred';
+        _error = 'Đã xảy ra lỗi không mong muốn';
       }
     } finally {
       _isLoading = false;
@@ -42,8 +42,16 @@ class ProfileProvider extends ChangeNotifier {
     try {
       _profile = await ProfileService.updateProfile(email, avatarFile);
       return true;
+    } on AuthException {
+      _error = 'Yêu cầu xác thực';
+      return false;
     } catch (e) {
-      _error = e.toString();
+      String errorMessage = e.toString();
+      if (errorMessage.contains('Exception:')) {
+        _error = errorMessage.replaceFirst('Exception: ', '');
+      } else {
+        _error = 'Đã xảy ra lỗi không mong muốn';
+      }
       return false;
     } finally {
       _isLoading = false;

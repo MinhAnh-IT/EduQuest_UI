@@ -27,6 +27,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
+
   @override
   void dispose() {
     _passwordController.dispose();
@@ -60,7 +61,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to reset password: ${e.toString()}'),
+            content: Text('Không thể đặt lại mật khẩu: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -133,8 +134,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   validator: (value) => Validators.validateConfirmPassword(
                       value, _passwordController.text),
                 ),
-                const SizedBox(height: 20),
-                _buildPasswordRequirements(),
                 const SizedBox(height: 40),
                 CustomButton(
                   onPressed: _resetPassword,
@@ -178,64 +177,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildPasswordRequirements() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[100]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            AppStrings.passwordRequirements,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.text,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildRequirementItem(
-            'At least 8 characters',
-            _passwordController.text.length >= 8,
-          ),
-          _buildRequirementItem(
-            'Contains uppercase letter',
-            _passwordController.text.contains(RegExp(r'[A-Z]')),
-          ),
-          _buildRequirementItem(
-            'Contains number',
-            _passwordController.text.contains(RegExp(r'[0-9]')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRequirementItem(String text, bool isMet) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(
-            isMet ? Icons.check_circle : Icons.check_circle_outline,
-            color: isMet ? AppColors.success : Colors.grey[400],
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: TextStyle(
-              color: isMet ? AppColors.text : Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -248,16 +189,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               color: AppColors.success,
             ),
             SizedBox(width: 8),
-            Text('Success'),
+            Text('Thành công'),
           ],
         ),
-        content: const Text('Your password has been reset successfully.'),
+        content: const Text('Mật khẩu của bạn đã được đặt lại thành công.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.popUntil(context, (route) => route.isFirst);
             },
-            child: const Text('Back to Login'),
+            child: const Text('Quay lại đăng nhập'),
           ),
         ],
       ),

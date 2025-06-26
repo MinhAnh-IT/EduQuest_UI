@@ -255,12 +255,14 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 4),                  Text(
+                  const SizedBox(height: 4),                  
+                  Text(
                     classDetail.instructorEmail,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
-                    ),                  ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -290,9 +292,11 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                         ),
                       ),
                     ],
-                  ),                  const SizedBox(height: 16),
+                  ),                  
+                  const SizedBox(height: 16),
                   Row(
-                    children: [                      Expanded(
+                    children: [
+                      Expanded(
                         child: _buildQuickStatCard(
                           'Tổng bài tập',
                           _getAssignmentStats(classProvider)['total'].toString(),

@@ -167,7 +167,6 @@ class AuthProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       final response = await AuthService.verifyOtp(username, otp);
-      print('Verify OTP response: $response');
 
       if (response['code'] == 200) {
         _setLoading(false);
@@ -182,7 +181,6 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      print('Error in verifyOTP: $e');
       String errorMessage = e.toString().replaceAll('Exception: ', '');
       if (errorMessage.contains('Invalid or expired OTP')) {
         errorMessage = 'Mã OTP không hợp lệ hoặc đã hết hạn';

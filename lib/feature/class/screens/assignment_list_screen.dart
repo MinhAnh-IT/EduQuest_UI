@@ -22,8 +22,8 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   @override
   void initState() {
     super.initState();
-    // Lấy danh sách bài tập khi vào màn hình
     Future.microtask(() {
+      // ignore: use_build_context_synchronously
       Provider.of<ExerciseProvider>(context, listen: false)
           .fetchAssignments(widget.classId);
     });
@@ -33,13 +33,6 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('Danh sách bài kiểm tra'),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -122,9 +115,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
                       color: assignment.statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
+                        // ignore: deprecated_member_use
                         color: assignment.statusColor.withOpacity(0.3),
                       ),
                     ),
@@ -221,9 +216,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
+                        // ignore: deprecated_member_use
                         color: assignment.statusColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
+                          // ignore: deprecated_member_use
                           color: assignment.statusColor.withOpacity(0.3),
                         ),
                       ),
@@ -261,12 +258,16 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: assignment.isOverdue
+                        // ignore: deprecated_member_use
                         ? Colors.red.withOpacity(0.1)
+                        // ignore: deprecated_member_use
                         : Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: assignment.isOverdue
+                        // ignore: deprecated_member_use
                           ? Colors.red.withOpacity(0.3)
+                          // ignore: deprecated_member_use
                           : Colors.blue.withOpacity(0.3),
                     ),
                   ),
@@ -311,15 +312,14 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        // TODO: Thay ExamScreen bằng màn hình làm bài thực tế của bạn
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Placeholder(), // ExamScreen(assignment: assignment)
+                            builder: (context) => const Placeholder(), 
                           ),
                         );
                         if (result == true) {
-                          // Reload lại danh sách khi nộp bài thành công
+                          // ignore: use_build_context_synchronously
                           Provider.of<ExerciseProvider>(context, listen: false)
                               .fetchAssignments(assignment.classId);
                         }
@@ -352,7 +352,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                             ? () {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang bình luận (chưa code)')),
+                            const SnackBar(content: Text('Đi tới trang bình luận')),
                           );
                         }
                             : () {
@@ -378,7 +378,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                             ? () {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đi tới trang kết quả (chưa code)')),
+                            const SnackBar(content: Text('Đi tới trang kết quả')),
                           );
                         }
                             : () {

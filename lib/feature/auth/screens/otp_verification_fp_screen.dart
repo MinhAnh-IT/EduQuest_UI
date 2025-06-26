@@ -14,15 +14,38 @@ class OTPVerificationFPScreen extends StatefulWidget {
 
 class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _otpController = TextEditingController();
+  final List<TextEditingController> _otpControllers = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   bool _isLoading = false;
+
+  @override
+  void dispose() {
+    for (var controller in _otpControllers) {
+      controller.dispose();
+    }
+    for (var focusNode in _focusNodes) {
+      focusNode.dispose();
+    }
+    super.dispose();
+  }
+
+  String get _otpCode {
+    return _otpControllers.map((controller) => controller.text).join();
+  }
+
   void _verifyOTPForgotPassword() async {
+    // Check if all 6 digits are filled
+    if (_otpCode.length != 6) {
+      _showError('Vui lòng nhập đầy đủ 6 số OTP');
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final success = await authProvider.verifyOTPForgotPassword(widget.username, _otpController.text.trim());
+        final success = await authProvider.verifyOTPForgotPassword(widget.username, _otpCode.trim());
 
         if (!mounted) return;
 
@@ -32,7 +55,7 @@ class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
             MaterialPageRoute(
               builder: (_) => ResetPasswordScreen(
                 username: widget.username,
-                otp: _otpController.text.trim(),
+                otp: _otpCode.trim(),
               ),
             ),
           );
@@ -70,12 +93,47 @@ class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _otpController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'OTP'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Vui lòng nhập OTP' : null,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(6, (index) {
+                  return SizedBox(
+                    width: 45,
+                    height: 55,
+                    child: TextFormField(
+                      controller: _otpControllers[index],
+                      focusNode: _focusNodes[index],
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      maxLength: 1,
+                      decoration: InputDecoration(
+                        counterText: '',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          // Move to next field
+                          if (index < 5) {
+                            _focusNodes[index + 1].requestFocus();
+                          } else {
+                            // Last field, remove focus
+                            _focusNodes[index].unfocus();
+                          }
+                        } else if (value.isEmpty && index > 0) {
+                          // Move to previous field when backspace
+                          _focusNodes[index - 1].requestFocus();
+                        }
+                      },
+                      validator: (value) =>
+                          value == null || value.isEmpty ? '' : null,
+                    ),
+                  );
+                }),
               ),
               const SizedBox(height: 24),
               ElevatedButton(

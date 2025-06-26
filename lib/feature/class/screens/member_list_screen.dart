@@ -23,6 +23,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
     super.initState();
     // Load students when entering the screen
     Future.microtask(() {
+      // ignore: use_build_context_synchronously
       Provider.of<ClassProvider>(context, listen: false)
           .loadStudents(widget.classId);
     });

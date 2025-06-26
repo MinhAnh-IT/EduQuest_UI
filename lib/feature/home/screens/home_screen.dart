@@ -111,8 +111,8 @@ class _HomeTabState extends State<HomeTab> {
         const SnackBar(
           content: Text(
               'Lớp học này đang chờ giáo viên phê duyệt. Bạn chưa thể truy cập chi tiết lớp.'),
-          backgroundColor: Colors.orange,
-          duration: Duration(seconds: 3),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
         ),
       );
     } else {
@@ -303,7 +303,7 @@ class _HomeTabState extends State<HomeTab> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Vui lòng nhập mã lớp'),
-                                backgroundColor: Colors.orange,
+                                backgroundColor: Colors.redAccent,
                               ),
                             );
                             return;
@@ -370,7 +370,7 @@ class _HomeTabState extends State<HomeTab> {
                                   SnackBar(
                                     content: Text(errorMessage),
                                     backgroundColor: Colors.red,
-                                    duration: const Duration(seconds: 4),
+                                    duration: const Duration(seconds: 2),
                                   ),
                                 );
                               }
@@ -384,7 +384,7 @@ class _HomeTabState extends State<HomeTab> {
                                   content: Text(
                                       'Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.'),
                                   backgroundColor: Colors.red,
-                                  duration: Duration(seconds: 4),
+                                  duration: Duration(seconds: 2),
                                 ),
                               );
                             }
@@ -508,7 +508,7 @@ class _HomeTabState extends State<HomeTab> {
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
                       ? Center(
-                          child: _errorMessage!.contains('Authentication required')
+                          child: _errorMessage!.contains('Yêu cầu đăng nhập')
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [

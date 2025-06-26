@@ -1,3 +1,4 @@
+// ignore: constant_identifier_names
 enum UserRole { INSTRUCTOR, STUDENT }
 
 class User {
@@ -10,7 +11,9 @@ class User {
   final String? avatarUrl;
   final DateTime? lastLoginAt;
   final DateTime createdAt;
-  final DateTime updatedAt;  bool get isStudent => role == UserRole.STUDENT;
+  final DateTime updatedAt;
+
+  bool get isStudent => role == UserRole.STUDENT;
   bool get isInstructor => role == UserRole.INSTRUCTOR;
 
   User({

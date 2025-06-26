@@ -46,7 +46,7 @@ class _StudentDetailsScreenState extends State<StudentDetailsScreen> {
         final studentDetails = {
           'studentCode': _studentCodeController.text,
         };
-
+        // ignore: use_build_context_synchronously
         final authProvider = context.read<AuthProvider>();
         authProvider.clearError();
         final success = await authProvider.updateStudentDetails(userId, studentDetails);

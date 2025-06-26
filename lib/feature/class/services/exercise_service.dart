@@ -12,7 +12,7 @@ class ExerciseService {
       final List<dynamic> exercises = data['data'];
       return exercises.map((e) => Assignment.fromJson(e)).toList();
     } else {
-      throw Exception('Failed to load exercises');
+      throw Exception('Không thể tải danh sách bài tập');
     }
   }
 }

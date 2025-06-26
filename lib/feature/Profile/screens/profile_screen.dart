@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
           if (profileProvider.error != null) {
             // Check if it's an authentication error
-            if (profileProvider.error == 'Authentication required') {
+            if (profileProvider.error == 'Yêu cầu xác thực') {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -317,8 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
                     try {
-                      final response = await _authService.logout();
-                      final success = response['code'] == 200;
+                      await _authService.logout();
 
                       if (mounted) {
                         navigator.pop(); 
@@ -327,21 +326,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               (route) => false,
                         );
 
-                        if (success) {
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Đăng xuất thành công'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        } else {
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(
-                              content: Text('Đã đăng xuất khỏi ứng dụng'),
-                              backgroundColor: Colors.orange,
-                            ),
-                          );
-                        }
+                        scaffoldMessenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('Đăng xuất thành công'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       }
                     } catch (e) {
                       if (mounted) {

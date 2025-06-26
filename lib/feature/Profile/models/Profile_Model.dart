@@ -19,7 +19,6 @@ class ProfileModel {
     this.studentCode,
   });
 
-
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
       id: json['id'],
@@ -43,7 +42,6 @@ class ProfileModel {
     };
   }
 
-  // Method tạo JSON đầy đủ
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -55,7 +53,6 @@ class ProfileModel {
       'studentCode': studentCode,
     };
   }
-
 
   ProfileModel copyWith({
     int? id,
@@ -76,7 +73,6 @@ class ProfileModel {
       studentCode: studentCode ?? this.studentCode,
     );
   }
-
 
   factory ProfileModel.fromUser(User user, {String? studentCode}) {
     return ProfileModel(

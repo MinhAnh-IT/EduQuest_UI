@@ -53,7 +53,7 @@ class ClassService {
       } else {
         return ApiResponse<ClassDetail>(
           status: StatusCode.internalServerError,
-          message: message.isNotEmpty ? message : 'Failed to retrieve class detail',
+          message: message.isNotEmpty ? message : 'Không thể lấy thông tin chi tiết lớp học',
         );
       }
     } catch (e) {
@@ -113,7 +113,7 @@ class ClassService {
       } else {
         return ApiResponse<List<Student>>(
           status: StatusCode.internalServerError,
-          message: message.isNotEmpty ? message : 'Failed to retrieve students list',
+          message: message.isNotEmpty ? message : 'Không thể lấy danh sách học sinh',
         );
       }
     } catch (e) {

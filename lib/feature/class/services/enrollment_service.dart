@@ -3,6 +3,7 @@ import '../models/enrollment.dart';
 import '../../auth/models/api_response.dart';
 import '../../../config/api_config.dart';
 import '../../../core/enums/status_code.dart';
+import '../../../core/enums/convert_status.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/exceptions/auth_exception.dart';
 
@@ -32,15 +33,17 @@ class EnrollmentService {
         }
       } else {
         final responseData = json.decode(response.body);
+        final rawMessage = responseData['message'] ?? 'Đã xảy ra lỗi';
+        final translatedMessage = ConvertStatus.translateErrorMessage(rawMessage);
         return ApiResponse<Enrollment>(
           status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
-          message: responseData['message'] ?? 'Đã xảy ra lỗi',
+          message: translatedMessage,
         );
       }
     } catch (e) {
       return ApiResponse<Enrollment>(
         status: StatusCode.internalServerError,
-        message: 'Đã xảy ra lỗi không mong muốn: $e',
+        message: 'Đã xảy ra lỗi không mong muốn',
       );
     }
   }
@@ -51,21 +54,23 @@ class EnrollmentService {
       final response = await ApiClient.delete(url, auth: true);
 
       final responseData = json.decode(response.body);
+      final rawMessage = responseData['message'] ?? 'Thành công';
+      final translatedMessage = ConvertStatus.translateErrorMessage(rawMessage);
       return ApiResponse<void>(
         status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
-        message: responseData['message'] ?? 'Thành công',
+        message: translatedMessage,
       );
     } catch (e) {
       return ApiResponse<void>(
         status: StatusCode.internalServerError,
-        message: 'Đã xảy ra lỗi không mong muốn: $e',
+        message: 'Đã xảy ra lỗi không mong muốn',
       );
     }
   }
 
   Future<ApiResponse<List<Enrollment>>> getMyClasses() async {
     try {
-      final url = '${ApiConfig.baseUrl}${ApiConfig.myEnrolledClasses}';
+      final url = '${ApiConfig.baseUrl}${ApiConfig.myClasses}';
       final response = await ApiClient.get(url, auth: true);
 
       if (response.statusCode == 200) {
@@ -80,20 +85,22 @@ class EnrollmentService {
         );
       } else {
         final responseData = json.decode(response.body);
+        final rawMessage = responseData['message'] ?? 'Đã xảy ra lỗi';
+        final translatedMessage = ConvertStatus.translateErrorMessage(rawMessage);
         return ApiResponse<List<Enrollment>>(
           status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
-          message: responseData['message'] ?? 'Đã xảy ra lỗi',
+          message: translatedMessage,
         );
       }
     } on AuthException {
       return ApiResponse<List<Enrollment>>(
         status: StatusCode.badRequest,
-        message: 'Authentication required',
+        message: 'Yêu cầu đăng nhập',
       );
     } catch (e) {
       return ApiResponse<List<Enrollment>>(
         status: StatusCode.internalServerError,
-        message: 'Đã xảy ra lỗi không mong muốn: $e',
+        message: 'Đã xảy ra lỗi không mong muốn',
       );
     }
   }
@@ -115,15 +122,17 @@ class EnrollmentService {
         );
       } else {
         final responseData = json.decode(response.body);
+        final rawMessage = responseData['message'] ?? 'Đã xảy ra lỗi';
+        final translatedMessage = ConvertStatus.translateErrorMessage(rawMessage);
         return ApiResponse<List<Enrollment>>(
           status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
-          message: responseData['message'] ?? 'Đã xảy ra lỗi',
+          message: translatedMessage,
         );
       }
     } catch (e) {
       return ApiResponse<List<Enrollment>>(
         status: StatusCode.internalServerError,
-        message: 'Đã xảy ra lỗi không mong muốn: $e',
+        message: 'Đã xảy ra lỗi không mong muốn',
       );
     }
   }

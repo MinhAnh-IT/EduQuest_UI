@@ -56,6 +56,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
 
         if (success ) {
           Navigator.pushNamed(
+            // ignore: use_build_context_synchronously
             context,
             '/otp-verification',
             arguments: {

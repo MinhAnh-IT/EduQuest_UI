@@ -43,13 +43,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       if (success) {
         // setState(() => _otpSent = true); // Comment để không hiển thị success screen
-        _goToOTPScreen(); // Navigate trực tiếp đến OTP screen
+        _goToOTPScreen();
       } else {
         _showError(authProvider.error ?? 'Yêu cầu đặt lại mật khẩu thất bại');
       }
     } catch (e) {
       if (!mounted) return;
-      _showError('Network error occurred. Please check your connection and try again.');
+      _showError('Đã xảy ra lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.');
     } finally {
       if (mounted) {
         setState(() {
@@ -229,7 +229,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Text(
-            'An OTP has been sent to verify your username.',
+            'Mã OTP đã được gửi để xác minh tên đăng nhập của bạn.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

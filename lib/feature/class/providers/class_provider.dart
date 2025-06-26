@@ -197,6 +197,7 @@ class ClassProvider extends ChangeNotifier {
       return null;
     }
   }
+  
   // Set initial class detail (useful when navigating from class list with existing data)
   void setInitialClassDetail(ClassDetail classDetail) {
     _classDetail = classDetail;

@@ -24,7 +24,7 @@ class ApiResponse<T> {
         }
     }
 
-    String messageValue = json['message'] as String? ?? 'An error occurred';    
+    String messageValue = json['message'] as String? ?? 'Đã xảy ra lỗi';    
     return ApiResponse(
       status: StatusCode.fromCode(statusCodeValue) ?? StatusCode.internalServerError, // Handle null case
       message: messageValue,

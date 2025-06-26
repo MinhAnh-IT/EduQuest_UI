@@ -61,6 +61,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
             arguments: {
               'username': _usernameController.text,
               'registrationData': registrationData,
+              'autoSendOtp': false,
             }
           );
         } else if (mounted) {
@@ -137,7 +138,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                       label: 'Tên đăng nhập',
                       hint: 'Nhập tên đăng nhập',
                       icon: Icons.person_outline,
-                      validator: (value) => Validators.validateRequired(value, 'tên đăng nhập'),
+                      validator: Validators.validateUsername,
                     ),
                     const SizedBox(height: 18),
                     _buildInputField(
@@ -174,15 +175,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
                           });
                         },
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Vui lòng nhập mật khẩu';
-                        }
-                        if (value.length < 6) {
-                          return 'Mật khẩu phải có ít nhất 6 ký tự và có kí tự đặc biệt ';
-                        }
-                        return null;
-                      },
+                      validator: Validators.validatePassword
                     ),
                     const SizedBox(height: 18),
                     _buildInputField(
@@ -284,59 +277,59 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
     String? Function(String?)? validator,
   }) {
     return Focus(
-      child: Builder(
-        builder: (context) {
-          final hasFocus = Focus
-              .of(context)
-              .hasFocus;
-          return TextFormField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: label,
-              labelStyle: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-              // label luôn cố định
-              hintText: hint,
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-              prefixIcon: Icon(icon,
-                  color: hasFocus ? const Color(0xFF357ABD) : Colors.grey),
-              helperText: helperText,
-              helperStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-              suffixIcon: suffixIcon,
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16, horizontal: 18),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                    color: Color(0xFF357ABD), width: 1.2),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                    color: Color(0xFFDFE6F3), width: 1.2),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                    color: Color(0xFF357ABD), width: 2),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.red, width: 1.2),
-              ),
-            ),
-            keyboardType: keyboardType,
-            obscureText: obscureText,
-            validator: validator,
-          );
-        },
-      ),
-    );
+  child: Builder(
+    builder: (context) {
+      final hasFocus = Focus.of(context).hasFocus;
+      return TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.never,
+          hintText: hint,
+          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+          prefixIcon: Icon(icon,
+              color: hasFocus ? const Color(0xFF357ABD) : Colors.grey),
+          helperText: helperText,
+          helperStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+          helperMaxLines: 2,   
+          suffixIcon: suffixIcon,
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+              vertical: 16, horizontal: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+                color: Color(0xFF357ABD), width: 1.2),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+                color: Color(0xFFDFE6F3), width: 1.2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+                color: Color(0xFF357ABD), width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.red, width: 1.2),
+          ),
+          errorMaxLines: 2,   
+        ),
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        validator: validator,
+      );
+    },
+  ),
+);
+
   }
 }

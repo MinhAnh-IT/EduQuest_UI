@@ -1,11 +1,14 @@
-// ... existing code ...
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:edu_quest/feature/auth/providers/profile_provider.dart';
-import 'package:edu_quest/feature/auth/screens//student/profile_edit_screen.dart';
+import 'package:edu_quest/feature/Profile/providers/profile_provider.dart';
+import 'package:edu_quest/feature/Profile/screens/profile_edit_screen.dart';
 import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:edu_quest/feature/auth/services/auth_service.dart';
 import 'package:edu_quest/feature/auth/screens/login_screen.dart';
+import 'package:edu_quest/core/utils/auth_utils.dart';
+import 'package:edu_quest/shared/widgets/custom_app_bar.dart';
+
+import '../../../config/api_config.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -32,10 +35,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hồ sơ cá nhân'),
+      appBar: const CustomAppBar(
+        title: 'Hồ sơ cá nhân',
         backgroundColor: AppTheme.primaryColor,
-        elevation: 0,
+        foregroundColor: Colors.white,
       ),
       body: Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
@@ -43,26 +46,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (profileProvider.error != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Có lỗi xảy ra: ${profileProvider.error}',
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => profileProvider.loadProfile(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryColor,
-                      foregroundColor: Colors.white,
+            // Check if it's an authentication error
+            if (profileProvider.error == 'Authentication required') {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.lock_outline,
+                      size: 64,
+                      color: Colors.red,
                     ),
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
-            );
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Phiên đăng nhập đã hết hạn',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Vui lòng đăng nhập lại để tiếp tục',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => AuthUtils.clearTokensAndRedirectToLogin(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      ),
+                      child: const Text('Đăng nhập lại'),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Có lỗi xảy ra: ${profileProvider.error}',
+                      style: const TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => profileProvider.loadProfile(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Thử lại'),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
           final profile = profileProvider.profile;
           if (profile == null) {
@@ -95,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ClipOval(
                       child: profile.avatarUrl != null
                           ? Image.network(
-                        'http://192.168.1.15:8080${profile.avatarUrl}',
+                        '${ApiConfig.baseUrl}${profile.avatarUrl}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],
@@ -134,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         _buildInfoRow('Họ và tên', profile.name),
                         const Divider(height: 28),
-                        _buildInfoRow('Email', profile.email ?? 'Chưa cập nhật'),
+                        _buildInfoRow('Email', profile.email),
                         if (profile.studentCode != null) ...[
                           const Divider(height: 28),
                           _buildInfoRow('Mã số sinh viên', profile.studentCode!),
@@ -146,7 +185,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Nút chỉnh sửa
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -283,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       final success = response['code'] == 200;
 
                       if (mounted) {
-                        navigator.pop(); // Close dialog
+                        navigator.pop(); 
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => const LoginScreen()),
                               (route) => false,
@@ -307,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     } catch (e) {
                       if (mounted) {
-                        navigator.pop(); // Close dialog
+                        navigator.pop(); 
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => const LoginScreen()),
                               (route) => false,

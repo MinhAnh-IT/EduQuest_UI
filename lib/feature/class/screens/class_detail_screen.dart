@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/class_detail.dart';
 import '../providers/class_provider.dart';
-import '../data/sample_assignments.dart';
-import '../../../shared/widgets/custom_app_bar.dart';
 import 'assignment_list_screen.dart';
+import '../../../shared/widgets/custom_app_bar.dart';
 import 'member_list_screen.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final int classId;
-  final ClassDetail? initialClassDetail; // Optional initial data
+  final ClassDetail? initialClassDetail; 
 
   const ClassDetailScreen({
     Key? key,
@@ -23,11 +22,10 @@ class ClassDetailScreen extends StatefulWidget {
 
 class _ClassDetailScreenState extends State<ClassDetailScreen>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-
-  @override
+  late TabController _tabController;  @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     
     // Load class data using provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -35,44 +33,48 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       
       // Reset provider state first
       classProvider.reset();
-      
-      // Use initial data if provided
+        // Use initial data if provided
       if (widget.initialClassDetail != null) {
-        // Set initial data to provider and then load students
+        // Set initial data to provider and then load students and assignments
         classProvider.setInitialClassDetail(widget.initialClassDetail!);
         classProvider.loadStudents(widget.classId);
-      } else {        // Load both class detail and students from API
+        classProvider.loadAssignments(widget.classId);
+      } else {
+        // Load class detail, students and assignments from API
         classProvider.loadClassData(widget.classId);
       }
     });
   }
-
   @override
   void dispose() {
-    _tabController?.dispose();
+    _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ClassProvider>(
-      builder: (context, classProvider, child) {
-        // Initialize TabController only when we have class data
-        if (classProvider.classDetail != null && _tabController == null) {
-          _tabController = TabController(length: 3, vsync: this);
-        }
-        
+      builder: (context, classProvider, child) {        
         return Scaffold(
-          backgroundColor: Colors.grey[100],          appBar: CustomAppBar(
+          backgroundColor: Colors.grey[100],
+          appBar: CustomAppBar(
             title: classProvider.classDetail?.name ?? 'Chi tiết lớp học',
-            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null || _tabController == null ? null : TabBar(
-              controller: _tabController!,
+            actions: [
+              if (!classProvider.isLoadingClassDetail && classProvider.classDetail != null)
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => classProvider.loadClassData(widget.classId),
+                ),
+            ],
+            bottom: classProvider.isLoadingClassDetail || classProvider.classDetail == null ? null : TabBar(
+              controller: _tabController,
               indicatorColor: Colors.white,
               labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
+              unselectedLabelColor: Colors.white70,              
               tabs: const [
                 Tab(icon: Icon(Icons.info), text: 'Thông tin'),
-                Tab(icon: Icon(Icons.assignment), text: 'Bài tập'),
-                Tab(icon: Icon(Icons.people), text: 'Thành viên'),
+                Tab(icon: Icon(Icons.assignment), text: 'Bài kiểm tra'),
+                Tab(icon: Icon(Icons.people), text: 'Học sinh'),
               ],
             ),
           ),
@@ -80,7 +82,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
         );
       },
     );
-  }Widget _buildBody(ClassProvider classProvider) {
+  }
+
+  Widget _buildBody(ClassProvider classProvider) {
     if (classProvider.isLoadingClassDetail) {
       return const Center(
         child: Column(
@@ -92,7 +96,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
           ],
         ),
       );
-    }    if (classProvider.classDetailError != null) {
+    }
+
+    if (classProvider.classDetailError != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +126,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 24),            
             ElevatedButton(
               onPressed: () {
                 classProvider.loadClassData(widget.classId);
@@ -131,7 +137,9 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
           ],
         ),
       );
-    }    if (classProvider.classDetail == null) {
+    }
+
+    if (classProvider.classDetail == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -142,19 +150,13 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               onPressed: () {
                 classProvider.loadClassData(widget.classId);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.cyan),
-              child: const Text('Tải lại', style: TextStyle(color: Colors.white)),
+              child: const Text('Tải lại'),
             ),
-          ],
-        ),
+          ],        ),
       );
-    }// Return TabBarView only if we have both class data and tab controller
-    if (classProvider.classDetail == null || _tabController == null) {
-      return const SizedBox.shrink();
-    }
-
+    }    
     return TabBarView(
-      controller: _tabController!,
+      controller: _tabController,
       children: [
         _buildInfoTab(classProvider),
         _buildAssignmentsTab(classProvider),
@@ -162,6 +164,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ],
     );
   }
+  
   Widget _buildInfoTab(ClassProvider classProvider) {
     final classDetail = classProvider.classDetail!;
     
@@ -221,7 +224,6 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
 
           const SizedBox(height: 16),
 
-          // Instructor Info Card
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -253,8 +255,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),                  Text(
                     classDetail.instructorEmail,
                     style: TextStyle(
                       fontSize: 14,
@@ -264,18 +265,133 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
               ),
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.assignment, color: Colors.cyan[600]),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Thống kê bài tập',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),                  const SizedBox(height: 16),
+                  Row(
+                    children: [                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Tổng bài tập',
+                          _getAssignmentStats(classProvider)['total'].toString(),
+                          Icons.assignment_outlined,
+                          Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Đã làm',
+                          _getAssignmentStats(classProvider)['completed'].toString(),
+                          Icons.assignment_turned_in,
+                          Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildQuickStatCard(
+                          'Chưa làm',
+                          _getAssignmentStats(classProvider)['pending'].toString(),
+                          Icons.assignment_late_outlined,
+                          Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
-    );  }
-  Widget _buildMembersTab(ClassProvider classProvider) {
-    return MemberListWidget(classId: widget.classId);
-  }  Widget _buildAssignmentsTab(ClassProvider classProvider) {
-    final classDetail = classProvider.classDetail!;
-    final assignments = SampleAssignments.createAssignmentsByClassName(
-      classDetail.id,
-      classDetail.name,
     );
+  }
+  Widget _buildQuickStatCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: color,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }  
+  
+  Widget _buildAssignmentsTab(ClassProvider classProvider) {
+    return AssignmentListScreen(
+      classId: widget.classId,
+      className: classProvider.classDetail?.name ?? 'Tất cả bài tập',
+    );
+  }
 
-    return AssignmentListWidget(assignments: assignments);
+  Widget _buildMembersTab(ClassProvider classProvider) {
+    return MemberListScreen(
+      classId: widget.classId,
+      className: classProvider.classDetail?.name ?? 'Danh sách học sinh',
+    );
+  }
+
+  Map<String, int> _getAssignmentStats(ClassProvider classProvider) {
+    final assignments = classProvider.assignments;
+
+    int total = assignments.length;
+    int completed = assignments.where((assignment) => assignment.isSubmitted).length;
+    int pending = total - completed;
+
+    return {
+      'total': total,
+      'completed': completed,
+      'pending': pending,
+    };
   }
 }

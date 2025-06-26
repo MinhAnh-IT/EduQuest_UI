@@ -1,132 +1,94 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
 import '../models/enrollment.dart';
 import '../../auth/models/api_response.dart';
 import '../../../config/api_config.dart';
 import '../../../core/enums/status_code.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/exceptions/auth_exception.dart';
 
 class EnrollmentService {
-  late final Dio _dio;
-  
-  EnrollmentService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: ApiConfig.connectionTimeout,
-      receiveTimeout: ApiConfig.receiveTimeout,
-      sendTimeout: ApiConfig.sendTimeout,
-      headers: ApiConfig.defaultHeaders,
-      validateStatus: (status) => status != null && status < 500,
-    ));
-    _setupInterceptors();
-  }
-
-  void _setupInterceptors() {
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        // Tự động thêm Authorization header từ ApiClient.token
-        final token = ApiClient.token;
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-    ));
-  }
-
-  // Join Class
   Future<ApiResponse<Enrollment>> joinClass(String classCode) async {
     try {
-      final response = await _dio.post(
-        ApiConfig.joinClass,
-        data: {'classCode': classCode.trim()},
+      final url = '${ApiConfig.baseUrl}${ApiConfig.joinClass}';
+      final response = await ApiClient.post(
+        url,
+        {'classCode': classCode.trim()},
+        auth: true,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (response.data['data'] != null) {
-          return ApiResponse<Enrollment>.fromJson(
-            response.data,
-            (data) => Enrollment.fromJson(data),
+        final responseData = json.decode(response.body);
+        if (responseData['data'] != null) {
+          return ApiResponse<Enrollment>(
+            status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
+            message: responseData['message'] ?? 'Thành công',
+            data: Enrollment.fromJson(responseData['data']),
           );
         } else {
           return ApiResponse<Enrollment>(
-            status: StatusCode.fromCode(response.data['code']) ?? StatusCode.ok,
-            message: response.data['message'] ?? 'Thành công',
+            status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
+            message: responseData['message'] ?? 'Thành công',
           );
         }
       } else {
-        return ApiResponse<Enrollment>.fromJson(response.data, null);
+        final responseData = json.decode(response.body);
+        return ApiResponse<Enrollment>(
+          status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
+          message: responseData['message'] ?? 'Đã xảy ra lỗi',
+        );
       }
-    } on DioException catch (e) {
-      if (e.response != null && e.response!.data is Map<String, dynamic>) {
-        return ApiResponse<Enrollment>.fromJson(e.response!.data, null);
-      }
-
-      return ApiResponse<Enrollment>(
-        status: StatusCode.internalServerError,
-        message: e.message ?? 'Network error occurred',
-      );
     } catch (e) {
       return ApiResponse<Enrollment>(
         status: StatusCode.internalServerError,
-        message: 'An unexpected error occurred',
+        message: 'Đã xảy ra lỗi không mong muốn: $e',
       );
     }
   }
 
-  // Leave Class
   Future<ApiResponse<void>> leaveClass(int classId) async {
     try {
-      final response = await _dio.delete('${ApiConfig.leaveClass}/$classId');
+      final url = '${ApiConfig.baseUrl}${ApiConfig.leaveClass}/$classId';
+      final response = await ApiClient.delete(url, auth: true);
 
-      return ApiResponse<void>.fromJson(response.data, null);
-    } on DioException catch (e) {
-      if (e.response != null && e.response!.data is Map<String, dynamic>) {
-        return ApiResponse<void>.fromJson(e.response!.data, null);
-      }
-
+      final responseData = json.decode(response.body);
       return ApiResponse<void>(
-        status: StatusCode.internalServerError,
-        message: e.message ?? 'Network error occurred',
+        status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
+        message: responseData['message'] ?? 'Thành công',
       );
     } catch (e) {
       return ApiResponse<void>(
         status: StatusCode.internalServerError,
-        message: 'An unexpected error occurred',
+        message: 'Đã xảy ra lỗi không mong muốn: $e',
       );
     }
   }
 
-  // Get student's enrolled classes
   Future<ApiResponse<List<Enrollment>>> getMyClasses() async {
     try {
-      final response = await _dio.get(ApiConfig.myClasses);
+      final url = '${ApiConfig.baseUrl}${ApiConfig.myEnrolledClasses}';
+      final response = await ApiClient.get(url, auth: true);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['data'] as List<dynamic>;
+        final responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'] as List<dynamic>;
         final enrollments = data.map((json) => Enrollment.fromJson(json)).toList();
         
         return ApiResponse<List<Enrollment>>(
           status: StatusCode.ok,
-          message: response.data['message'] ?? 'Thành công',
+          message: responseData['message'] ?? 'Thành công',
           data: enrollments,
         );
       } else {
+        final responseData = json.decode(response.body);
         return ApiResponse<List<Enrollment>>(
-          status: StatusCode.fromCode(response.data['code']) ?? StatusCode.internalServerError,
-          message: response.data['message'] ?? 'Đã xảy ra lỗi',
+          status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
+          message: responseData['message'] ?? 'Đã xảy ra lỗi',
         );
       }
-    } on DioException catch (e) {
-      if (e.response != null && e.response!.data is Map<String, dynamic>) {
-        return ApiResponse<List<Enrollment>>(
-          status: StatusCode.fromCode(e.response!.data['code']) ?? StatusCode.internalServerError,
-          message: e.response!.data['message'] ?? 'Lỗi kết nối',
-        );
-      }
-
+    } on AuthException {
       return ApiResponse<List<Enrollment>>(
-        status: StatusCode.internalServerError,
-        message: e.message ?? 'Lỗi kết nối mạng',
+        status: StatusCode.badRequest,
+        message: 'Authentication required',
       );
     } catch (e) {
       return ApiResponse<List<Enrollment>>(
@@ -138,35 +100,26 @@ class EnrollmentService {
 
   Future<ApiResponse<List<Enrollment>>> getMyEnrolledClasses() async {
     try {
-      final response = await _dio.get(ApiConfig.myEnrolledClasses);
+      final url = '${ApiConfig.baseUrl}${ApiConfig.myEnrolledClasses}';
+      final response = await ApiClient.get(url, auth: true);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['data'] as List<dynamic>;
+        final responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'] as List<dynamic>;
         final enrollments = data.map((json) => Enrollment.fromJson(json)).toList();
         
         return ApiResponse<List<Enrollment>>(
           status: StatusCode.ok,
-          message: response.data['message'] ?? 'Thành công',
+          message: responseData['message'] ?? 'Thành công',
           data: enrollments,
         );
       } else {
+        final responseData = json.decode(response.body);
         return ApiResponse<List<Enrollment>>(
-          status: StatusCode.fromCode(response.data['code']) ?? StatusCode.internalServerError,
-          message: response.data['message'] ?? 'Đã xảy ra lỗi',
+          status: StatusCode.fromCode(responseData['code']) ?? StatusCode.internalServerError,
+          message: responseData['message'] ?? 'Đã xảy ra lỗi',
         );
       }
-    } on DioException catch (e) {
-      if (e.response != null && e.response!.data is Map<String, dynamic>) {
-        return ApiResponse<List<Enrollment>>(
-          status: StatusCode.fromCode(e.response!.data['code']) ?? StatusCode.internalServerError,
-          message: e.response!.data['message'] ?? 'Lỗi kết nối',
-        );
-      }
-
-      return ApiResponse<List<Enrollment>>(
-        status: StatusCode.internalServerError,
-        message: e.message ?? 'Lỗi kết nối mạng',
-      );
     } catch (e) {
       return ApiResponse<List<Enrollment>>(
         status: StatusCode.internalServerError,

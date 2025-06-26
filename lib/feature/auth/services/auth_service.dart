@@ -26,27 +26,51 @@ class AuthService {
   
   // Logout
   Future<Map<String, dynamic>> logout() async {
-    final token = await _storage.read(key: 'auth_token');
-    if (token == null) {
+    try {
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      if (refreshToken == null) {
+        // Clear all tokens anyway
+        await _storage.delete(key: 'access_token');
+        await _storage.delete(key: 'refresh_token');
+        return {
+          'code': 200,
+          'message': 'Logged out successfully',
+          'data': null
+        };
+      }
+      
+      final url = '${ApiConfig.baseUrl}${ApiConfig.logout}';
+      final response = await ApiClient.post(url, {
+        'refreshToken': refreshToken
+      }, auth: true);
+      
+      // Clear stored tokens after logout attempt (regardless of response)
+      await _storage.delete(key: 'access_token');
+      await _storage.delete(key: 'refresh_token');
+      ApiClient.token = null;
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        // Even if server logout fails, we've cleared local tokens
+        return {
+          'code': 200,
+          'message': 'Logged out locally',
+          'data': null
+        };
+      }
+    } catch (e) {
+      // Clear tokens even if there's an error
+      await _storage.delete(key: 'access_token');
+      await _storage.delete(key: 'refresh_token');
+      ApiClient.token = null;
+      
       return {
-        'code': 401,
-        'message': 'Authentication token not found',
+        'code': 200,
+        'message': 'Logged out locally',
         'data': null
       };
     }
-      // Set token for auth header
-    ApiClient.token = token;
-    
-    final url = '${ApiConfig.baseUrl}${ApiConfig.logout}';
-    final response = await ApiClient.post(url, {}, auth: true);
-    
-    // Clear stored token after successful logout
-    if (response.statusCode == 200) {
-      await _storage.delete(key: 'auth_token');
-      ApiClient.token = null;
-    }
-    
-    return jsonDecode(response.body);
   }
   // Verify OTP for forgot password
   Future<Map<String, dynamic>> verifyOTPForgotPassword(String username, String otp) async {

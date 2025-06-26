@@ -1,3 +1,4 @@
+import 'package:edu_quest/core/enums/status_code.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/network/api_client.dart';
@@ -110,7 +111,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String username, String password, {VoidCallback? onUserNotVerified}) async {
     _setLoading(true);
     try {
       final response = await AuthService.login(username, password);
@@ -125,6 +126,10 @@ class AuthProvider extends ChangeNotifier {
         ApiClient.token = _token;
         _setLoading(false);
         return true;
+      } else if (response['code'] == StatusCode.userNotVerified.code) {
+        _setLoading(false);
+        if (onUserNotVerified != null) onUserNotVerified();
+        return false;
       } else {
         _setError(response['message']);
         return false;

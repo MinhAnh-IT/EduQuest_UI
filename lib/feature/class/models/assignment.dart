@@ -2,77 +2,93 @@ import 'package:flutter/material.dart';
 
 class Assignment {
   final int id;
-  final String title;
-  final String description;
-  final DateTime dueDate;
-  final String status; // 'pending', 'submitted', 'graded'
-  final String? grade;
-  final DateTime createdAt;
+  final int classId;
+  final String name;
+  final DateTime startAt;
+  final DateTime endAt;
+  final int durationMinutes;
+  final String? status; // "IN_PROGRESS", "SUBMITTED", "EXPIRED", hoặc null
+  final int questionCount;
 
   Assignment({
     required this.id,
-    required this.title,
-    required this.description,
-    required this.dueDate,
+    required this.classId,
+    required this.name,
+    required this.startAt,
+    required this.endAt,
+    required this.durationMinutes,
     required this.status,
-    this.grade,
-    required this.createdAt,
+    required this.questionCount,
   });
 
   factory Assignment.fromJson(Map<String, dynamic> json) {
     return Assignment(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      dueDate: DateTime.parse(json['dueDate'] as String),
-      status: json['status'] as String,
-      grade: json['grade'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      id: json['id'] == null ? 0 : int.tryParse(json['id'].toString()) ?? 0,
+      classId: json['classId'] == null ? 0 : int.tryParse(json['classId'].toString()) ?? 0,
+      name: json['name'] ?? '',
+      startAt: DateTime.parse(json['startAt']),
+      endAt: DateTime.parse(json['endAt']),
+      durationMinutes: json['durationMinutes'] == null ? 0 : int.tryParse(json['durationMinutes'].toString()) ?? 0,
+      status: json['status'],
+      questionCount: json['questionCount'] == null ? 0 : int.tryParse(json['questionCount'].toString()) ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'title': title,
-      'description': description,
-      'dueDate': dueDate.toIso8601String(),
+      'classId': classId,
+      'name': name,
+      'startAt': startAt.toIso8601String(),
+      'endAt': endAt.toIso8601String(),
+      'durationMinutes': durationMinutes,
       'status': status,
-      'grade': grade,
-      'createdAt': createdAt.toIso8601String(),
+      'questionCount': questionCount,
     };
   }
 
-  // Helper methods
-  bool get isOverdue => DateTime.now().isAfter(dueDate) && status == 'pending';
-  bool get isSubmitted => status == 'submitted' || status == 'graded';
-  
+  // Đã nộp bài
+  bool get isSubmitted => status == 'SUBMITTED';
+
+  // Chưa làm bài (status null, 'NOT_STARTED', hoặc 'pending')
+  bool get isNotStarted => status == null || status == 'NOT_STARTED' || status == 'pending';
+
+  // Quá hạn (status là 'EXPIRED' hoặc đã quá hạn thực tế)
+  bool get isExpired => status == 'EXPIRED' || isOverdue;
+
+  // Đã quá hạn thực tế (so sánh thời gian hiện tại với endAt)
+  bool get isOverdue => DateTime.now().isAfter(endAt) && (status == null || status == 'pending');
+
+  // Disable nút nếu chưa làm bài hoặc quá hạn
+  bool get isDisabled => isNotStarted && !isExpired;
+
   Color get statusColor {
-    switch (status) {
-      case 'submitted':
+    switch (status) { 
+      case 'IN_PROGRESS':
         return Colors.blue;
-      case 'graded':
-        return grade != null ? Colors.green : Colors.orange;
-      case 'pending':
-        return isOverdue ? Colors.red : Colors.orange;
+      case 'SUBMITTED':
+        return Colors.green;
+      case 'EXPIRED':
+        return Colors.red;
       default:
         return Colors.grey;
     }
   }
+
   String get statusText {
     switch (status) {
-      case 'submitted':
+      case 'IN_PROGRESS':
+        return 'Đang làm';
+      case 'SUBMITTED':
         return 'Đã nộp';
-      case 'graded':
-        return 'Đã chấm điểm';
-      case 'pending':
-        return isOverdue ? 'Quá hạn' : 'Chưa nộp';
+      case 'EXPIRED':
+        return 'Quá hạn';
       default:
-        return 'Không xác định';
+        return 'Chưa làm';
     }
   }
 
-  String get formattedDueDate {
-    return '${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}/${dueDate.year}';
+  String get formattedEndAt {
+    return '${endAt.day.toString().padLeft(2, '0')}/${endAt.month.toString().padLeft(2, '0')}/${endAt.year}';
   }
 }

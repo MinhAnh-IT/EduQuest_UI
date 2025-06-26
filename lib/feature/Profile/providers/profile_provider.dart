@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:edu_quest/feature/auth/models/Profile_Model.dart';
-import 'package:edu_quest/feature/auth/services/profile_service.dart';
+import 'package:edu_quest/feature/Profile/models/Profile_Model.dart';
+import 'package:edu_quest/feature/Profile/services/profile_service.dart';
+import 'package:edu_quest/core/exceptions/auth_exception.dart';
 
 class ProfileProvider extends ChangeNotifier {
   ProfileModel? _profile;
@@ -18,8 +19,16 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _profile = await ProfileService.getCurrentUser();
+    } on AuthException {
+      _error = 'Authentication required';
+      // Có thể thêm logic để clear tokens và redirect về login
     } catch (e) {
-      _error = e.toString();
+      String errorMessage = e.toString();
+      if (errorMessage.contains('Exception:')) {
+        _error = errorMessage.replaceFirst('Exception: ', '');
+      } else {
+        _error = 'An unexpected error occurred';
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

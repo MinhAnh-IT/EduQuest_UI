@@ -4,7 +4,8 @@ import '../../../shared/widgets/custom_app_bar.dart';
 import '../../class/services/enrollment_service.dart';
 import '../../../core/enums/status_code.dart';
 import '../../class/screens/class_detail_screen.dart';
-import 'package:edu_quest/feature/auth/screens/student/profile_screen.dart';
+import 'package:edu_quest/feature/profile/screens/profile_screen.dart';
+import 'package:edu_quest/core/utils/auth_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -101,6 +102,7 @@ class _HomeTabState extends State<HomeTab> {
     ];
     return colors[index % colors.length].withValues(alpha: 0.9);
   }
+
   void _handleClassTap(BuildContext context, Map<String, String> classData) {
     final status = classData['status']?.toUpperCase() ?? '';
 
@@ -114,16 +116,23 @@ class _HomeTabState extends State<HomeTab> {
         ),
       );
     } else {
-      final classId = int.parse(classData['id'] ?? '1');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClassDetailScreen(classId: classId),
-        ),
-      );
+      _navigateToClassDetail(context, classData);
     }
   }
-
+  
+  void _navigateToClassDetail(BuildContext context, Map<String, String> classData) {
+    final classId = int.parse(classData['id'] ?? '1');
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClassDetailScreen(
+          classId: classId,
+        ),
+      ),
+    );
+  }
+  
   void _showLeaveClassConfirmationDialog(
       BuildContext context, Map<String, String> classData) {
     bool isLoading = false;
@@ -183,7 +192,8 @@ class _HomeTabState extends State<HomeTab> {
                                     content: Text('Đã rời lớp học thành công!'),
                                     backgroundColor: Colors.green,
                                   ),
-                                );                              }
+                                );
+                              }
                               _fetchMyClasses();
                             } else {
                               navigator.pop();
@@ -309,10 +319,12 @@ class _HomeTabState extends State<HomeTab> {
 
                           try {
                             final response =
-                                await _enrollmentService.joinClass(classCode);                            if (response.status == StatusCode.ok ||
+                                await _enrollmentService.joinClass(classCode);
+
+                            if (response.status == StatusCode.ok ||
                                 response.status.code == 200 ||
                                 response.status.code == 201) {
-                              navigator.pop();
+                              navigator.pop(); 
                               if (mounted) {
                                 scaffoldMessenger.showSnackBar(
                                   const SnackBar(
@@ -325,7 +337,8 @@ class _HomeTabState extends State<HomeTab> {
                               }
                               _fetchMyClasses();
                             } else {
-                              navigator.pop();
+                              navigator
+                                  .pop(); 
                               String errorMessage;
                               switch (response.status) {
                                 case StatusCode.classCodeRequired:
@@ -361,8 +374,10 @@ class _HomeTabState extends State<HomeTab> {
                                   ),
                                 );
                               }
-                            }                          } catch (e) {
-                            navigator.pop();
+                            }
+                          } catch (e) {
+                            navigator
+                                .pop(); 
                             if (mounted) {
                               scaffoldMessenger.showSnackBar(
                                 const SnackBar(
@@ -398,13 +413,18 @@ class _HomeTabState extends State<HomeTab> {
     });
 
     try {
-      final response = await _enrollmentService.getMyClasses();      if (response.status == StatusCode.ok && response.data != null) {
+      final response = await _enrollmentService.getMyClasses();
+
+      if (response.status == StatusCode.ok && response.data != null) {
         final List<Map<String, String>> classes =
             response.data!.map((enrollment) {
           return {
             'name': enrollment.className,
             'instructor': enrollment.instructorName,
             'id': enrollment.classId.toString(),
+            'code': 'CLASS${enrollment.classId}',
+            'description': 'Trạng thái: ${enrollment.status}',
+            'studentCount': '0',
             'enrollmentId': enrollment.enrollmentId.toString(),
             'status': enrollment.status,
           };
@@ -488,27 +508,53 @@ class _HomeTabState extends State<HomeTab> {
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
                       ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Không thể tải danh sách lớp học',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                _errorMessage!,
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.grey[700]),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _fetchMyClasses,
-                                child: const Text('Thử lại'),
-                              ),
-                            ],
-                          ),
+                          child: _errorMessage!.contains('Authentication required')
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_outline,
+                                      size: 64,
+                                      color: Colors.red,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Phiên đăng nhập đã hết hạn',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Vui lòng đăng nhập lại để tiếp tục',
+                                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton(
+                                      onPressed: () => AuthUtils.clearTokensAndRedirectToLogin(context),
+                                      child: const Text('Đăng nhập lại'),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Không thể tải danh sách lớp học',
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _errorMessage!,
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.grey[700]),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ElevatedButton(
+                                      onPressed: _fetchMyClasses,
+                                      child: const Text('Thử lại'),
+                                    ),
+                                  ],
+                                ),
                         )
                       : _filteredClasses.isEmpty &&
                               _searchController.text.isNotEmpty

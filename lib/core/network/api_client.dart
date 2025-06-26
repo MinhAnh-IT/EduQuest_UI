@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'token_manager.dart';
+import '../exceptions/auth_exception.dart';
 
 class ApiClient {
   static String? token;
@@ -20,10 +21,9 @@ class ApiClient {
       if (token != null) {
         headers['Authorization'] = 'Bearer $token';
       } else {
-        print('Không lấy được token hợp lệ');
+        
       }
     }
-
     return headers;
   }
 
@@ -33,10 +33,10 @@ class ApiClient {
     final response = await http.post(uri,
         headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
 
-    if (auth && response.statusCode == 403) {
+    if (auth && (response.statusCode == 401 || response.statusCode == 403)) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
-        throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
+        throw AuthException('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse = await http.post(uri,
           headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
@@ -51,10 +51,10 @@ class ApiClient {
     final response =
         await http.get(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 403) {
+    if (auth && (response.statusCode == 401 || response.statusCode == 403)) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
-        throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
+        throw AuthException('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse =
           await http.get(uri, headers: await getHeaders(useAuth: auth));
@@ -70,10 +70,10 @@ class ApiClient {
     final response = await http.put(uri,
         headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
 
-    if (auth && response.statusCode == 403) {
+    if (auth && (response.statusCode == 401 || response.statusCode == 403)) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
-        throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
+        throw AuthException('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse = await http.put(uri,
           headers: await getHeaders(useAuth: auth), body: jsonEncode(body));
@@ -88,10 +88,10 @@ class ApiClient {
     final response =
         await http.delete(uri, headers: await getHeaders(useAuth: auth));
 
-    if (auth && response.statusCode == 403) {
+    if (auth && (response.statusCode == 401 || response.statusCode == 403)) {
       token = await TokenManager().getValidAccessToken();
       if (token == null) {
-        throw Exception('Không thể làm mới token. Vui lòng đăng nhập lại.');
+        throw AuthException('Không thể làm mới token. Vui lòng đăng nhập lại.');
       }
       final retryResponse =
           await http.delete(uri, headers: await getHeaders(useAuth: auth));

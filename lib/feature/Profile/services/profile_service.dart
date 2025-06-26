@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:edu_quest/config/api_config.dart';
 import 'package:edu_quest/core/network/api_client.dart';
 import 'package:edu_quest/core/network/token_manager.dart';
-import 'package:edu_quest/feature/auth/models/Profile_Model.dart';
+import 'package:edu_quest/feature/Profile/models/Profile_Model.dart';
 
 class ProfileService {
   static Future<ProfileModel> getCurrentUser() async {

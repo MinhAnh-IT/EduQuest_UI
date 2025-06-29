@@ -120,11 +120,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     });
     try {
       final authProvider = context.read<AuthProvider>();
-<<<<<<< HEAD
       await authProvider.resendOTP(widget.username); 
-=======
-      await authProvider.resendOTP(widget.username);
->>>>>>> d9eab1dbf5d7c6b4533f6a5779eb8947145d088f
     } finally {
       setState(() {
         _isResending = false;

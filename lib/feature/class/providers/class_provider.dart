@@ -37,12 +37,12 @@ class ClassProvider extends ChangeNotifier {
   List<Assignment> get assignments => _assignments;
   bool get isLoadingAssignments => _isLoadingAssignments;
   String? get assignmentsError => _assignmentsError;
-  // Helper getters
   int get studentsCount => _students.length;
-  // Since we're only getting enrolled students, these will be simplified
   List<Student> get enrolledStudents => _students; // All students are enrolled now
   List<Student> get pendingStudents => []; // Empty since we only get enrolled
-  List<Student> get rejectedStudents => []; // Empty since we only get enrolled// Load class detail
+  List<Student> get rejectedStudents => []; // Empty since we only get enrolled
+
+  // Load class detail
   Future<void> loadClassDetail(int classId) async {
     _isLoadingClassDetail = true;
     _classDetailError = null;
@@ -63,7 +63,9 @@ class ClassProvider extends ChangeNotifier {
       _isLoadingClassDetail = false;
       notifyListeners();
     }
-  }  // Load students in class (only enrolled students)
+  }  
+  
+  // Load students in class (only enrolled students)
   Future<void> loadStudents(int classId) async {
     _isLoadingStudents = true;
     _studentsError = null;

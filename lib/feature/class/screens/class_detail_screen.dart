@@ -332,6 +332,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen>
       ),
     );
   }
+  
   Widget _buildQuickStatCard(String title, String value, IconData icon, Color color) {
     return Card(
       elevation: 1,

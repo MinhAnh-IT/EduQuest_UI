@@ -7,10 +7,11 @@ import '../models/class_detail.dart';
 import '../models/student.dart';
 
 class ClassService {
-  final String baseUrl = ApiConfig.baseUrl;  Future<ApiResponse<ClassDetail>> getClassDetail(int classId) async {
+  final String baseUrl = ApiConfig.baseUrl;
+  Future<ApiResponse<ClassDetail>> getClassDetail(int classId) async {
     try {
       final url = Uri.parse('$baseUrl/classes/$classId/detail');
-      
+
       final response = await http.get(
         url,
         headers: {
@@ -21,7 +22,8 @@ class ClassService {
       if (response.statusCode != 200) {
         return ApiResponse<ClassDetail>(
           status: StatusCode.internalServerError,
-          message: 'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
+          message:
+              'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
         );
       }
 
@@ -37,9 +39,10 @@ class ClassService {
             message: 'No class data received from server',
           );
         }
-        
-        final classDetail = ClassDetail.fromApiResponse(classDetailData as Map<String, dynamic>);
-        
+
+        final classDetail = ClassDetail.fromApiResponse(
+            classDetailData as Map<String, dynamic>);
+
         return ApiResponse<ClassDetail>(
           status: StatusCode.ok,
           message: message,
@@ -53,7 +56,9 @@ class ClassService {
       } else {
         return ApiResponse<ClassDetail>(
           status: StatusCode.internalServerError,
-          message: message.isNotEmpty ? message : 'Không thể lấy thông tin chi tiết lớp học',
+          message: message.isNotEmpty
+              ? message
+              : 'Không thể lấy thông tin chi tiết lớp học',
         );
       }
     } catch (e) {
@@ -63,10 +68,11 @@ class ClassService {
       );
     }
   }
-    Future<ApiResponse<List<Student>>> getStudentsInClass(int classId) async {
+
+  Future<ApiResponse<List<Student>>> getStudentsInClass(int classId) async {
     try {
       final url = Uri.parse('$baseUrl/classes/$classId/students/enrolled');
-      
+
       final response = await http.get(
         url,
         headers: {
@@ -77,7 +83,8 @@ class ClassService {
       if (response.statusCode != 200) {
         return ApiResponse<List<Student>>(
           status: StatusCode.internalServerError,
-          message: 'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
+          message:
+              'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}',
         );
       }
 
@@ -95,11 +102,12 @@ class ClassService {
             data: [],
           );
         }
-        
+
         final students = (studentsData as List<dynamic>)
-            .map((studentJson) => Student.fromJson(studentJson as Map<String, dynamic>))
+            .map((studentJson) =>
+                Student.fromJson(studentJson as Map<String, dynamic>))
             .toList();
-        
+
         return ApiResponse<List<Student>>(
           status: StatusCode.ok,
           message: message,
@@ -113,7 +121,8 @@ class ClassService {
       } else {
         return ApiResponse<List<Student>>(
           status: StatusCode.internalServerError,
-          message: message.isNotEmpty ? message : 'Không thể lấy danh sách học sinh',
+          message:
+              message.isNotEmpty ? message : 'Không thể lấy danh sách học sinh',
         );
       }
     } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../config/api_config.dart';
 import '../models/student.dart';
 import '../providers/class_provider.dart';
 
@@ -213,7 +214,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
         leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
           backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
-              ? NetworkImage(student.avatarUrl!)
+              ? NetworkImage(ApiConfig.serverUrl + student.avatarUrl!)
               : null,
           child: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
               ? null

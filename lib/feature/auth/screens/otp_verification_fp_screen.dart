@@ -231,20 +231,6 @@ class _OTPVerificationFPScreenState extends State<OTPVerificationFPScreen> {
                           text: 'Xác nhận OTP',
                           isLoading: _isLoading,
                         ),
-                        const SizedBox(height: 20),
-                        TextButton(
-                          onPressed: () {
-                            // TODO: Implement resend OTP
-                          },
-                          child: Text(
-                            'Gửi lại mã OTP',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

@@ -78,7 +78,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(AppStrings.resetPasswordTitle),
+        title: const Text('Đặt lại mật khẩu'),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.primary,
@@ -148,7 +148,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         const SizedBox(height: 30),
                         CustomButton(
                           onPressed: _resetPassword,
-                          text: AppStrings.resetPasswordTitle,
+                          text: 'Đặt lại mật khẩu',
                           isLoading: _isLoading,
                         ),
                       ],
@@ -182,7 +182,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ),
           const SizedBox(height: 24),
           const Text(
-            AppStrings.createNewPassword,
+            'Tạo mật khẩu mới',
             style: AppStyles.headingStyle,
             textAlign: TextAlign.center,
           ),
@@ -190,7 +190,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              AppStrings.newPasswordHint,
+              'Mật khẩu mới của bạn phải khác với mật khẩu đã sử dụng trước đó.',
               textAlign: TextAlign.center,
               style: AppStyles.bodyStyle,
             ),

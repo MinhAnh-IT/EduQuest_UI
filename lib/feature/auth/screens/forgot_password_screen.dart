@@ -116,7 +116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           const SizedBox(height: 30),
           CustomButton(
             onPressed: _isLoading ? null : _resetPassword,
-            text: AppStrings.sendOTP,
+            text: 'Gửi mã OTP',
             isLoading: _isLoading,
           ),
           const SizedBox(height: 30),
@@ -129,7 +129,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildHeader() {
     return Container(
       alignment: Alignment.center,
-      child: Column(        children: [
+      child: Column(
+        children: [
           const Icon(
             Icons.lock_reset_outlined,
             size: 80,
@@ -137,7 +138,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           const SizedBox(height: 20),
           const Text(
-            AppStrings.forgotPasswordTitle,
+            'Quên mật khẩu',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -145,14 +146,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              AppStrings.enterUsername,
+              'Vui lòng nhập tên đăng nhập để nhận mã OTP đặt lại mật khẩu.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Color(0xFF757575),
                 height: 1.4,
               ),
             ),
@@ -165,14 +166,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildLoginLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [        Text(
-          AppStrings.rememberPassword,
-          style: TextStyle(color: Colors.grey[600]),
+      children: [
+        const Text(
+          'Đã nhớ mật khẩu? ',
+          style: TextStyle(color: Color(0xFF757575)),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text(
-            AppStrings.backToLogin,
+            'Quay lại đăng nhập',
             style: TextStyle(
               color: Colors.blue,
               fontWeight: FontWeight.bold,
@@ -194,7 +196,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         const SizedBox(height: 40),
         CustomButton(
           onPressed: _goToOTPScreen,
-          text: 'Nhập OTP',
+          text: 'Nhập mã OTP',
         ),
       ],
     );
@@ -206,7 +208,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       decoration: BoxDecoration(
         color: Colors.green[50],
         shape: BoxShape.circle,
-      ),      child: const Icon(
+      ),
+      child: const Icon(
         Icons.sms_outlined,
         size: 60,
         color: Colors.green,
@@ -218,7 +221,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       children: [
         const Text(
-          'OTP Sent!',
+          'Đã gửi mã OTP!',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -226,14 +229,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
           child: Text(
-            'Mã OTP đã được gửi để xác minh tên đăng nhập của bạn.',
+            'Mã OTP đã được gửi đến email hoặc số điện thoại của bạn. Vui lòng kiểm tra và nhập mã để tiếp tục.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[600],
+              color: Color(0xFF757575),
               height: 1.4,
             ),
           ),

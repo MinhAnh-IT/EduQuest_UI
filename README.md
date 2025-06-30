@@ -1,4 +1,4 @@
-# eduquest_ui
+# register_login
 
 A new Flutter project.
 

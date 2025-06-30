@@ -1,0 +1,24 @@
+### 10. Get Enrolled Students in Class API
+
+**Endpoint:** `GET /api/classes/{classId}/students/enrolled`
+
+**Description:** Retrieves list of students who are enrolled (approved) in a specific class
+
+**Path Parameters:**
+- `classId`: Class ID (number)
+**Response:**
+```json
+{
+    "code": 200,
+    "message": "Successfully retrieved enrolled students in class",
+    "data": [
+        {
+            "studentId": 1,
+            "studentCode": "STU001",
+            "studentName": "Nguyễn Phúc Sơn",
+            "studentEmail": "nguyenphucson93@gmail.com",
+            "avatarUrl": "http://192.168.1.2:8080/uploads/1750758595037_scaled_download.png",
+            "enrollmentStatus": "ENROLLED"
+        }
+    ]
+}

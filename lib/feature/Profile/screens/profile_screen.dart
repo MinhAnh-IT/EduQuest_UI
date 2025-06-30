@@ -129,8 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: ClipOval(
                       child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                          ? Image.network(
-                        ApiConfig.serverUrl + profile.avatarUrl!,
+                          ? Image.network(profile.avatarUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],

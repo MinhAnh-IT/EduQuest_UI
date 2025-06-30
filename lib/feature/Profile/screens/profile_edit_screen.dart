@@ -7,8 +7,6 @@ import 'package:edu_quest/shared/theme/app_theme.dart';
 import 'package:edu_quest/shared/utils/validators.dart';
 import 'package:edu_quest/shared/widgets/custom_app_bar.dart';
 
-import '../../../config/api_config.dart';
-
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({Key? key}) : super(key: key);
 

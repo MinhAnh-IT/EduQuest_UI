@@ -214,7 +214,7 @@ class _MemberListScreenState extends State<MemberListScreen> {
         leading: CircleAvatar(
           backgroundColor: Colors.cyan[100],
           backgroundImage: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
-              ? NetworkImage(ApiConfig.serverUrl + student.avatarUrl!)
+              ? NetworkImage(student.avatarUrl!)
               : null,
           child: student.avatarUrl != null && student.avatarUrl!.isNotEmpty
               ? null

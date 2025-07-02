@@ -404,8 +404,40 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                       ),
                     ),
                   ),
+
+// Thông báo quá hạn
+                if (assignment.isOverdue && !assignment.isSubmitted)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.warning, color: Colors.red, size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Bài kiểm tra đã quá hạn nộp',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 if (!assignment.isNotStartedYet) ...[
-                  if (!assignment.isSubmitted && !assignment.isExpired)
+                  // Nút bắt đầu làm bài
+                  if (!assignment.isSubmitted && !assignment.isOverdue)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -439,7 +471,9 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                         ),
                       ),
                     ),
+
                   const SizedBox(height: 16),
+
                   Row(
                     children: [
                       Expanded(
@@ -449,10 +483,11 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                               : (assignment.isSubmitted || assignment.isExpired)
                               ? () {
                             Navigator.pushNamed(
-                                context, '/discussion-list',
-                                arguments: {
-                                  'exerciseId': assignment.id,
-                                });
+                              context, '/discussion-list',
+                              arguments: {
+                                'exerciseId': assignment.id,
+                              },
+                            );
                           }
                               : null,
                           icon: const Icon(Icons.comment),
@@ -470,10 +505,12 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                               ? null
                               : (assignment.isSubmitted || assignment.isExpired)
                               ? () {
-                            Navigator.pushNamed(context, '/result',
-                                arguments: {
-                                  'exerciseId': assignment.id,
-                                });
+                            Navigator.pushNamed(
+                              context, '/result',
+                              arguments: {
+                                'exerciseId': assignment.id,
+                              },
+                            );
                           }
                               : null,
                           icon: const Icon(Icons.visibility),

@@ -51,16 +51,27 @@ class Assignment {
 
   bool get isNotStarted => status == null || status == 'NOT_STARTED' || status == 'pending';
 
-  bool get isExpired => status == 'EXPIRED' || isOverdue;
+  bool get isInProgress => status == 'IN_PROGRESS';
 
-  bool get isOverdue => DateTime.now().isAfter(endAt) && (status == null || status == 'pending');
+  bool get isOverdue => DateTime.now().isAfter(endAt);
+
+  bool get isExpired => status == 'EXPIRED' || isOverdue;
 
   bool get isDisabled => isNotStarted && !isExpired;
 
   bool get isNotStartedYet => DateTime.now().isBefore(startAt);
 
+  bool get canStart => !isSubmitted && !isOverdue && !isNotStartedYet;
+
+  String get actualStatus {
+    if (isOverdue && status != 'SUBMITTED') {
+    }
+    return status ?? 'NOT_STARTED';
+  }
+
   Color get statusColor {
-    switch (status) { 
+    final actualStatus = this.actualStatus;
+    switch (actualStatus) {
       case 'IN_PROGRESS':
         return Colors.blue;
       case 'SUBMITTED':
@@ -73,7 +84,8 @@ class Assignment {
   }
 
   String get statusText {
-    switch (status) {
+    final actualStatus = this.actualStatus;
+    switch (actualStatus) {
       case 'IN_PROGRESS':
         return 'Đang làm';
       case 'SUBMITTED':

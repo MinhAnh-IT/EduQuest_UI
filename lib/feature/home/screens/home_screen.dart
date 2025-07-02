@@ -325,7 +325,7 @@ class _HomeTabState extends State<HomeTab> {
                                 response.status.code == 200 ||
                                 response.status.code == 201) {
                               navigator.pop(); 
-                              if (mounted) {
+                              if (response.data != null) {
                                 scaffoldMessenger.showSnackBar(
                                   const SnackBar(
                                     content: Text(

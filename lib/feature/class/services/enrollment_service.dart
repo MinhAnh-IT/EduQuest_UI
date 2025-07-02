@@ -17,22 +17,28 @@ class EnrollmentService {
         auth: true,
       );
 
+      final responseData = json.decode(response.body);
+      
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = json.decode(response.body);
-        if (responseData['data'] != null) {
+        // Thành công - kiểm tra data type
+        final data = responseData['data'];
+        
+        if (data != null && data is Map<String, dynamic>) {
+          // Data là object Enrollment
           return ApiResponse<Enrollment>(
-            status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
-            message: responseData['message'] ?? 'Thành công',
-            data: Enrollment.fromJson(responseData['data']),
+            status: StatusCode.ok,
+            message: responseData['message'] ?? 'Tham gia lớp học thành công',
+            data: Enrollment.fromJson(data),
           );
         } else {
+          // Data là boolean hoặc null (trường hợp pending approval)
           return ApiResponse<Enrollment>(
-            status: StatusCode.fromCode(responseData['code']) ?? StatusCode.ok,
-            message: responseData['message'] ?? 'Thành công',
+            status: StatusCode.ok,
+            message: responseData['message'] ?? 'Tham gia lớp học thành công',
           );
         }
       } else {
-        final responseData = json.decode(response.body);
+        // Lỗi từ server
         final rawMessage = responseData['message'] ?? 'Đã xảy ra lỗi';
         final translatedMessage = ConvertStatus.translateErrorMessage(rawMessage);
         return ApiResponse<Enrollment>(
@@ -43,7 +49,7 @@ class EnrollmentService {
     } catch (e) {
       return ApiResponse<Enrollment>(
         status: StatusCode.internalServerError,
-        message: 'Đã xảy ra lỗi không mong muốn',
+        message: 'Đã xảy ra lỗi không mong muốn: ${e.toString()}',
       );
     }
   }

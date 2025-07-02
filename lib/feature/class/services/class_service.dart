@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:edu_quest/core/network/api_client.dart';
 import 'package:http/http.dart' as http;
 import '../../../config/api_config.dart';
 import '../../auth/models/api_response.dart';
@@ -10,15 +11,9 @@ class ClassService {
   final String baseUrl = ApiConfig.baseUrl;
   Future<ApiResponse<ClassDetail>> getClassDetail(int classId) async {
     try {
-      final url = Uri.parse('$baseUrl/classes/$classId/detail');
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final url = "$baseUrl/classes/$classId/detail";
+      
+      final response = await ApiClient.get(url, auth: true);
       if (response.statusCode != 200) {
         return ApiResponse<ClassDetail>(
           status: StatusCode.internalServerError,
@@ -71,14 +66,9 @@ class ClassService {
 
   Future<ApiResponse<List<Student>>> getStudentsInClass(int classId) async {
     try {
-      final url = Uri.parse('$baseUrl/classes/$classId/students/enrolled');
+      final url = '$baseUrl/classes/$classId/students/enrolled';
 
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
+      final response = await ApiClient.get(url, auth: true);
 
       if (response.statusCode != 200) {
         return ApiResponse<List<Student>>(
